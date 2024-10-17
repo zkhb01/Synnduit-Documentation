@@ -1,0 +1,20 @@
+Synnduit.SynnduitException: An exception occurred during the run; see inner exception for details. ---> System.InvalidOperationException: 
+The specified entity type ('SharePoint.TeamSiteSupportedProgram') could not be found; it may not exist or the name may be ambiguous; see inner exception for details. 
+   ---> System.InvalidOperationException: Sequence contains no matching element
+   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)
+   at Synnduit.Runner.Single[T](IEnumerable`1 collection, String name, Func`2 getName, String exceptionMessageFormat) in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 203
+   --- End of inner exception stack trace ---
+   at Synnduit.Runner.Single[T](IEnumerable`1 collection, String name, Func`2 getName, String exceptionMessageFormat) in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 209
+   at Synnduit.Runner.ContextFactory.GetEntityType(String entityTypeName, IEnumerable`1 entityTypes) in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 444
+   at Synnduit.Runner.ContextFactory.CreateContext(IBootstrapper bootstrapper, SegmentConfiguration segmentConfiguration, Int32 segmentIndex, Int32 segmentCount, IDictionary`2 runData) in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 31
+4
+   at Synnduit.Runner.SetupContext(SegmentConfiguration segmentConfiguration, Int32 segmentIndex, Int32 segmentCount, IBootstrapper bootstrapper, ISafeRepository safeRepository) in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 138
+   at Synnduit.Runner.RunSegment(Int32 segmentIndex, Int32 segmentCount, SegmentConfiguration segmentConfiguration, IBootstrapper bootstrapper, ISafeRepository safeRepository) in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 100
+   at Synnduit.Runner.RunSegment(Int32 segmentIndex, Int32 segmentCount, SegmentConfiguration segmentConfiguration) in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 82
+   at Synnduit.Runner.Run() in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 61
+   --- End of inner exception stack trace ---
+   at Synnduit.Runner.Run() in D:\TEMP\Synnduit\src\Synnduit.Core\Runner.cs:line 66
+   at Synnduit.Program.Main(String[] args) in D:\TEMP\Synnduit\src\Synnduit.Console\Program.cs:line 13
+
+Root cause was a compiled mock version was applied to the prod server. 
+Fix: recomplie wtihout MOCK on the conditional Compile
