@@ -9,12 +9,12 @@
       ,[PreviousValue]
       ,[NewValue] -- select *
   FROM [dbo].[EntityValueChange]
-  WHERE [TimeStamp] >  '2000-09-19 10:23:00.9701465 -06:00'   
+  WHERE [TimeStamp] >  '2025-03-12T14:07:29.3313552-06:00'   
   
   --AND EntityType like 'Staff'
   --AND [TimeStamp] < '2023-03-30T23:19:49.4045983-06:00' --and '2020-03-25T18:13:37.1337707-06:00'
   --and ValueName = 'JobId'
- and SourceSystemEntityId like '%0025570%' --or SourceSystemEntityId like 'LDC1051'
+ --and SourceSystemEntityId like '%0025570%' --or SourceSystemEntityId like 'LDC1051'
  --and DestinationSystemEntityId like '95B95264-3017-494A-952F-F1A0BACA82FC'
  --and PreviousValue is null
   --and charindex('''',NewValue)  = 0
