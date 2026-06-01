@@ -1,0 +1,74 @@
+@page "/"
+@rendermode InteractiveServer
+@inject MasteryService Mastery
+@inject LearnerSession Session
+@inject NavigationManager Nav
+
+<PageTitle>Synnduit Tutor — Sign in</PageTitle>
+
+<h1>Synnduit Tutor</h1>
+<p class="lead">Learn how Synnduit works, one concept at a time. Master the foundations, then prove your .NET prerequisites.</p>
+
+<div class="alert alert-secondary py-2">
+    <small><strong>Core preview:</strong> authentication is stubbed — pick or create a learner below.
+    Entra SSO will replace this later.</small>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h4>Continue as</h4>
+        @if (_learners is null)
+        {
+            <p><em>Loading…</em></p>
+        }
+        else if (_learners.Count == 0)
+        {
+            <p class="text-muted">No learners yet — create one on the right.</p>
+        }
+        else
+        {
+            <div class="list-group">
+                @foreach (var l in _learners)
+                {
+                    <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                            @onclick="() => SignIn(l)">
+                        <span>@l.DisplayName</span>
+                        <small class="text-muted">@l.ExternalId</small>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="col-md-6">
+        <h4>New learner</h4>
+        <div class="mb-2">
+            <label class="form-label">Display name</label>
+            <input class="form-control" @bind="_newName" @bind:event="oninput" placeholder="e.g. Eason Zhang" />
+        </div>
+        <button class="btn btn-primary" @onclick="CreateAsync" disabled="@string.IsNullOrWhiteSpace(_newName)">
+            Create &amp; start
+        </button>
+    </div>
+</div>
+
+@code {
+    private List<Learner>? _learners;
+    private string _newName = "";
+
+    protected override async Task OnInitializedAsync() => _learners = await Mastery.GetLearnersAsync();
+
+    private void SignIn(Learner l)
+    {
+        Session.SignIn(l.Id, l.DisplayName);
+        Nav.NavigateTo("/dashboard");
+    }
+
+    private async Task CreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newName)) return;
+        var ext = "stub:" + _newName.Trim().ToLowerInvariant().Replace(' ', '.');
+        var learner = await Mastery.GetOrCreateLearnerAsync(_newName.Trim(), ext);
+        SignIn(learner);
+    }
+}

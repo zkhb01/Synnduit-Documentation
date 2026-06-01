@@ -1,0 +1,267 @@
+@page "/quiz/{ConceptId}"
+@rendermode InteractiveServer
+@inject CurriculumStore Store
+@inject LearnerSession Session
+@inject MasteryService Mastery
+@inject ScoringService Scoring
+@inject IRemediationService Remediation
+@inject NavigationManager Nav
+
+<PageTitle>Quiz: @(_concept?.Name ?? ConceptId) — Synnduit Tutor</PageTitle>
+
+@if (!Session.IsSignedIn)
+{
+    <RedirectToHome />
+}
+else if (_concept is null)
+{
+    <p class="text-danger">Concept <code>@ConceptId</code> not found.</p>
+    <a href="/dashboard">← My path</a>
+}
+else
+{
+    <div class="mb-2"><a href="@($"/lesson/{_concept.Id}")" class="text-decoration-none">← Lesson</a></div>
+    <h2>Check: @_concept.Id — @_concept.Name</h2>
+    <p class="text-muted">Pass mark: @((int)(_concept.MasteryThreshold * 100))%. @_items.Count question(s).</p>
+
+    @if (_result is null)
+    {
+        @for (var qi = 0; qi < _items.Count; qi++)
+        {
+            var item = _items[qi];
+            var n = qi + 1;
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p><strong>@n.</strong> @item.Stem
+                        <span class="badge bg-light text-dark ms-1">@item.Difficulty</span>
+                        @if (!item.IsAutoScored) { <span class="badge bg-info text-dark">self-graded</span> }
+                    </p>
+
+                    @switch (item.Type)
+                    {
+                        case "mc":
+                            @foreach (var o in item.Options!)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="@item.Id"
+                                           id="@(item.Id)_@o.Id" checked="@(_single.GetValueOrDefault(item.Id) == o.Id)"
+                                           @onchange="() => _single[item.Id] = o.Id" />
+                                    <label class="form-check-label" for="@(item.Id)_@o.Id">@o.Text</label>
+                                </div>
+                            }
+                            break;
+
+                        case "multi":
+                            @foreach (var o in item.Options!)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox"
+                                           id="@(item.Id)_@o.Id" checked="@(_multi.GetValueOrDefault(item.Id)?.Contains(o.Id) ?? false)"
+                                           @onchange="e => ToggleMulti(item.Id, o.Id, (bool)e.Value!)" />
+                                    <label class="form-check-label" for="@(item.Id)_@o.Id">@o.Text</label>
+                                </div>
+                            }
+                            break;
+
+                        case "order":
+                            <p class="small text-muted mb-1">Assign each line its position (1 = first).</p>
+                            @foreach (var o in item.Options!)
+                            {
+                                <div class="d-flex align-items-center mb-1">
+                                    <select class="form-select form-select-sm me-2" style="width:5rem"
+                                            @onchange="e => SetRank(item.Id, o.Id, e.Value?.ToString())">
+                                        <option value="">–</option>
+                                        @for (var r = 1; r <= item.Options!.Count; r++)
+                                        {
+                                            <option value="@r" selected="@(_ranks.GetValueOrDefault(item.Id)?.GetValueOrDefault(o.Id) == r)">@r</option>
+                                        }
+                                    </select>
+                                    <span>@o.Text</span>
+                                </div>
+                            }
+                            break;
+
+                        default: // short / scenario / classify / match — self-graded
+                            <textarea class="form-control mb-2" rows="3" placeholder="Your answer…"
+                                      @bind="_text[item.Id]"></textarea>
+                            <details class="mb-2">
+                                <summary class="small">Show sample answer &amp; rubric</summary>
+                                @if (item.SampleAnswer is not null)
+                                {
+                                    <p class="mt-2 mb-1"><em>@item.SampleAnswer</em></p>
+                                }
+                                @if (item.Rubric is { Count: > 0 })
+                                {
+                                    <ul class="small mb-0">@foreach (var r in item.Rubric) { <li>@r</li> }</ul>
+                                }
+                            </details>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <input type="radio" class="btn-check" name="@(item.Id)_self" id="@(item.Id)_yes"
+                                       checked="@(_self.GetValueOrDefault(item.Id) == true)"
+                                       @onchange="() => _self[item.Id] = true" />
+                                <label class="btn btn-outline-success" for="@(item.Id)_yes">I covered the rubric</label>
+                                <input type="radio" class="btn-check" name="@(item.Id)_self" id="@(item.Id)_no"
+                                       checked="@(_self.GetValueOrDefault(item.Id) == false)"
+                                       @onchange="() => _self[item.Id] = false" />
+                                <label class="btn btn-outline-secondary" for="@(item.Id)_no">Not quite</label>
+                            </div>
+                            break;
+                    }
+                </div>
+            </div>
+        }
+
+        <button class="btn btn-primary" @onclick="SubmitAsync" disabled="@_submitting">Submit answers</button>
+    }
+    else
+    {
+        <div class="alert @(_result.Passed ? "alert-success" : "alert-warning")">
+            <h4 class="mb-1">@((int)Math.Round(_result.Score * 100))% — @(_result.Passed ? "Mastered! ✔" : "Not yet")</h4>
+            <div>@(_result.Items.Count(r => r.Correct)) of @_result.Items.Count correct (pass @((int)(_concept.MasteryThreshold * 100))%).</div>
+            @if (_escalated)
+            {
+                <div class="mt-2"><strong>Heads up:</strong> after repeated attempts, this concept is flagged for a mentor (@Store.Graph.MasteryModel.EscalationTarget).</div>
+            }
+        </div>
+
+        @foreach (var r in _result.Items)
+        {
+            <div class="card mb-2 border-@(r.Correct ? "success" : "danger")">
+                <div class="card-body py-2">
+                    <div>@(r.Correct ? "✔" : "✗") <strong>@r.Item.Stem</strong>
+                        @if (r.WasModelScored) { <span class="badge bg-info text-dark">self-graded</span> }
+                    </div>
+                    @if (!string.IsNullOrEmpty(r.Item.Explanation))
+                    {
+                        <div class="small text-muted mt-1">@r.Item.Explanation</div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (_remediation is not null)
+        {
+            <div class="card border-warning mt-3">
+                <div class="card-header bg-warning-subtle">
+                    @_remediation.Heading
+                    <span class="badge bg-secondary ms-2">@(_remediation.IsLive ? "Claude" : "guided")</span>
+                </div>
+                <div class="card-body">
+                    <p>@_remediation.Body</p>
+                    @if (_remediation.MisconceptionNotes.Count > 0)
+                    {
+                        <p class="mb-1"><strong>About the answers you picked:</strong></p>
+                        <ul>@foreach (var note in _remediation.MisconceptionNotes) { <li>@note</li> }</ul>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="mt-3 d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="/dashboard">← My path</a>
+            @if (!_result.Passed)
+            {
+                <a class="btn btn-primary" href="@($"/lesson/{_concept.Id}")">Re-read lesson</a>
+                <button class="btn btn-outline-primary" @onclick="Retry">Try fresh questions</button>
+            }
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public string ConceptId { get; set; } = "";
+
+    private Concept? _concept;
+    private List<Item> _items = new();
+    private bool _submitting;
+    private bool _escalated;
+
+    private readonly Dictionary<string, string> _single = new();
+    private readonly Dictionary<string, HashSet<string>> _multi = new();
+    private readonly Dictionary<string, Dictionary<string, int>> _ranks = new();
+    private readonly Dictionary<string, string> _text = new();
+    private readonly Dictionary<string, bool?> _self = new();
+
+    private QuizResult? _result;
+    private RemediationResult? _remediation;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!Session.IsSignedIn) return;   // markup redirects to Home
+        _concept = Store.Graph.FindConcept(ConceptId);
+        if (_concept is null) return;
+        await LoadItemsAsync();
+    }
+
+    private async Task LoadItemsAsync()
+    {
+        var m = await Mastery.GetMasteryAsync(Session.LearnerId!.Value, _concept!.Id);
+        var seen = new HashSet<string>((m?.SeenItemIdsCsv ?? "")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        _items = Store.SelectItems(_concept.ItemPoolId, seen, 5);
+        ResetInputs();
+    }
+
+    private void ResetInputs()
+    {
+        _single.Clear(); _multi.Clear(); _ranks.Clear(); _text.Clear(); _self.Clear();
+        _result = null; _remediation = null; _escalated = false;
+    }
+
+    private void ToggleMulti(string itemId, string optId, bool on)
+    {
+        var set = _multi.TryGetValue(itemId, out var s) ? s : _multi[itemId] = new();
+        if (on) set.Add(optId); else set.Remove(optId);
+    }
+
+    private void SetRank(string itemId, string optId, string? value)
+    {
+        var map = _ranks.TryGetValue(itemId, out var m) ? m : _ranks[itemId] = new();
+        if (int.TryParse(value, out var r)) map[optId] = r; else map.Remove(optId);
+    }
+
+    private async Task SubmitAsync()
+    {
+        _submitting = true;
+        var responses = new Dictionary<string, ItemResponse>();
+        foreach (var item in _items)
+        {
+            var resp = new ItemResponse();
+            switch (item.Type)
+            {
+                case "mc":
+                    if (_single.TryGetValue(item.Id, out var one)) resp.SelectedOptionIds.Add(one);
+                    break;
+                case "multi":
+                    if (_multi.TryGetValue(item.Id, out var set)) resp.SelectedOptionIds.AddRange(set);
+                    break;
+                case "order":
+                    if (_ranks.TryGetValue(item.Id, out var ranks))
+                        resp.OrderedOptionIds = ranks.OrderBy(kv => kv.Value).Select(kv => kv.Key).ToList();
+                    break;
+                default:
+                    resp.SelfAssessedCorrect = _self.GetValueOrDefault(item.Id);
+                    break;
+            }
+            responses[item.Id] = resp;
+        }
+
+        _result = Scoring.Score(_items, responses, _concept!.MasteryThreshold);
+        var mastery = await Mastery.RecordAttemptAsync(
+            Session.LearnerId!.Value, _concept, _result, _items.Select(i => i.Id));
+        _escalated = mastery.EscalatedToMentor;
+
+        if (!_result.Passed)
+        {
+            var lesson = Store.GetLesson(_concept.Id);
+            _remediation = await Remediation.RemediateAsync(_concept, lesson, _result.WrongItems, responses);
+        }
+
+        _submitting = false;
+    }
+
+    private async Task Retry()
+    {
+        await LoadItemsAsync();
+    }
+}

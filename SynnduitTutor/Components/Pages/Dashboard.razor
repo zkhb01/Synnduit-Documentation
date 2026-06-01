@@ -1,0 +1,101 @@
+@page "/dashboard"
+@rendermode InteractiveServer
+@inject LearnerSession Session
+@inject MasteryService Mastery
+@inject GatingEngine Gating
+@inject NavigationManager Nav
+
+<PageTitle>My path — Synnduit Tutor</PageTitle>
+
+@if (!Session.IsSignedIn)
+{
+    <RedirectToHome />
+}
+else if (_levels is null)
+{
+    <p><em>Loading your path…</em></p>
+}
+else
+{
+    <h1>@Session.DisplayName's path</h1>
+    <p class="text-muted">Master every concept in a level to clear its gate. Locked concepts open once their prerequisites are done.</p>
+
+    @foreach (var lv in _levels)
+    {
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>
+                    <strong>@lv.Level.Id — @lv.Level.Name</strong>
+                    @if (lv.Level.IsPlacement)
+                    {
+                        <span class="badge bg-info text-dark ms-2">placement</span>
+                    }
+                </span>
+                <span>
+                    @if (lv.Complete)
+                    {
+                        <span class="badge bg-success">gate cleared</span>
+                    }
+                    else if (!lv.Unlocked)
+                    {
+                        <span class="badge bg-secondary">locked</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-light text-dark">@lv.Concepts.Count(c => c.Status is ConceptStatus.Mastered or ConceptStatus.Skipped)/@lv.Concepts.Count done</span>
+                    }
+                </span>
+            </div>
+            <div class="list-group list-group-flush">
+                @foreach (var cv in lv.Concepts)
+                {
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="me-2">@StatusIcon(cv.Status)</span>
+                            <strong>@cv.Concept.Id</strong> — @cv.Concept.Name
+                            @if (cv.Critical)
+                            {
+                                <span class="badge bg-warning text-dark ms-2" title="Synnduit-critical concept">★ critical</span>
+                            }
+                            @if (cv.Attempts > 0)
+                            {
+                                <small class="text-muted ms-2">best @((int)Math.Round(cv.BestScore * 100))%</small>
+                            }
+                        </div>
+                        <div>
+                            @if (cv.Status == ConceptStatus.Locked)
+                            {
+                                <span class="text-muted small">needs @string.Join(", ", cv.Concept.Prereqs)</span>
+                            }
+                            else
+                            {
+                                <a class="btn btn-sm btn-outline-primary" href="@($"/lesson/{cv.Concept.Id}")">
+                                    @(cv.Status is ConceptStatus.Mastered or ConceptStatus.Skipped ? "Review" : "Open")
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private IReadOnlyList<LevelView>? _levels;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsSignedIn) return;
+        var map = await Mastery.GetMasteryMapAsync(Session.LearnerId!.Value);
+        _levels = Gating.BuildOverview(map);
+    }
+
+    private static MarkupString StatusIcon(ConceptStatus s) => new(s switch
+    {
+        ConceptStatus.Mastered => "<span title='mastered' style='color:#198754'>✔</span>",
+        ConceptStatus.Skipped  => "<span title='skipped (placement)' style='color:#0dcaf0'>⏭</span>",
+        ConceptStatus.Available => "<span title='available' style='color:#0d6efd'>○</span>",
+        _ => "<span title='locked' style='color:#adb5bd'>🔒</span>"
+    });
+}
