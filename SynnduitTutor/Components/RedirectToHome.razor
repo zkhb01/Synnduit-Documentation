@@ -3,5 +3,11 @@
 <p><em>Please sign in first…</em></p>
 
 @code {
-    protected override void OnInitialized() => Nav.NavigateTo("/", replace: true);
+    // Redirect only once the component is interactive. Doing this in OnInitialized would run
+    // during static prerender, where NavigateTo throws NavigationException.
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            Nav.NavigateTo("/", replace: true);
+    }
 }
