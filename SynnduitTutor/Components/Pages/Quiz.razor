@@ -199,6 +199,9 @@ else
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
         _items = Store.SelectItems(_concept.ItemPoolId, seen, 5);
         ResetInputs();
+        // Seed text entries so the two-way @bind getter on model-item textareas never indexes a missing key.
+        foreach (var it in _items)
+            _text[it.Id] = "";
     }
 
     private void ResetInputs()
