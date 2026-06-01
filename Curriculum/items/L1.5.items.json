@@ -1,0 +1,99 @@
+{
+  "poolId": "L1.5.items",
+  "conceptId": "L1.5",
+  "conceptName": "StarBridge (bookkeeping DB)",
+  "items": [
+    {
+      "id": "L1.5.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is StarBridge?",
+      "options": [
+        { "id": "a", "text": "The destination database where synced data lands" },
+        { "id": "b", "text": "The SQL database where Synnduit stores its bookkeeping — mappings, transactions, value changes, and exceptions" },
+        { "id": "c", "text": "The source system Synnduit reads from" },
+        { "id": "d", "text": "The .NET library that contains the feeds and sinks" }
+      ],
+      "correct": ["b"],
+      "explanation": "StarBridge is Synnduit's separate bookkeeping database — its memory of mappings, outcomes, change history, and errors.",
+      "misconceptions": {
+        "a": "The destination holds the synced data; StarBridge holds Synnduit's records about that data. They are separate databases.",
+        "c": "Sources are external systems; StarBridge is internal to Synnduit."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.5.q2",
+      "type": "multi",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which of the following does StarBridge store? (Select all that apply.)",
+      "options": [
+        { "id": "a", "text": "Mappings (source ID ↔ destination ID)" },
+        { "id": "b", "text": "Per-record transaction outcomes" },
+        { "id": "c", "text": "Field-level value changes" },
+        { "id": "d", "text": "Exceptions encountered during processing" }
+      ],
+      "correct": ["a", "b", "c", "d"],
+      "explanation": "All four. StarBridge records mappings, transactions (EntityTransaction), value changes (EntityValueChange), and exceptions (EntityException).",
+      "source": "README.md#6-where-to-look-first-when-something-goes-wrong"
+    },
+    {
+      "id": "L1.5.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How many StarBridge databases does a single Run use?",
+      "options": [
+        { "id": "a", "text": "One per Run" },
+        { "id": "b", "text": "One shared across all Runs in the organization" },
+        { "id": "c", "text": "One per entity type" },
+        { "id": "d", "text": "One per source record" }
+      ],
+      "correct": ["a"],
+      "explanation": "There is one StarBridge database per Run. CCSD's Sync-SRC-DDH has three Runs, hence three StarBridge DBs.",
+      "misconceptions": {
+        "b": "Each Run gets its own StarBridge so its bookkeeping stays isolated.",
+        "c": "A StarBridge DB covers a Run's whole set of entities, not one DB per entity type."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.5.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You need to find, for one staff record, every field that changed and when. Which StarBridge table do you query?",
+      "options": [
+        { "id": "a", "text": "EntityException" },
+        { "id": "b", "text": "EntityValueChange" },
+        { "id": "c", "text": "EntityTransaction" },
+        { "id": "d", "text": "The destination's Staff table" }
+      ],
+      "correct": ["b"],
+      "explanation": "EntityValueChange holds field-level diffs — which value changed, from what to what, and when.",
+      "misconceptions": {
+        "c": "EntityTransaction holds the per-record outcome, not the field-level diffs.",
+        "a": "EntityException holds errors, not change history."
+      },
+      "source": "README.md#6-where-to-look-first-when-something-goes-wrong"
+    },
+    {
+      "id": "L1.5.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Where do delta detection's \"last run's recorded state\" and a mapping physically live?",
+      "options": [
+        { "id": "a", "text": "In the destination database" },
+        { "id": "b", "text": "In StarBridge" },
+        { "id": "c", "text": "In the source system" },
+        { "id": "d", "text": "In the appsettings.json file" }
+      ],
+      "correct": ["b"],
+      "explanation": "Both the recorded prior state (for diffing) and the source↔destination mappings are rows in StarBridge — that's what makes delta detection and non-duplication possible.",
+      "source": "README.md#2-the-mental-model"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "poolId": "L0.E1.items",
+  "conceptId": "L0.E1",
+  "conceptName": "Querying a source with EF",
+  "items": [
+    {
+      "id": "L0.E1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "When does `context.Staff.Where(s => s.Active)` actually execute against the database?",
+      "options": [
+        { "id": "a", "text": "Immediately, on the line where it is written" },
+        { "id": "b", "text": "When the query is enumerated — e.g. .ToList(), foreach, .First()" },
+        { "id": "c", "text": "When the DbContext is created" },
+        { "id": "d", "text": "Never — Where is client-side only" }
+      ],
+      "correct": ["b"],
+      "explanation": "LINQ-to-Entities uses deferred execution: the query runs when you enumerate it (ToList/foreach/First), not when it is defined.",
+      "misconceptions": {
+        "a": "Defining the query only builds it; enumeration triggers the SQL."
+      },
+      "source": "https://learn.microsoft.com/ef/core/querying/"
+    },
+    {
+      "id": "L0.E1.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "In a feed's `LoadEntities()`, what is the role of `.Select(s => new Staff { ... })`?",
+      "options": [
+        { "id": "a", "text": "It deletes rows from the source" },
+        { "id": "b", "text": "It projects each source row into a Staff POCO" },
+        { "id": "c", "text": "It writes the Staff records to the destination" },
+        { "id": "d", "text": "It opens the database connection" }
+      ],
+      "correct": ["b"],
+      "explanation": "The Select projects source rows into the entity POCO type the feed returns as its snapshot.",
+      "misconceptions": {
+        "c": "Writing to the destination is the sink's job; the feed only reads and projects."
+      },
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L0.E1.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Why does `StaffFeed.LoadEntities()` call `.ToList()` at the end of the query?",
+      "options": [
+        { "id": "a", "text": "To materialize the results (run the SQL) and return a concrete snapshot collection" },
+        { "id": "b", "text": "To delete the DbContext" },
+        { "id": "c", "text": "To sort the records alphabetically" },
+        { "id": "d", "text": "It is optional and has no effect" }
+      ],
+      "correct": ["a"],
+      "explanation": "ToList() forces enumeration, executing the query and producing an in-memory collection — the snapshot the feed returns.",
+      "misconceptions": {
+        "d": "Without materializing, the query could execute lazily after the context is disposed, causing errors."
+      },
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L0.E1.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Why is it a good idea to materialize a query (`.ToList()`) before doing complex C# transformations on the results?",
+      "rubric": [
+        "EF tries to translate LINQ to SQL; complex/unsupported C# inside the query can fail to translate or run inefficiently",
+        "Materializing first brings the rows into memory so subsequent C# runs client-side (and after that the context can be safely disposed)"
+      ],
+      "sampleAnswer": "EF translates the query to SQL, and arbitrary C# in the middle either can't be translated or runs server-side unexpectedly. Calling .ToList() first pulls the rows into memory, so any complex transformation runs as plain in-memory C# — and you're not depending on the DbContext still being open.",
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    }
+  ]
+}

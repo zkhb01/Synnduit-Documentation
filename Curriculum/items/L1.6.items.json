@@ -1,0 +1,112 @@
+{
+  "poolId": "L1.6.items",
+  "conceptId": "L1.6",
+  "conceptName": "Mapping (source-to-destination link)",
+  "items": [
+    {
+      "id": "L1.6.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is a mapping in Synnduit?",
+      "options": [
+        { "id": "a", "text": "A transformation that reshapes source fields into destination fields" },
+        { "id": "b", "text": "The persisted link between a source record's ID and the destination record's ID" },
+        { "id": "c", "text": "A configuration file that lists which entities to sync" },
+        { "id": "d", "text": "A diagram of the source and destination systems" }
+      ],
+      "correct": ["b"],
+      "explanation": "A mapping is a stored row in StarBridge linking one source ID to its destination ID — the engine's record that it already created that destination record.",
+      "misconceptions": {
+        "a": "Field transformation happens in the feed/sink; a mapping is specifically the ID-to-ID link.",
+        "c": "That describes the Run/Segment configuration, not a mapping."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.6.q2",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Run 1 creates Staff with source code 12345 in the destination. Run 2 sees source code 12345 again. Why is no duplicate created?",
+      "rubric": [
+        "Run 1 wrote a mapping (12345 ↔ the destination ID) into StarBridge",
+        "Run 2 looks up that mapping, finds the existing destination record, and updates it (or detects no change) instead of creating a new one"
+      ],
+      "sampleAnswer": "Because run 1 stored a mapping linking source 12345 to the destination record it created. On run 2 the engine looks up 12345, finds the mapping, and updates the existing destination record rather than inserting a new one.",
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.6.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Where is a mapping stored?",
+      "options": [
+        { "id": "a", "text": "In the destination database, alongside the synced record" },
+        { "id": "b", "text": "In StarBridge" },
+        { "id": "c", "text": "In the source system" },
+        { "id": "d", "text": "In memory only, for the duration of the run" }
+      ],
+      "correct": ["b"],
+      "explanation": "Mappings are persisted in StarBridge so they survive across runs — that persistence is what makes re-runs update rather than duplicate.",
+      "misconceptions": {
+        "d": "If it were only in memory, the next run would have no record and would duplicate — persistence is the whole point."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.6.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which two POCO attributes tell Synnduit what to store on each side of a mapping?",
+      "options": [
+        { "id": "a", "text": "[EntityProperty] and [DuplicationKey]" },
+        { "id": "b", "text": "[SourceSystemIdentifier] and [DestinationSystemIdentifier]" },
+        { "id": "c", "text": "[EntityType] and [Feed]" },
+        { "id": "d", "text": "[Required] and [NotMapped]" }
+      ],
+      "correct": ["b"],
+      "explanation": "[SourceSystemIdentifier] marks the source-side ID and [DestinationSystemIdentifier] marks the destination-side ID — the two ends of the mapping.",
+      "misconceptions": {
+        "a": "[DuplicationKey] drives deduplication (matching unmapped records), not the stored mapping link."
+      },
+      "source": "README.md#5-a-real-ccsd-example-sync-src-ddh"
+    },
+    {
+      "id": "L1.6.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "For a source record that already has a mapping, how does the engine decide which destination record it corresponds to?",
+      "options": [
+        { "id": "a", "text": "By re-comparing all the field values to every destination record" },
+        { "id": "b", "text": "By looking up the stored mapping (source ID → destination ID)" },
+        { "id": "c", "text": "By asking the user to confirm" },
+        { "id": "d", "text": "By matching on the DuplicationKey" }
+      ],
+      "correct": ["b"],
+      "explanation": "Once a mapping exists, the engine matches by the stored link — a direct lookup, not field comparison.",
+      "misconceptions": {
+        "a": "Field comparison is expensive and unnecessary once the link is known.",
+        "d": "DuplicationKey matching applies only to records that have no mapping yet (deduplication, L1.11)."
+      },
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.6.q6",
+      "type": "short",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Mapping depends on both delta detection (L1.4) and StarBridge (L1.5). Explain how those two concepts come together when run 2 processes a source record that already exists in the destination.",
+      "rubric": [
+        "StarBridge role: the mapping row (and last-run recorded state) is read from StarBridge",
+        "Delta role: after the mapping is found, the engine diffs the snapshot record against the recorded state to decide update vs. no-change",
+        "Result: the existing destination record is updated or left alone — never duplicated"
+      ],
+      "sampleAnswer": "The engine reads the mapping from StarBridge to find the matching destination record, then uses delta detection to compare the snapshot version against last run's recorded state (also in StarBridge). If a field changed it updates that destination record; if not, NoChangesDetected. Either way it reuses the mapped record instead of creating a duplicate.",
+      "source": "README.md#2-the-mental-model"
+    }
+  ]
+}

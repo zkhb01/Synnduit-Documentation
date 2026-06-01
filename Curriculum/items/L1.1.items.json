@@ -1,0 +1,94 @@
+{
+  "poolId": "L1.1.items",
+  "conceptId": "L1.1",
+  "conceptName": "What Synnduit is",
+  "items": [
+    {
+      "id": "L1.1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which best describes what Synnduit is?",
+      "options": [
+        { "id": "a", "text": "A one-time data import / migration tool you run once" },
+        { "id": "b", "text": "A long-running data synchronization engine that keeps a source and destination in sync over time" },
+        { "id": "c", "text": "A reporting dashboard for viewing data" },
+        { "id": "d", "text": "A database backup utility" }
+      ],
+      "correct": ["b"],
+      "explanation": "Synnduit is a continuous sync engine — it runs repeatedly and keeps source and destination aligned, rather than copying once.",
+      "misconceptions": {
+        "a": "Confuses a one-time import with ongoing synchronization — the defining trait is that it runs continuously.",
+        "c": "The Synnduit Dashboard sits on top of Synnduit to visualize history; it is not Synnduit itself.",
+        "d": "Synnduit moves and reconciles data between systems; it is not a backup tool."
+      },
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.1.q2",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Synnduit's tagline is \"ETL meets version control.\" Explain what each half contributes, in one or two sentences.",
+      "rubric": [
+        "ETL half: it moves/transforms data from a source to a destination",
+        "Version-control half: it tracks changes (down to the field) AND/OR remembers the source↔destination link so records are updated, not duplicated"
+      ],
+      "sampleAnswer": "Like ETL, it extracts data from a source and loads it into a destination. Like version control, it logs every field-level change and remembers which destination record each source record maps to, so re-runs update rather than duplicate.",
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.1.q3",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "A teammate wrote a nightly script that copies all 5,000 staff from HR into the destination. After a week, the destination has tens of thousands of staff rows. Why does this happen, and what does Synnduit do differently?",
+      "rubric": [
+        "Identifies the cause: the script has no memory of what it already created, so each run re-inserts everything (duplicates)",
+        "Contrasts Synnduit: it remembers the source↔destination link (mapping), so a later run updates the existing record instead of inserting a new one"
+      ],
+      "sampleAnswer": "The script keeps no record of what it inserted before, so every night it creates all 5,000 again — duplicates pile up. Synnduit stores a mapping linking each source staff ID to the destination record it created, so the next run finds that link and updates the existing record instead of duplicating it.",
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.1.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the \"version control\" half of \"ETL meets version control\" refer to?",
+      "options": [
+        { "id": "a", "text": "Synnduit stores its own source code in Git" },
+        { "id": "b", "text": "Synnduit tracks every change down to the individual field and remembers source-to-destination links" },
+        { "id": "c", "text": "You must use a specific version of .NET to run it" },
+        { "id": "d", "text": "Each run overwrites the previous run's data completely" }
+      ],
+      "correct": ["b"],
+      "explanation": "The phrase describes a behavior of the synced data: field-level change history plus remembered mappings — version-control-like qualities applied to integration.",
+      "misconceptions": {
+        "a": "It is about the data being synced, not Synnduit's own codebase.",
+        "c": "This confuses a runtime requirement with the product's behavior.",
+        "d": "Overwriting everything each run is exactly the ETL-only behavior Synnduit improves on."
+      },
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.1.q5",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which statements about Synnduit are true? (Select all that apply.)",
+      "options": [
+        { "id": "a", "text": "It runs repeatedly over the long term, not once" },
+        { "id": "b", "text": "It tracks change history at the field level" },
+        { "id": "c", "text": "It is open source (Apache 2.0) and built in .NET" },
+        { "id": "d", "text": "It deletes and re-loads the entire destination on every run" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "Synnduit is a long-running, open-source .NET engine with field-level change history. It processes only changes (the delta) — it does not wipe and reload.",
+      "misconceptions": {
+        "d": "Full reload each run is the ETL-only model; Synnduit processes only the delta."
+      },
+      "source": "README.md#1-what-is-synnduit"
+    }
+  ]
+}

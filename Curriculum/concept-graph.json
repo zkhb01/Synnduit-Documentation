@@ -1,0 +1,271 @@
+{
+  "version": "0.1",
+  "generated": "2026-05-22",
+  "source": "SynnduitDocumentation/README.md + repo knowledge base",
+  "companionDoc": "CurriculumBlueprint.md",
+  "masteryModel": {
+    "defaultThreshold": 0.8,
+    "reassessmentUsesFreshItems": true,
+    "remediationCycleLimitBeforeEscalation": 2,
+    "escalationTarget": "human-mentor",
+    "contentStrategy": "hybrid: reviewed canonical lesson + quiz bank backbone; Claude supplies adaptive diagnosis, re-teaching, fresh items, and Q&A"
+  },
+  "pathOrder": ["L1", "L0", "L2"],
+  "levels": [
+    {
+      "id": "L1",
+      "name": "Synnduit Foundations",
+      "order": 1,
+      "type": "conceptual",
+      "gate": "all-concepts-mastered",
+      "gatesLevel": null,
+      "concepts": [
+        {
+          "id": "L1.1",
+          "name": "What Synnduit is",
+          "objective": "State that Synnduit is a long-running data synchronization engine (not a one-time copy/ETL); explain 'ETL meets version control'.",
+          "prereqs": [],
+          "sources": ["README.md#1-what-is-synnduit"],
+          "itemPoolId": "L1.1.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Contrast against a naive nightly copy script (duplicates, no history); show how remembered links + change log fix it."
+        },
+        {
+          "id": "L1.2",
+          "name": "Source vs Destination",
+          "objective": "Define source (origin) and destination (lands; CCSD = DDH); classify real systems.",
+          "prereqs": ["L1.1"],
+          "sources": ["README.md#1", "README.md#3"],
+          "itemPoolId": "L1.2.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Use the CCSD source/StarBridge table (README 5.1) as concrete grounding."
+        },
+        {
+          "id": "L1.3",
+          "name": "Engine model (you plug things in)",
+          "objective": "You don't modify the engine; you implement a source connector and a destination connector, and the engine computes & applies the delta.",
+          "prereqs": ["L1.2"],
+          "sources": ["README.md#2-the-mental-model"],
+          "itemPoolId": "L1.3.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Walk the source->engine->destination ASCII diagram; 'engine fixed, connectors yours'."
+        },
+        {
+          "id": "L1.4",
+          "name": "Delta detection (snapshot to delta)",
+          "objective": "The connector emits a full snapshot; the engine processes only what changed since last run.",
+          "prereqs": ["L1.3"],
+          "sources": ["README.md#2", "README.md#4"],
+          "itemPoolId": "L1.4.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "'Snapshot in, delta out' - engine diffs your snapshot against last run's recorded state."
+        },
+        {
+          "id": "L1.5",
+          "name": "StarBridge (bookkeeping DB)",
+          "objective": "StarBridge is the SQL DB storing mappings, transactions, value changes, exceptions; one per Run.",
+          "prereqs": ["L1.3"],
+          "sources": ["README.md#2", "README.md#3"],
+          "itemPoolId": "L1.5.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "The diagram's StarBridge box; relate each stored thing to a later concept (mappings->L1.6, transactions->L1.10)."
+        },
+        {
+          "id": "L1.6",
+          "name": "Mapping (source-to-destination link)",
+          "objective": "A mapping is the persisted link between source ID and destination ID; it is why the same record updates, not duplicates, next run.",
+          "prereqs": ["L1.4", "L1.5"],
+          "sources": ["README.md#1", "README.md#3"],
+          "itemPoolId": "L1.6.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Two-run timeline: run 1 writes a mapping row; run 2 looks it up -> Update not Create."
+        },
+        {
+          "id": "L1.7",
+          "name": "Run & Segment",
+          "objective": "A Run syncs a set of entities; a Segment is one step (Migration or GarbageCollection). Order matters: parents before children migrating in, reverse for GC.",
+          "prereqs": ["L1.3"],
+          "sources": ["README.md#3", "README.md#5.4"],
+          "itemPoolId": "L1.7.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "The appsettings.json segment list (README 5.4); foreign-key parent/child ordering analogy."
+        },
+        {
+          "id": "L1.8",
+          "name": "iFeed & iSink (the connectors)",
+          "objective": "IFeed<TEntity> = source connector (snapshot); ISink<TEntity> = destination connector (New/Create/Get/Update/Delete). You write these.",
+          "prereqs": ["L1.3", "L1.4"],
+          "sources": ["README.md#3", "README.md#5.6"],
+          "itemPoolId": "L1.8.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Map onto L1.3's connector boxes; show StaffFeed.LoadEntities() shape."
+        },
+        {
+          "id": "L1.9",
+          "name": "POCO & attributes",
+          "objective": "A POCO is the C# class for one entity type; attributes are the contract: [EntityType], [SourceSystemIdentifier], [DestinationSystemIdentifier], [EntityProperty], [DuplicationKey].",
+          "prereqs": ["L1.8"],
+          "sources": ["README.md#3", "README.md#5.5"],
+          "itemPoolId": "L1.9.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Annotate Staff.cs line-by-line, one attribute at a time."
+        },
+        {
+          "id": "L1.10",
+          "name": "Transaction outcomes",
+          "objective": "Every record in every run gets an outcome (NewEntityCreated, ChangesDetectedAndMerged, NoChangesDetected, Skipped, Rejected, ExceptionThrown, ...); outcomes are how you read a run.",
+          "prereqs": ["L1.4", "L1.6"],
+          "sources": ["README.md#3", "README.md#6", "Documentation/Synnduit Console.docx"],
+          "itemPoolId": "L1.10.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Tie to delta detection (no change -> NoChangesDetected); show a console summary block."
+        },
+        {
+          "id": "L1.11",
+          "name": "Dedup & merge (conceptual)",
+          "objective": "A [DuplicationKey] lets the engine match a 'new' source record to an existing destination record and merge, instead of duplicating.",
+          "prereqs": ["L1.6", "L1.9"],
+          "sources": ["README.md#4", "Documentation/Synnduit Deduplication sequence.docx"],
+          "itemPoolId": "L1.11.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Connect mapping (L1.6) + DuplicationKey (L1.9): 'no mapping yet, but the key finds the twin'."
+        },
+        {
+          "id": "L1.12",
+          "name": "Thresholds & resumability",
+          "objective": "Safety features: abort thresholds (deletion/orphan/exception %) protect the destination from a bad feed; runs are resumable after a crash.",
+          "prereqs": ["L1.7"],
+          "sources": ["README.md#4", "README.md#5.4"],
+          "itemPoolId": "L1.12.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "The appsettings threshold settings; frame as 'guardrails against a bad snapshot'."
+        }
+      ]
+    },
+    {
+      "id": "L0",
+      "name": "Prerequisites: .NET substrate for Synnduit code",
+      "order": 2,
+      "type": "placement",
+      "gate": "all-concepts-adequate",
+      "gatesLevel": "L2",
+      "sourcingRule": "link external for the generic skill; author only the Synnduit-application slice",
+      "concepts": [
+        {
+          "id": "L0.G1",
+          "name": "Using generic types",
+          "genericObjective": "Read/use List<T>, IEnumerable<T>, Dictionary<K,V> - what the type parameter means.",
+          "synnduitObjective": "Recognize IEntityCollection<TEntity> as a feed's return type.",
+          "prereqs": [],
+          "externalSource": "Microsoft Learn - C# generics",
+          "authoredSource": "Sync-SRC-DDH StaffFeed.cs",
+          "itemPoolId": "L0.G1.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": false,
+          "remediationAngle": "MS Learn generics -> show it in StaffFeed.LoadEntities() returning a collection of Staff."
+        },
+        {
+          "id": "L0.G2",
+          "name": "Implementing a generic interface",
+          "genericObjective": "Implement IExample<T> - supply T, implement its members.",
+          "synnduitObjective": "class StaffFeed : IFeed<Staff>; class TeamSiteWebPartSink : ISink<TeamSiteWebPart> - <T> is your entity type.",
+          "prereqs": ["L0.G1", "L0.O1"],
+          "externalSource": "Microsoft Learn - generic interfaces",
+          "authoredSource": "Sync-DDH-SPO sinks; Sync-SRC-DDH StaffFeed.cs",
+          "itemPoolId": "L0.G2.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": true,
+          "remediationAngle": "Walk a real sink class - interface on the left, entity type as <T>, the five methods as the contract."
+        },
+        {
+          "id": "L0.D1",
+          "name": "DI & constructor injection",
+          "genericObjective": "Inversion of control; a class declares dependencies in its constructor and receives them.",
+          "synnduitObjective": "A sink takes its service via the constructor rather than new-ing it.",
+          "prereqs": [],
+          "externalSource": "Microsoft Learn - dependency injection",
+          "authoredSource": "any Sync-DDH-SPO sink constructor",
+          "itemPoolId": "L0.D1.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": false,
+          "remediationAngle": "MS Learn DI basics -> the sink constructor that receives its service."
+        },
+        {
+          "id": "L0.D2",
+          "name": "MEF composition in Synnduit",
+          "genericObjective": "Attribute-driven composition - parts are exported and discovered, not container-registered.",
+          "synnduitObjective": "[Sink]/[Feed] mark discoverable parts; [Export(typeof(IService))] + [PartCreationPolicy(CreationPolicy.Shared)] publish a service; [ImportingConstructor] marks the injected constructor.",
+          "prereqs": ["L0.D1", "L0.O1", "L0.O2"],
+          "externalSource": null,
+          "authoredSource": "TeamSiteWebPartService.cs ([Export]); Sync-DDH-SPO sinks ([Sink], [ImportingConstructor])",
+          "itemPoolId": "L0.D2.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": true,
+          "authorPriority": "high",
+          "remediationAngle": "Flag even for strong DI devs (they know Microsoft.Extensions.DI, not MEF). Author 'the DI you know vs the MEF Synnduit uses', then annotate a real [Export]/[ImportingConstructor] pair."
+        },
+        {
+          "id": "L0.O1",
+          "name": "Interfaces & implementation",
+          "genericObjective": "An interface is a contract; implementing it means supplying every member.",
+          "synnduitObjective": "ISink<T> / IFeed<T> are the contracts your connectors fulfill.",
+          "prereqs": [],
+          "externalSource": "Microsoft Learn - interfaces",
+          "authoredSource": "ISink<T> member list mapped to a real sink",
+          "itemPoolId": "L0.O1.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": false,
+          "remediationAngle": "MS Learn interfaces -> show ISink<T>'s members mapped to a real sink's methods."
+        },
+        {
+          "id": "L0.O2",
+          "name": "Attributes (declarative metadata)",
+          "genericObjective": "[Attribute] annotations attach metadata read by tooling/frameworks at runtime.",
+          "synnduitObjective": "The POCO contract is attributes: [EntityType], [EntityProperty], [SourceSystemIdentifier], [DuplicationKey].",
+          "prereqs": [],
+          "externalSource": "Microsoft Learn - attributes",
+          "authoredSource": "Staff.cs; TeamSiteWebPart.cs",
+          "itemPoolId": "L0.O2.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": false,
+          "remediationAngle": "MS Learn attributes -> annotate a real POCO attribute-by-attribute (ties into L1.9)."
+        },
+        {
+          "id": "L0.E1",
+          "name": "Querying a source with EF",
+          "genericObjective": "DbContext, LINQ-to-Entities (.Where().Select()), and deferred execution (runs on enumeration, not when written).",
+          "synnduitObjective": "A feed opens a DbContext, queries, and projects rows into POCOs.",
+          "prereqs": [],
+          "externalSource": "Microsoft Learn - EF Core / EF6 querying",
+          "authoredSource": "Sync-SRC-DDH StaffFeed.cs; Sync-DDH-SPO SchoolObjectModel feeds",
+          "itemPoolId": "L0.E1.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": false,
+          "remediationAngle": "MS Learn EF querying -> the StaffFeed HRAD .Where().Select() projection; call out materialize-before-complex-LINQ."
+        },
+        {
+          "id": "L0.E2",
+          "name": "POCOs & the nullable requirement",
+          "genericObjective": "A POCO is a plain class mapped to data; EF binds columns to properties.",
+          "synnduitObjective": "Synnduit requires POCO properties to be nullable; non-nullable properties cause subtle change-detection/load problems.",
+          "prereqs": ["L0.E1", "L0.O2"],
+          "externalSource": null,
+          "authoredSource": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx (extract) + a POCO example",
+          "itemPoolId": "L0.E2.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": true,
+          "authorPriority": "high",
+          "remediationAngle": "Extract the nullable-requirement doc; show wrong (int) vs right (int?) and why the engine needs the distinction."
+        }
+      ]
+    }
+  ]
+}

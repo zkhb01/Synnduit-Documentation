@@ -1,0 +1,74 @@
+{
+  "poolId": "L0.O2.items",
+  "conceptId": "L0.O2",
+  "conceptName": "Attributes (declarative metadata)",
+  "items": [
+    {
+      "id": "L0.O2.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does putting `[EntityProperty]` on a property do?",
+      "options": [
+        { "id": "a", "text": "Runs code immediately when that line is reached" },
+        { "id": "b", "text": "Attaches metadata that the engine reads at runtime to tag the field for change detection" },
+        { "id": "c", "text": "Creates a new database column" },
+        { "id": "d", "text": "Throws an exception if the value is null" }
+      ],
+      "correct": ["b"],
+      "explanation": "Attributes are passive metadata; the engine reads [EntityProperty] via reflection and tracks that field for change detection.",
+      "misconceptions": {
+        "a": "Attributes don't execute where they sit — they're read later by a framework."
+      },
+      "source": "https://learn.microsoft.com/dotnet/csharp/advanced-topics/reflection-and-attributes/"
+    },
+    {
+      "id": "L0.O2.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "In general .NET terms, what is an attribute?",
+      "options": [
+        { "id": "a", "text": "A bracketed annotation that attaches metadata, read by tooling/frameworks (often via reflection)" },
+        { "id": "b", "text": "A special kind of loop" },
+        { "id": "c", "text": "A method that must return void" },
+        { "id": "d", "text": "A way to inherit from two base classes" }
+      ],
+      "correct": ["a"],
+      "explanation": "Attributes attach declarative metadata to code elements; frameworks read them at runtime to decide behavior.",
+      "source": "https://learn.microsoft.com/dotnet/csharp/advanced-topics/reflection-and-attributes/"
+    },
+    {
+      "id": "L0.O2.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "In the Synnduit POCO contract, which statement is correct?",
+      "options": [
+        { "id": "a", "text": "The attributes are documentation only and have no effect" },
+        { "id": "b", "text": "The engine reads the attributes by reflection and uses them to drive change detection, dedup, and mapping" },
+        { "id": "c", "text": "The attributes generate the destination's SQL schema" },
+        { "id": "d", "text": "The attributes are executed top-to-bottom like statements" }
+      ],
+      "correct": ["b"],
+      "explanation": "Synnduit reads the POCO's attributes at runtime to learn how to handle the entity — they're functional metadata, not decoration.",
+      "misconceptions": {
+        "a": "They are functional — omitting [EntityProperty], for instance, stops a field being tracked."
+      },
+      "source": "Staff.cs; TeamSiteWebPart.cs"
+    },
+    {
+      "id": "L0.O2.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Explain why forgetting `[EntityProperty]` on a field is a 'silent' bug, in terms of what attributes are.",
+      "rubric": [
+        "Attributes are runtime metadata, not compiled instructions — omitting one is not a compile error",
+        "Without [EntityProperty] the engine simply never tracks that field, so changes go undetected with no error"
+      ],
+      "sampleAnswer": "Because attributes are passive metadata the engine reads at runtime, leaving one off isn't a compile error. The code builds fine; the engine just never learns to track that field, so its changes are silently ignored.",
+      "source": "Staff.cs; TeamSiteWebPart.cs"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "poolId": "L1.3.items",
+  "conceptId": "L1.3",
+  "conceptName": "Engine model (you plug things in)",
+  "items": [
+    {
+      "id": "L1.3.q1",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "To add a new integration to Synnduit, what do you do?",
+      "options": [
+        { "id": "a", "text": "Modify the Synnduit engine's source code" },
+        { "id": "b", "text": "Implement a source connector (feed) and a destination connector (sink); the engine diffs them" },
+        { "id": "c", "text": "Write a SQL script that copies data between databases" },
+        { "id": "d", "text": "Reconfigure the destination database schema" }
+      ],
+      "correct": ["b"],
+      "explanation": "You supply the two connectors; the fixed engine computes and applies the delta. The engine binary is never edited.",
+      "misconceptions": {
+        "a": "The engine is fixed — you extend it via connectors and override points, not by editing it.",
+        "c": "Hand-written copy scripts lose the mappings, change history, and delta detection the engine provides.",
+        "d": "The destination schema is owned by the destination system, not something you change to add an integration."
+      },
+      "source": "README.md#2-the-mental-model"
+    },
+    {
+      "id": "L1.3.q2",
+      "type": "order",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Put the pieces of the Synnduit data flow in order, from where data originates to where it lands.",
+      "options": [
+        { "id": "a", "text": "Synnduit engine (computes the delta)" },
+        { "id": "b", "text": "Source system" },
+        { "id": "c", "text": "Destination system" }
+      ],
+      "correct": ["b", "a", "c"],
+      "explanation": "Source → engine → destination. The engine sits in the middle and applies only the delta to the destination.",
+      "source": "README.md#2-the-mental-model"
+    },
+    {
+      "id": "L1.3.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which part of the work does the Synnduit engine handle for you (rather than you writing it)?",
+      "options": [
+        { "id": "a", "text": "Reading the raw data out of the source system" },
+        { "id": "b", "text": "Comparing the new snapshot to last run and applying only the changes (the delta)" },
+        { "id": "c", "text": "Knowing the source system's specific API or query language" },
+        { "id": "d", "text": "Knowing how to create/update records in the destination system" }
+      ],
+      "correct": ["b"],
+      "explanation": "Diffing the snapshot and applying the delta (plus mappings, change history, dedup, thresholds) is the engine's job. Reading the source and writing the destination are your connectors.",
+      "misconceptions": {
+        "a": "Reading the source is the feed's job — yours.",
+        "c": "The source-specific access is exactly what your feed provides.",
+        "d": "Destination create/update/delete is the sink's job — yours."
+      },
+      "source": "README.md#2-the-mental-model"
+    },
+    {
+      "id": "L1.3.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "A colleague says \"Synnduit does as much as possible out-of-the-box but treats developers as first-class citizens.\" In terms of the engine model, what is fixed and what is yours to write?",
+      "rubric": [
+        "Fixed/engine: the diffing/delta + bookkeeping (mappings, change history, dedup, thresholds, GC) — written once, not edited by you",
+        "Yours: the source connector (feed) and destination connector (sink), i.e. the system-specific code; default behavior can be overridden"
+      ],
+      "sampleAnswer": "The engine — delta detection, mappings, dedup, change logging, thresholds, garbage collection — is fixed and reused. You write the system-specific connectors (the feed that reads the source, the sink that writes the destination), and you can override default behaviors where needed.",
+      "source": "Documentation/Synnduit Nov 2017.pptx.md"
+    },
+    {
+      "id": "L1.3.q5",
+      "type": "mc",
+      "difficulty": "synthesis",
+      "scoring": "auto",
+      "stem": "Why does CCSD report roughly a 75% reduction in custom code by using Synnduit?",
+      "options": [
+        { "id": "a", "text": "The destination database is smaller" },
+        { "id": "b", "text": "The hard, reusable parts (diffing, dedup, change logging, thresholds, GC) live in the engine, so teams only write system-specific connectors" },
+        { "id": "c", "text": "Synnduit generates the destination's user interface automatically" },
+        { "id": "d", "text": "It eliminates the need for any source-side code" }
+      ],
+      "correct": ["b"],
+      "explanation": "The engine absorbs the mechanically hard, error-prone logic once; per-integration work shrinks to writing connectors, cutting custom code dramatically.",
+      "misconceptions": {
+        "d": "You still write source-side feeds — but far less plumbing than a hand-rolled sync."
+      },
+      "source": "Documentation/Synnduit Nov 2017.pptx.md"
+    }
+  ]
+}

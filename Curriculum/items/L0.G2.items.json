@@ -1,0 +1,94 @@
+{
+  "poolId": "L0.G2.items",
+  "conceptId": "L0.G2",
+  "conceptName": "Implementing a generic interface",
+  "items": [
+    {
+      "id": "L0.G2.q1",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "In `class TeamSiteWebPartSink : ISink<TeamSiteWebPart>`, what does `TeamSiteWebPart` bind to?",
+      "options": [
+        { "id": "a", "text": "The base class of the sink" },
+        { "id": "b", "text": "The interface's type parameter T — the entity this sink handles" },
+        { "id": "c", "text": "A method parameter" },
+        { "id": "d", "text": "The destination database name" }
+      ],
+      "correct": ["b"],
+      "explanation": "TeamSiteWebPart is bound to ISink<T>'s type parameter, so this sink operates on TeamSiteWebPart entities.",
+      "misconceptions": {
+        "a": "It's the generic type argument, not a base class — the base relationship here is implementing the interface."
+      },
+      "source": "Sync-DDH-SPO sinks"
+    },
+    {
+      "id": "L0.G2.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "When you write `class StaffFeed : IFeed<Staff>`, what must the class provide?",
+      "options": [
+        { "id": "a", "text": "Nothing — IFeed supplies default implementations" },
+        { "id": "b", "text": "All members declared by IFeed<T>, with T meaning Staff" },
+        { "id": "c", "text": "Only a constructor" },
+        { "id": "d", "text": "A copy of the Synnduit engine" }
+      ],
+      "correct": ["b"],
+      "explanation": "Implementing a generic interface means supplying every member, with the type parameter bound to your entity (Staff).",
+      "misconceptions": {
+        "a": "An interface is a contract; you must implement its members."
+      },
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L0.G2.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "`ISink<T>` declares `T Get(...)`. In `class TeamSiteWebPartSink : ISink<TeamSiteWebPart>`, what is the return type of the Get method you implement?",
+      "options": [
+        { "id": "a", "text": "T (left generic)" },
+        { "id": "b", "text": "TeamSiteWebPart" },
+        { "id": "c", "text": "object" },
+        { "id": "d", "text": "void" }
+      ],
+      "correct": ["b"],
+      "explanation": "Binding T to TeamSiteWebPart substitutes it throughout the contract, so Get returns a TeamSiteWebPart.",
+      "misconceptions": {
+        "a": "In the implementing class T is already bound to a concrete type — TeamSiteWebPart — not left generic."
+      },
+      "source": "Sync-DDH-SPO sinks"
+    },
+    {
+      "id": "L0.G2.q4",
+      "type": "short",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Describe the three-step shape of writing any Synnduit connector (feed or sink), in terms of generic-interface implementation.",
+      "rubric": [
+        "Pick the interface (IFeed<T> for a source, ISink<T> for a destination)",
+        "Bind your entity POCO as the type argument T",
+        "Implement all the interface's members (typed to your entity)"
+      ],
+      "sampleAnswer": "Choose the interface for the direction you need (IFeed<T> to read a source, ISink<T> to write a destination), bind your POCO as <T> (e.g. <Staff>), and implement every member of that interface with T now meaning your entity.",
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L0.G2.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which two prerequisite skills does implementing a generic interface combine?",
+      "options": [
+        { "id": "a", "text": "Generics (reading <T>) and interfaces (implementing a contract)" },
+        { "id": "b", "text": "Dependency injection and attributes" },
+        { "id": "c", "text": "EF querying and LINQ" },
+        { "id": "d", "text": "Async and exception handling" }
+      ],
+      "correct": ["a"],
+      "explanation": "Implementing IFeed<Staff> requires understanding both the generic type parameter and the interface-as-contract idea.",
+      "source": "https://learn.microsoft.com/dotnet/standard/generics/interfaces"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "poolId": "L0.G1.items",
+  "conceptId": "L0.G1",
+  "conceptName": "Using generic types",
+  "items": [
+    {
+      "id": "L0.G1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is an `IEnumerable<Staff>`?",
+      "options": [
+        { "id": "a", "text": "A collection that can hold any type of object" },
+        { "id": "b", "text": "A sequence of Staff items" },
+        { "id": "c", "text": "A single Staff object" },
+        { "id": "d", "text": "A method that returns Staff" }
+      ],
+      "correct": ["b"],
+      "explanation": "The type parameter <Staff> says the sequence contains Staff items.",
+      "misconceptions": {
+        "a": "The whole point of the generic parameter is that it is NOT 'anything' — it is specifically Staff."
+      },
+      "source": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics"
+    },
+    {
+      "id": "L0.G1.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A Synnduit feed declares `IEntityCollection<Staff> LoadEntities()`. What does the `<Staff>` tell you?",
+      "options": [
+        { "id": "a", "text": "The collection returned holds Staff entities" },
+        { "id": "b", "text": "The method takes a Staff as a parameter" },
+        { "id": "c", "text": "Staff is the name of the feed class" },
+        { "id": "d", "text": "Only one Staff record is returned" }
+      ],
+      "correct": ["a"],
+      "explanation": "IEntityCollection<Staff> is a collection of Staff — the snapshot the feed returns.",
+      "misconceptions": {
+        "d": "A collection can hold many items; the generic parameter is the element type, not a count."
+      },
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L0.G1.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "In `Dictionary<string, Staff>`, what do the two type parameters represent?",
+      "options": [
+        { "id": "a", "text": "Two unrelated Staff lists" },
+        { "id": "b", "text": "The key type (string) and the value type (Staff)" },
+        { "id": "c", "text": "The minimum and maximum size" },
+        { "id": "d", "text": "Two versions of the same Staff" }
+      ],
+      "correct": ["b"],
+      "explanation": "Dictionary<K,V> maps keys of type K to values of type V — here string keys to Staff values.",
+      "source": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics"
+    },
+    {
+      "id": "L0.G1.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one sentence, what is the difference between `IEntityCollection<Staff>` and `IEntityCollection<Student>`?",
+      "rubric": [
+        "Same generic collection type, different element type",
+        "One holds Staff entities, the other holds Student entities"
+      ],
+      "sampleAnswer": "They are the same kind of Synnduit collection, but one contains Staff entities and the other contains Student entities — the type parameter is the only difference.",
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    }
+  ]
+}

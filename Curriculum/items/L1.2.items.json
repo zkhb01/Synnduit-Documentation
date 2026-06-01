@@ -1,0 +1,102 @@
+{
+  "poolId": "L1.2.items",
+  "conceptId": "L1.2",
+  "conceptName": "Source vs Destination",
+  "items": [
+    {
+      "id": "L1.2.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "At CCSD, which system is the destination for the Synnduit syncs?",
+      "options": [
+        { "id": "a", "text": "PowerSchool" },
+        { "id": "b", "text": "HRAD (PeopleSoft HR)" },
+        { "id": "c", "text": "DDH (District Data Hub)" },
+        { "id": "d", "text": "ServiceNow" }
+      ],
+      "correct": ["c"],
+      "explanation": "At CCSD the destination is always the DDH — the district's single source of truth that data is synced into.",
+      "misconceptions": {
+        "a": "PowerSchool is a source system (School and Student APIs).",
+        "b": "HRAD is a source system (PeopleSoft HR).",
+        "d": "ServiceNow is a source system."
+      },
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.2.q2",
+      "type": "classify",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Classify each system as Source or Destination in the CCSD integration: (1) PowerSchool, (2) DDH, (3) HRAD, (4) ServiceNow.",
+      "rubric": [
+        "PowerSchool = Source",
+        "DDH = Destination",
+        "HRAD = Source",
+        "ServiceNow = Source"
+      ],
+      "sampleAnswer": "PowerSchool — Source; DDH — Destination; HRAD — Source; ServiceNow — Source. Only the DDH is the destination; the rest are sources where data originates.",
+      "source": "README.md#5-a-real-ccsd-example-sync-src-ddh"
+    },
+    {
+      "id": "L1.2.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What defines a system as the \"source\" in a sync?",
+      "options": [
+        { "id": "a", "text": "It is the largest or most important system" },
+        { "id": "b", "text": "It is where the data originates / is maintained (the system of record)" },
+        { "id": "c", "text": "It is the system Synnduit writes the final data into" },
+        { "id": "d", "text": "It is whichever system runs on SQL Server" }
+      ],
+      "correct": ["b"],
+      "explanation": "The source is the system of record — where the data is authored and maintained — regardless of size or importance.",
+      "misconceptions": {
+        "a": "Importance is irrelevant; HR is the source for staff because it authors that data, even though DDH is the district hub.",
+        "c": "That describes the destination.",
+        "d": "The underlying database technology does not determine the role."
+      },
+      "source": "README.md#1-what-is-synnduit"
+    },
+    {
+      "id": "L1.2.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Employee records are authored and maintained in HR, then kept in sync into the DDH. In Synnduit terms, HR is the ___ and DDH is the ___.",
+      "options": [
+        { "id": "a", "text": "destination; source" },
+        { "id": "b", "text": "source; destination" },
+        { "id": "c", "text": "source; source" },
+        { "id": "d", "text": "destination; destination" }
+      ],
+      "correct": ["b"],
+      "explanation": "Data originates in HR (source) and lands in the DDH (destination). Flow is always source → destination.",
+      "misconceptions": {
+        "a": "This inverts the flow — data does not originate in the DDH."
+      },
+      "source": "README.md#5-a-real-ccsd-example-sync-src-ddh"
+    },
+    {
+      "id": "L1.2.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which direction does data flow in a Synnduit sync?",
+      "options": [
+        { "id": "a", "text": "Destination → Source" },
+        { "id": "b", "text": "Source → Destination" },
+        { "id": "c", "text": "Both directions at once" },
+        { "id": "d", "text": "Whichever direction has fewer records" }
+      ],
+      "correct": ["b"],
+      "explanation": "Synnduit reads a snapshot from the source and applies changes to the destination: source → destination.",
+      "misconceptions": {
+        "c": "A single sync is one-directional; bidirectional behavior would be two separate syncs."
+      },
+      "source": "README.md#2-the-mental-model"
+    }
+  ]
+}

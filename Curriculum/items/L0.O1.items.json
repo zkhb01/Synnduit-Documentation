@@ -1,0 +1,74 @@
+{
+  "poolId": "L0.O1.items",
+  "conceptId": "L0.O1",
+  "conceptName": "Interfaces & implementation",
+  "items": [
+    {
+      "id": "L0.O1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "When a class implements an interface, how many of the interface's members must it provide?",
+      "options": [
+        { "id": "a", "text": "Any subset it chooses" },
+        { "id": "b", "text": "All of them" },
+        { "id": "c", "text": "Only the properties, not the methods" },
+        { "id": "d", "text": "None — the interface provides default bodies for everything" }
+      ],
+      "correct": ["b"],
+      "explanation": "An interface is a contract; the implementing class must supply every member (the compiler enforces it).",
+      "misconceptions": {
+        "a": "Picking a subset would break the contract and fail to compile."
+      },
+      "source": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/interfaces"
+    },
+    {
+      "id": "L0.O1.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "What is the role of `ISink<T>` in Synnduit?",
+      "options": [
+        { "id": "a", "text": "A concrete class that writes to the destination" },
+        { "id": "b", "text": "A contract that your destination connector class must fulfill" },
+        { "id": "c", "text": "A configuration setting in appsettings.json" },
+        { "id": "d", "text": "A StarBridge table" }
+      ],
+      "correct": ["b"],
+      "explanation": "ISink<T> is an interface (a contract); your sink class implements it, supplying all its members.",
+      "misconceptions": {
+        "a": "ISink<T> is the contract; the concrete class (e.g. StaffSink) is what implements it."
+      },
+      "source": "ISink<T> member list mapped to a real sink"
+    },
+    {
+      "id": "L0.O1.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Why can the Synnduit engine call any connector you write without knowing your concrete class?",
+      "options": [
+        { "id": "a", "text": "It reads your source code at runtime" },
+        { "id": "b", "text": "It talks to your class through the interface (IFeed<T> / ISink<T>) it implements" },
+        { "id": "c", "text": "All connectors must be named the same" },
+        { "id": "d", "text": "It copies your class into the engine" }
+      ],
+      "correct": ["b"],
+      "explanation": "Because your class fulfills the interface contract, the engine can call it polymorphically through that interface — that's the value of programming to an interface.",
+      "source": "ISink<T> member list mapped to a real sink"
+    },
+    {
+      "id": "L0.O1.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "A teammate writes `class StaffSink : ISink<Staff>` but only implements Create and Update. What will happen and why?",
+      "rubric": [
+        "It will not compile",
+        "Because ISink<Staff> is a contract requiring all its members (New/Create/Get/Update/Delete) to be implemented"
+      ],
+      "sampleAnswer": "It won't compile — implementing ISink<Staff> obligates the class to provide every member of the interface, not just Create and Update. The missing members are a compile error.",
+      "source": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/interfaces"
+    }
+  ]
+}
