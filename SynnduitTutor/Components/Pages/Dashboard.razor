@@ -16,8 +16,9 @@ else if (_levels is null)
 }
 else
 {
+    <div class="eyebrow">Your progress</div>
     <h1>@Session.DisplayName's path</h1>
-    <p class="text-muted">Master every concept in a level to clear its gate. Locked concepts open once their prerequisites are done.</p>
+    <p class="lead">Master every concept in a level to clear its gate. Locked concepts open once their prerequisites are done.</p>
 
     @foreach (var lv in _levels)
     {
@@ -92,9 +93,9 @@ else
 
     private static MarkupString StatusIcon(ConceptStatus s) => new(s switch
     {
-        ConceptStatus.Mastered => "<span title='mastered' style='color:#198754'>✔</span>",
-        ConceptStatus.Skipped  => "<span title='skipped (placement)' style='color:#0dcaf0'>⏭</span>",
-        ConceptStatus.Available => "<span title='available' style='color:#0d6efd'>○</span>",
-        _ => "<span title='locked' style='color:#adb5bd'>🔒</span>"
+        ConceptStatus.Mastered => "<span title='mastered' style='color:#5d7a44'>✔</span>",
+        ConceptStatus.Skipped  => "<span title='skipped (placement)' style='color:#b18d4d'>⏭</span>",
+        ConceptStatus.Available => "<span title='available' style='color:#8a6c33'>✠</span>",
+        _ => "<span title='locked' style='color:#b6ad99'>🔒</span>"
     });
 }

@@ -1,32 +1,33 @@
 @inject LearnerSession Session
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Synnduit Tutor</a>
-    </div>
+<div class="brand">
+    <a class="brand-lockup" href="">
+        <span class="crest"><img src="brand/ccsd-mark.png" alt="Calgary Catholic School District" /></span>
+        <span class="wordmark">
+            <span class="wm-1">Synnduit</span>
+            <span class="wm-2">Tutor</span>
+        </span>
+    </a>
+    <div class="brand-sub">Integration learning path</div>
 </div>
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Sign in
-            </NavLink>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">Sign in</NavLink>
         </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="dashboard">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> My path
-            </NavLink>
+        <div class="nav-item">
+            <NavLink class="nav-link" href="dashboard">My path</NavLink>
         </div>
-
-        @if (Session.IsSignedIn)
-        {
-            <div class="nav-item px-3 mt-2">
-                <span class="nav-link disabled">Signed in: <strong>@Session.DisplayName</strong></span>
-            </div>
-        }
     </nav>
+
+    @if (Session.IsSignedIn)
+    {
+        <div class="learner-chip">
+            <span class="lc-label">Signed in</span>
+            <span class="lc-name">@Session.DisplayName</span>
+        </div>
+    }
 </div>
