@@ -284,3 +284,98 @@ details[open] > summary { margin-bottom: .4rem; }
 
 .blazor-error-boundary { background: var(--oxblood); padding: 1rem 1.25rem; color: #fff; border-radius: var(--radius); }
 .blazor-error-boundary::after { content: "An error has occurred."; }
+
+/* =========================================================================
+   Donut incentive UI
+   ========================================================================= */
+.donut { display: inline-block; vertical-align: middle; filter: drop-shadow(0 2px 2px rgba(22,19,12,.18)); }
+.donut--muted { filter: none; opacity: .8; }
+
+/* ---- Donut jar (dashboard) ---- */
+.donut-jar { margin-bottom: 1.75rem; }
+.donut-jar .card-header span:first-child { font-size: 1.05rem; }
+.dj-meter, .dj-donuts { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; margin-bottom: .6rem; }
+.dj-more {
+    font-family: var(--font-display); font-weight: 560; color: var(--gold-deep);
+    background: rgba(177,141,77,.12); border: 1px solid rgba(177,141,77,.4);
+    border-radius: 999px; padding: .1rem .6rem; font-size: .95rem;
+}
+.dj-msg { margin: .2rem 0 .35rem; color: var(--ink-soft); }
+.dj-caption { margin: 0; font-size: .78rem; color: var(--ink-muted); letter-spacing: .02em; }
+.dj-ready .dj-msg strong { color: var(--gold-deep); }
+
+/* ---- Earned strip (quiz results) ---- */
+.donut-earned {
+    display: flex; gap: 1.1rem; align-items: center;
+    background: linear-gradient(110deg, rgba(177,141,77,.16), rgba(177,141,77,.05));
+    border: 1px solid rgba(177,141,77,.45); border-left: 4px solid var(--gold);
+    border-radius: var(--radius); padding: 1rem 1.2rem; margin-bottom: 1.25rem;
+}
+.de-donuts { display: flex; gap: .25rem; flex-wrap: wrap; max-width: 240px; }
+@media (prefers-reduced-motion: no-preference) {
+    .de-donuts .donut { animation: pop .42s cubic-bezier(.2,.8,.3,1.4) backwards; }
+    .de-donuts .donut:nth-child(2){animation-delay:.06s}
+    .de-donuts .donut:nth-child(3){animation-delay:.12s}
+    .de-donuts .donut:nth-child(4){animation-delay:.18s}
+    .de-donuts .donut:nth-child(5){animation-delay:.24s}
+    .de-donuts .donut:nth-child(n+6){animation-delay:.30s}
+}
+@keyframes pop { from { opacity:0; transform: scale(.2) rotate(-25deg); } to { opacity:1; transform:none; } }
+.de-total { font-family: var(--font-display); font-size: 1.5rem; font-weight: 560; color: var(--gold-deep); line-height: 1.1; }
+.de-reasons { list-style: none; padding: 0; margin: .35rem 0 0; font-size: .85rem; color: var(--ink-soft); }
+.de-reasons li { margin: .05rem 0; }
+.de-pts { display: inline-block; min-width: 1.9rem; font-weight: 700; color: var(--gold-deep); }
+
+/* ---- Milestone banner ---- */
+.milestone-banner {
+    display: flex; gap: 1.2rem; align-items: center;
+    background: var(--ink);
+    background-image: radial-gradient(420px 200px at 12% -20%, rgba(177,141,77,.28), transparent 70%);
+    color: #f3ecd9; border-radius: var(--radius); padding: 1.4rem 1.6rem; margin-bottom: 1.5rem;
+    border: 1px solid var(--gold-deep);
+}
+.milestone-banner h3 { font-family: var(--font-display); color: #fff; }
+.milestone-banner .eyebrow { color: var(--gold-bright); }
+.milestone-banner p { color: rgba(243,236,217,.8); margin: 0; }
+.mb-cross { font-size: 3rem; color: var(--gold-bright); line-height: 1; }
+
+/* ---- Voucher / certificate ---- */
+.voucher-actions { display: flex; gap: .6rem; margin-bottom: 1.25rem; }
+.voucher {
+    max-width: 640px; margin: 0 auto; background: var(--paper);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+    padding: 2.4rem 2.6rem; text-align: center; position: relative;
+}
+.voucher-rule { height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: .2rem 0 1.4rem; }
+.voucher-rule:last-child { margin: 1.4rem 0 .2rem; }
+.voucher-head { display: flex; align-items: center; gap: .9rem; justify-content: center; text-align: left; margin-bottom: 1rem; }
+.voucher-crest { width: 46px; height: 46px; object-fit: contain; mix-blend-mode: multiply; }
+.voucher-kicker { font-family: var(--font-display); font-size: 1.3rem; font-weight: 560; color: var(--ink); letter-spacing: -.01em; }
+.voucher-title { font-family: var(--font-display); font-size: clamp(2.2rem, 1.6rem+2vw, 3rem); margin: .2rem 0 .6rem; }
+.voucher-cite { color: var(--ink-muted); margin: .2rem 0; font-style: italic; }
+.voucher-name { font-family: var(--font-display); font-size: 1.9rem; font-weight: 560; color: var(--ink); margin: .1rem 0 .4rem; }
+.voucher-count { display: flex; flex-direction: column; align-items: center; gap: .5rem; margin: 1rem 0; }
+.vc-donuts { display: flex; gap: .3rem; flex-wrap: wrap; justify-content: center; max-width: 460px; }
+.vc-num { font-family: var(--font-display); font-size: 2.4rem; font-weight: 600; color: var(--gold-deep); line-height: 1; }
+.vc-num span { font-size: 1rem; color: var(--ink-muted); font-weight: 400; letter-spacing: .04em; }
+.voucher-milestone { font-weight: 600; color: var(--ink); margin: .2rem 0 1.4rem; }
+.voucher-redeem { display: flex; justify-content: space-between; align-items: center; text-align: left; gap: 1rem;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 1rem 0; margin: 1rem 0; }
+.vr-manager { font-family: var(--font-display); font-size: 1.3rem; color: var(--ink); }
+.vr-note { font-size: .8rem; color: var(--ink-muted); margin-top: .15rem; max-width: 32ch; }
+.voucher-stamp {
+    font-size: 2.4rem; color: var(--gold); border: 2px solid var(--gold); border-radius: 50%;
+    width: 64px; height: 64px; display: grid; place-items: center; transform: rotate(-12deg);
+    opacity: .85; flex: 0 0 auto;
+}
+.voucher-foot { display: flex; justify-content: space-between; font-size: .8rem; color: var(--ink-muted); letter-spacing: .03em; }
+
+/* ---- Print: show only the voucher ---- */
+@media print {
+    .sidebar, .top-row, .voucher-actions, .voucher-finephrase, #blazor-error-ui { display: none !important; }
+    body { background: #fff !important; }
+    .page, main, .content { display: block !important; padding: 0 !important; margin: 0 !important; }
+    .voucher { box-shadow: none; border: 1px solid #bbb; margin: 0 auto; }
+    .donut { filter: none; }
+    * { animation: none !important; }
+}

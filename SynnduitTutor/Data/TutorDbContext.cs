@@ -6,6 +6,8 @@ public sealed class TutorDbContext(DbContextOptions<TutorDbContext> options) : D
 {
     public DbSet<Learner> Learners => Set<Learner>();
     public DbSet<ConceptMastery> ConceptMastery => Set<ConceptMastery>();
+    public DbSet<DonutAward> DonutAwards => Set<DonutAward>();
+    public DbSet<Voucher> Vouchers => Set<Voucher>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -18,6 +20,17 @@ public sealed class TutorDbContext(DbContextOptions<TutorDbContext> options) : D
         b.Entity<ConceptMastery>(e =>
         {
             e.HasIndex(x => new { x.LearnerId, x.ConceptId }).IsUnique();
+        });
+
+        b.Entity<DonutAward>(e =>
+        {
+            e.HasIndex(x => new { x.LearnerId, x.VoucherId });
+            e.HasIndex(x => new { x.LearnerId, x.LevelId, x.Reason });
+        });
+
+        b.Entity<Voucher>(e =>
+        {
+            e.HasIndex(x => x.Code).IsUnique();
         });
     }
 }

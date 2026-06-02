@@ -17,10 +17,15 @@ builder.Services.AddDbContextFactory<TutorDbContext>(o => o.UseSqlite($"Data Sou
 // --- Curriculum (read-only authored content) ---
 builder.Services.AddSingleton<CurriculumStore>();
 
+// --- Donut incentive config (appsettings: "Donuts") ---
+var donutOptions = builder.Configuration.GetSection("Donuts").Get<DonutOptions>() ?? new DonutOptions();
+builder.Services.AddSingleton(donutOptions);
+
 // --- Engine ---
 builder.Services.AddScoped<GatingEngine>();
 builder.Services.AddScoped<ScoringService>();
 builder.Services.AddScoped<MasteryService>();
+builder.Services.AddScoped<DonutService>();
 builder.Services.AddScoped<IRemediationService, StubRemediationService>();
 
 // --- Stub auth: current learner per circuit ---

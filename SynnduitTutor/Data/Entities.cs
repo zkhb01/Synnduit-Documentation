@@ -37,3 +37,38 @@ public sealed class ConceptMastery
     public string SeenItemIdsCsv { get; set; } = "";
     public DateTime? LastAttemptUtc { get; set; }
 }
+
+/// <summary>
+/// One earned-donut ledger entry (append-only). Earned the moment a concept is first mastered;
+/// <see cref="VoucherId"/> stays null until the donuts are redeemed onto a printed voucher.
+/// </summary>
+public sealed class DonutAward
+{
+    public int Id { get; set; }
+    public int LearnerId { get; set; }
+    public Learner? Learner { get; set; }
+
+    /// <summary>Mastered | FirstAttempt | Perfect | Critical | LevelComplete</summary>
+    public string Reason { get; set; } = "";
+    public string? ConceptId { get; set; }
+    public string? LevelId { get; set; }
+    public int Points { get; set; }
+    public DateTime EarnedUtc { get; set; }
+
+    /// <summary>Null = unredeemed (counts toward the next voucher); set once redeemed.</summary>
+    public int? VoucherId { get; set; }
+}
+
+/// <summary>A redeemed, printable donut voucher — handed to the manager to buy the real donuts.</summary>
+public sealed class Voucher
+{
+    public int Id { get; set; }
+    public int LearnerId { get; set; }
+    public Learner? Learner { get; set; }
+
+    public string Code { get; set; } = "";
+    public int Points { get; set; }
+    public string Milestone { get; set; } = "";
+    public string ManagerName { get; set; } = "";   // snapshot of the configured manager at issue time
+    public DateTime IssuedUtc { get; set; }
+}

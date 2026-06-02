@@ -2,6 +2,7 @@
 @inject LearnerSession Session
 @inject MasteryService Mastery
 @inject GatingEngine Gating
+@inject DonutService Donuts
 @inject NavigationManager Nav
 
 <PageTitle>My path — Synnduit Tutor</PageTitle>
@@ -19,6 +20,15 @@ else
     <div class="eyebrow">Your progress</div>
     <h1>@Session.DisplayName's path</h1>
     <p class="lead">Master every concept in a level to clear its gate. Locked concepts open once their prerequisites are done.</p>
+
+    @if (_balance is not null)
+    {
+        <DonutJar Balance="_balance" Threshold="Donuts.Threshold" OnRedeem="RedeemAsync" Redeeming="_redeeming" />
+        @if (_redeemError is not null)
+        {
+            <p class="text-muted small mb-3">@_redeemError</p>
+        }
+    }
 
     @foreach (var lv in _levels)
     {
@@ -83,12 +93,41 @@ else
 
 @code {
     private IReadOnlyList<LevelView>? _levels;
+    private DonutBalance? _balance;
+    private bool _redeeming;
+    private string? _redeemError;
 
     protected override async Task OnInitializedAsync()
     {
         if (!Session.IsSignedIn) return;
         var map = await Mastery.GetMasteryMapAsync(Session.LearnerId!.Value);
         _levels = Gating.BuildOverview(map);
+        _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value);
+    }
+
+    private async Task RedeemAsync()
+    {
+        if (_redeeming || _levels is null) return;
+        _redeeming = true;
+        _redeemError = null;
+        try
+        {
+            var milestone = BuildMilestoneLabel();
+            var voucher = await Donuts.RedeemAsync(Session.LearnerId!.Value, milestone);
+            Nav.NavigateTo($"/voucher/{voucher.Id}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _redeemError = ex.Message;
+            _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value);
+            _redeeming = false;
+        }
+    }
+
+    private string BuildMilestoneLabel()
+    {
+        var cleared = _levels!.Where(l => l.Complete).Select(l => l.Level.Name).ToList();
+        return cleared.Count > 0 ? string.Join(" + ", cleared) : "Synnduit Foundations — in progress";
     }
 
     private static MarkupString StatusIcon(ConceptStatus s) => new(s switch

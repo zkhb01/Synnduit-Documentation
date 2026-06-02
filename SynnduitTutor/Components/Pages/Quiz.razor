@@ -123,6 +123,37 @@ else
             }
         </div>
 
+        @if (_awards.Count > 0)
+        {
+            <div class="donut-earned">
+                <div class="de-donuts">
+                    @for (var i = 0; i < _awards.Sum(a => a.Points); i++) { <Donut Size="40" /> }
+                </div>
+                <div class="de-body">
+                    <div class="de-total">+@(_awards.Sum(a => a.Points)) donuts earned</div>
+                    <ul class="de-reasons">
+                        @foreach (var a in _awards)
+                        {
+                            <li><span class="de-pts">+@a.Points</span> @AwardLabel(a.Reason)</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        @if (_levelJustCompleted)
+        {
+            <div class="milestone-banner">
+                <div class="mb-cross">✠</div>
+                <div>
+                    <div class="eyebrow">Milestone</div>
+                    <h3 class="mb-1">@_completedLevelName — gate cleared</h3>
+                    <p class="mb-2">Every concept in this level is mastered. Head to your path to redeem your donut voucher.</p>
+                    <a class="btn btn-primary btn-sm" href="/dashboard">Go to my path →</a>
+                </div>
+            </div>
+        }
+
         @foreach (var r in _result.Items)
         {
             <div class="card mb-2 border-@(r.Correct ? "success" : "danger")">
@@ -183,6 +214,9 @@ else
 
     private QuizResult? _result;
     private RemediationResult? _remediation;
+    private IReadOnlyList<DonutAward> _awards = Array.Empty<DonutAward>();
+    private bool _levelJustCompleted;
+    private string? _completedLevelName;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -208,6 +242,7 @@ else
     {
         _single.Clear(); _multi.Clear(); _ranks.Clear(); _text.Clear(); _self.Clear();
         _result = null; _remediation = null; _escalated = false;
+        _awards = Array.Empty<DonutAward>(); _levelJustCompleted = false; _completedLevelName = null;
     }
 
     private void ToggleMulti(string itemId, string optId, bool on)
@@ -249,9 +284,12 @@ else
         }
 
         _result = Scoring.Score(_items, responses, _concept!.MasteryThreshold);
-        var mastery = await Mastery.RecordAttemptAsync(
+        var outcome = await Mastery.RecordAttemptAsync(
             Session.LearnerId!.Value, _concept, _result, _items.Select(i => i.Id));
-        _escalated = mastery.EscalatedToMentor;
+        _escalated = outcome.Mastery.EscalatedToMentor;
+        _awards = outcome.NewAwards;
+        _levelJustCompleted = outcome.LevelJustCompleted;
+        _completedLevelName = outcome.CompletedLevelName;
 
         if (!_result.Passed)
         {
@@ -261,6 +299,16 @@ else
 
         _submitting = false;
     }
+
+    private static string AwardLabel(string reason) => reason switch
+    {
+        "Mastered" => "Concept mastered",
+        "FirstAttempt" => "First-attempt bonus",
+        "Perfect" => "Perfect score",
+        "Critical" => "Critical concept",
+        "LevelComplete" => "Level cleared",
+        _ => reason
+    };
 
     private async Task Retry()
     {

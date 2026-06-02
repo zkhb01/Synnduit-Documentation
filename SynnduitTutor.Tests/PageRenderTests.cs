@@ -23,28 +23,52 @@ public class PageRenderTests : IDisposable
     {
         var store = TestSupport.RealStore();
         var session = new LearnerSession();
+        var donutOpts = TestSupport.DonutOpts();
 
         _ctx.Services.AddSingleton(store);
         _ctx.Services.AddSingleton<IDbContextFactory<Data.TutorDbContext>>(_db);
-        _ctx.Services.AddSingleton(new MasteryService(_db, store));
+        _ctx.Services.AddSingleton(donutOpts);
+        _ctx.Services.AddSingleton(new MasteryService(_db, store, donutOpts));
         _ctx.Services.AddSingleton(new GatingEngine(store));
         _ctx.Services.AddSingleton<ScoringService>();
+        _ctx.Services.AddSingleton(new DonutService(_db, donutOpts));
         _ctx.Services.AddSingleton<IRemediationService, StubRemediationService>();
         _ctx.Services.AddSingleton(session);
 
         // Sign in a real learner so the auth-guarded pages render their content.
-        var mastery = new MasteryService(_db, store);
+        var mastery = new MasteryService(_db, store, donutOpts);
         var learner = mastery.GetOrCreateLearnerAsync("Render Tester", "stub:render").GetAwaiter().GetResult();
         _learnerId = learner.Id;
         session.SignIn(learner.Id, learner.DisplayName);
     }
 
     [Fact]
-    public void Dashboard_renders_the_concept_path()
+    public void Dashboard_renders_the_concept_path_and_donut_jar()
     {
         var cut = _ctx.Render<Dashboard>();
         Assert.Contains("L1.1", cut.Markup);
         Assert.Contains("What Synnduit is", cut.Markup);
+        Assert.Contains("Donut jar", cut.Markup);   // incentive panel present
+    }
+
+    [Fact]
+    public async Task Voucher_page_renders_certificate_with_manager_placeholder()
+    {
+        var store = TestSupport.RealStore();
+        var opts = TestSupport.DonutOpts();
+        var mastery = new MasteryService(_db, store, opts);
+        var donuts = new DonutService(_db, opts);
+
+        QuizResult Pass() => new(Array.Empty<ItemResult>(), 1.0, true, Array.Empty<SynnduitTutor.Models.Item>());
+        foreach (var id in new[] { "L1.1", "L1.2", "L1.3", "L1.4" })
+            await mastery.RecordAttemptAsync(_learnerId, store.Graph.FindConcept(id)!, Pass(), new[] { id + ".q1" });
+
+        var voucher = await donuts.RedeemAsync(_learnerId, "Foundations");
+
+        var cut = _ctx.Render<Voucher>(p => p.Add(x => x.Id, voucher.Id));
+        Assert.Contains("Donut Voucher", cut.Markup);
+        Assert.Contains("Manager Name", cut.Markup);     // configured placeholder, printed on voucher
+        Assert.Contains(voucher.Code, cut.Markup);
     }
 
     [Fact]

@@ -23,6 +23,9 @@ internal static class TestSupport
     public static CurriculumStore RealStore() =>
         new(FindCurriculumRoot(), NullLogger<CurriculumStore>.Instance);
 
+    /// <summary>Default donut config (all bonuses = 1, level bonus = 3, threshold = 6).</summary>
+    public static DonutOptions DonutOpts() => new();
+
     /// <summary>A throwaway file-based SQLite database for one test.</summary>
     public sealed class TempDbFactory : IDbContextFactory<TutorDbContext>, IDisposable
     {

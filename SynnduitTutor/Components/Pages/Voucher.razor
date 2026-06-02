@@ -1,0 +1,89 @@
+@page "/voucher/{Id:int}"
+@inject DonutService Donuts
+@inject MasteryService Mastery
+@inject LearnerSession Session
+@inject IJSRuntime JS
+
+<PageTitle>Donut voucher — Synnduit Tutor</PageTitle>
+
+@if (!Session.IsSignedIn)
+{
+    <RedirectToHome />
+}
+else if (_voucher is null)
+{
+    <p class="text-danger">Voucher not found.</p>
+    <a href="/dashboard">← My path</a>
+}
+else
+{
+    <div class="voucher-actions">
+        <a href="/dashboard" class="btn btn-outline-secondary btn-sm">← My path</a>
+        <button class="btn btn-primary btn-sm" @onclick="PrintAsync">🖨 Print voucher</button>
+    </div>
+
+    <article class="voucher">
+        <div class="voucher-rule"></div>
+        <header class="voucher-head">
+            <img class="voucher-crest" src="brand/ccsd-mark.png" alt="Calgary Catholic School District" />
+            <div>
+                <div class="eyebrow">Calgary Catholic School District</div>
+                <div class="voucher-kicker">Synnduit Tutor</div>
+            </div>
+        </header>
+
+        <h1 class="voucher-title">Donut Voucher</h1>
+        <p class="voucher-cite">This certifies that</p>
+        <p class="voucher-name">@_learnerName</p>
+        <p class="voucher-cite">has earned, through demonstrated mastery,</p>
+
+        <div class="voucher-count">
+            <div class="vc-donuts">
+                @for (var i = 0; i < Math.Min(_voucher.Points, 12); i++) { <Donut Size="34" /> }
+            </div>
+            <div class="vc-num">@_voucher.Points <span>donuts</span></div>
+        </div>
+
+        <p class="voucher-milestone">@_voucher.Milestone</p>
+
+        <div class="voucher-redeem">
+            <div>
+                <div class="eyebrow">Redeem with</div>
+                <div class="vr-manager">@_voucher.ManagerName</div>
+                <div class="vr-note">Please honour this voucher for @_voucher.Points donut(s) for the team.</div>
+            </div>
+            <div class="voucher-stamp">✠</div>
+        </div>
+
+        <footer class="voucher-foot">
+            <span>No. <strong>@_voucher.Code</strong></span>
+            <span>Issued @_voucher.IssuedUtc.ToLocalTime().ToString("MMMM d, yyyy")</span>
+        </footer>
+        <div class="voucher-rule"></div>
+    </article>
+
+    <p class="text-muted small mt-3 voucher-finephrase">
+        Minimum @Donuts.Threshold donuts required to issue a voucher. Earned donuts are recognition of
+        learning excellence; the real treats are kindly provided by your manager.
+    </p>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Data.Voucher? _voucher;
+    private string _learnerName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Session.IsSignedIn) return;
+        _voucher = await Donuts.GetVoucherAsync(Id);
+        if (_voucher is not null)
+        {
+            var learner = await Mastery.GetLearnerAsync(_voucher.LearnerId);
+            _learnerName = learner?.DisplayName ?? "Learner";
+        }
+    }
+
+    private async Task PrintAsync() => await JS.InvokeVoidAsync("print");
+}

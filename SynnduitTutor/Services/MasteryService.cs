@@ -4,11 +4,23 @@ using SynnduitTutor.Models;
 
 namespace SynnduitTutor.Services;
 
+/// <summary>Result of recording a quiz attempt, including any donuts just earned and milestone state.</summary>
+public sealed record AttemptOutcome(
+    ConceptMastery Mastery,
+    IReadOnlyList<DonutAward> NewAwards,
+    bool LevelJustCompleted,
+    string? CompletedLevelId,
+    string? CompletedLevelName)
+{
+    public int DonutsEarned => NewAwards.Sum(a => a.Points);
+}
+
 /// <summary>
-/// Reads/writes per-learner mastery state. Uses an IDbContextFactory so each operation gets a
-/// short-lived context (safe under Blazor Server's concurrency model).
+/// Reads/writes per-learner mastery state and awards donuts atomically with each attempt.
+/// Uses an IDbContextFactory so each operation gets a short-lived context (safe under Blazor Server).
 /// </summary>
-public sealed class MasteryService(IDbContextFactory<TutorDbContext> dbFactory, CurriculumStore store)
+public sealed class MasteryService(
+    IDbContextFactory<TutorDbContext> dbFactory, CurriculumStore store, DonutOptions donuts)
 {
     public async Task<List<Learner>> GetLearnersAsync()
     {
@@ -51,14 +63,20 @@ public sealed class MasteryService(IDbContextFactory<TutorDbContext> dbFactory, 
 
     /// <summary>
     /// Records a quiz attempt: updates best score, mastery, attempt/remediation counts, seen items,
-    /// and (for L0 placement, first-attempt pass) the skip flag.
+    /// (for L0 placement) skip-on-pass, and — when a concept is mastered for the FIRST time — awards
+    /// donuts (base + first-attempt / perfect-score / critical bonuses) and a level-completion bonus.
     /// </summary>
-    public async Task<ConceptMastery> RecordAttemptAsync(
+    public async Task<AttemptOutcome> RecordAttemptAsync(
         int learnerId, Concept concept, QuizResult result, IEnumerable<string> servedItemIds)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
-        var m = await db.ConceptMastery.FirstOrDefaultAsync(x => x.LearnerId == learnerId && x.ConceptId == concept.Id);
-        var isFirstAttempt = m is null;
+        var now = DateTime.UtcNow;
+
+        var existing = await db.ConceptMastery.FirstOrDefaultAsync(x => x.LearnerId == learnerId && x.ConceptId == concept.Id);
+        var isFirstAttempt = existing is null;
+        var wasMastered = existing?.Mastered == true;
+
+        var m = existing;
         if (m is null)
         {
             m = new ConceptMastery { LearnerId = learnerId, ConceptId = concept.Id };
@@ -66,7 +84,7 @@ public sealed class MasteryService(IDbContextFactory<TutorDbContext> dbFactory, 
         }
 
         m.Attempts++;
-        m.LastAttemptUtc = DateTime.UtcNow;
+        m.LastAttemptUtc = now;
         if (result.Score > m.BestScore) m.BestScore = result.Score;
 
         var placement = store.Graph.LevelOf(concept)?.IsPlacement == true;
@@ -80,7 +98,6 @@ public sealed class MasteryService(IDbContextFactory<TutorDbContext> dbFactory, 
         }
         else if (!isFirstAttempt)
         {
-            // A failed re-attempt counts as a remediation cycle; escalate past the configured limit.
             m.RemediationCycles++;
             if (m.RemediationCycles >= store.Graph.MasteryModel.RemediationCycleLimitBeforeEscalation)
                 m.EscalatedToMentor = true;
@@ -91,7 +108,59 @@ public sealed class MasteryService(IDbContextFactory<TutorDbContext> dbFactory, 
         foreach (var id in servedItemIds) seen.Add(id);
         m.SeenItemIdsCsv = string.Join(',', seen);
 
+        // ---- Donuts: only on the first time this concept is mastered ----
+        var awards = new List<DonutAward>();
+        var justMastered = passed && !wasMastered;
+        if (justMastered)
+        {
+            void Add(string reason, int points)
+            {
+                if (points <= 0) return;
+                awards.Add(new DonutAward { LearnerId = learnerId, Reason = reason, ConceptId = concept.Id, Points = points, EarnedUtc = now });
+            }
+            Add("Mastered", donuts.Award.ConceptMastered);
+            if (isFirstAttempt) Add("FirstAttempt", donuts.Award.FirstAttemptBonus);
+            if (result.Score >= 1.0) Add("Perfect", donuts.Award.PerfectScoreBonus);
+            if (concept.SynnduitCritical) Add("Critical", donuts.Award.CriticalConceptBonus);
+            db.DonutAwards.AddRange(awards);
+        }
+
         await db.SaveChangesAsync();
-        return m;
+
+        // ---- Level-completion milestone ----
+        var levelJustCompleted = false;
+        string? completedLevelId = null, completedLevelName = null;
+        if (justMastered)
+        {
+            var level = store.Graph.LevelOf(concept);
+            if (level is not null)
+            {
+                var ids = level.Concepts.Select(c => c.Id).ToList();
+                var doneCount = await db.ConceptMastery.CountAsync(x =>
+                    x.LearnerId == learnerId && ids.Contains(x.ConceptId) && (x.Mastered || x.SkippedByPlacement));
+
+                if (doneCount == ids.Count)
+                {
+                    var already = await db.DonutAwards.AnyAsync(a =>
+                        a.LearnerId == learnerId && a.LevelId == level.Id && a.Reason == "LevelComplete");
+                    if (!already)
+                    {
+                        var bonus = new DonutAward
+                        {
+                            LearnerId = learnerId, Reason = "LevelComplete", LevelId = level.Id,
+                            Points = donuts.Award.LevelCompletionBonus, EarnedUtc = now
+                        };
+                        db.DonutAwards.Add(bonus);
+                        await db.SaveChangesAsync();
+                        if (bonus.Points > 0) awards.Add(bonus);
+                        levelJustCompleted = true;
+                        completedLevelId = level.Id;
+                        completedLevelName = level.Name;
+                    }
+                }
+            }
+        }
+
+        return new AttemptOutcome(m, awards, levelJustCompleted, completedLevelId, completedLevelName);
     }
 }

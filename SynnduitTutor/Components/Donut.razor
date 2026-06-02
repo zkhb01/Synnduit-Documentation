@@ -1,0 +1,36 @@
+@* A small gold-glazed donut glyph. Muted = an empty "slot" for the progress meter. *@
+
+<svg class="donut @(Muted ? "donut--muted" : null)" width="@Size" height="@Size" viewBox="0 0 40 40"
+     role="img" aria-label="@(Muted ? "empty donut slot" : "donut")">
+    @if (Muted)
+    {
+        <path fill-rule="evenodd"
+              d="M20 4a16 16 0 100 32 16 16 0 100-32Zm0 10a6 6 0 110 12 6 6 0 110-12Z"
+              fill="none" stroke="rgba(106,98,83,0.45)" stroke-width="1.4" stroke-dasharray="2 2.4" />
+    }
+    else
+    {
+        @* dough ring (transparent hole via evenodd) *@
+        <path fill-rule="evenodd"
+              d="M20 4a16 16 0 100 32 16 16 0 100-32Zm0 9.5a6.5 6.5 0 110 13 6.5 6.5 0 110-13Z"
+              fill="#c69a51" />
+        @* glaze, nudged up to reveal a dough rim (drip look) *@
+        <path fill-rule="evenodd" transform="translate(0,-1)"
+              d="M20 5.5a14.5 14.5 0 100 29 14.5 14.5 0 100-29Zm0 8a6.5 6.5 0 110 13 6.5 6.5 0 110-13Z"
+              fill="#d8bb78" />
+        @* sprinkles *@
+        <g>
+            <rect x="18.6" y="7.2"  width="2.8" height="1.2" rx=".6" fill="#16130c" transform="rotate(28 20 7.8)" />
+            <rect x="27.4" y="12.2" width="2.8" height="1.2" rx=".6" fill="#5d7a44" transform="rotate(-40 28.8 12.8)" />
+            <rect x="28.6" y="22.6" width="2.8" height="1.2" rx=".6" fill="#fbf8f1" transform="rotate(35 30 23.2)" />
+            <rect x="9.2"  y="13.0" width="2.8" height="1.2" rx=".6" fill="#8c2f2f" transform="rotate(50 10.6 13.6)" />
+            <rect x="9.0"  y="24.0" width="2.8" height="1.2" rx=".6" fill="#16130c" transform="rotate(-30 10.4 24.6)" />
+            <rect x="18.2" y="31.4" width="2.8" height="1.2" rx=".6" fill="#8a6c33" transform="rotate(12 19.6 32)" />
+        </g>
+    }
+</svg>
+
+@code {
+    [Parameter] public int Size { get; set; } = 30;
+    [Parameter] public bool Muted { get; set; }
+}
