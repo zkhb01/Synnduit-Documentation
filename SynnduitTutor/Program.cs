@@ -26,7 +26,22 @@ builder.Services.AddScoped<GatingEngine>();
 builder.Services.AddScoped<ScoringService>();
 builder.Services.AddScoped<MasteryService>();
 builder.Services.AddScoped<DonutService>();
-builder.Services.AddScoped<IRemediationService, StubRemediationService>();
+
+// --- Remediation: live Claude when an API key is configured, else the deterministic stub ---
+builder.Services.AddScoped<StubRemediationService>();
+var anthropicOptions = builder.Configuration.GetSection("Anthropic").Get<AnthropicOptions>() ?? new AnthropicOptions();
+if (string.IsNullOrWhiteSpace(anthropicOptions.ApiKey))
+    anthropicOptions.ApiKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
+if (!string.IsNullOrWhiteSpace(anthropicOptions.ApiKey))
+{
+    builder.Services.AddSingleton(anthropicOptions);
+    builder.Services.AddSingleton(new Anthropic.AnthropicClient { ApiKey = anthropicOptions.ApiKey });
+    builder.Services.AddScoped<IRemediationService, ClaudeRemediationService>();
+}
+else
+{
+    builder.Services.AddScoped<IRemediationService>(sp => sp.GetRequiredService<StubRemediationService>());
+}
 
 // --- Stub auth: current learner per circuit ---
 builder.Services.AddScoped<LearnerSession>();
