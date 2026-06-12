@@ -1,4 +1,5 @@
 @inject LearnerSession Session
+@inject IConfiguration Config
 
 <div class="brand">
     <a class="brand-lockup" href="">
@@ -29,5 +30,11 @@
             <span class="lc-label">Signed in</span>
             <span class="lc-name">@Session.DisplayName</span>
         </div>
+        @if (Config.IsEntraConfigured())
+        {
+            <div class="nav-item">
+                <a class="nav-link" href="/auth/logout">Sign out</a>
+            </div>
+        }
     }
 </div>

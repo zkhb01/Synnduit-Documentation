@@ -46,8 +46,9 @@ else
     builder.Services.AddScoped<IAnswerGrader>(sp => sp.GetRequiredService<StubAnswerGrader>());
 }
 
-// --- Stub auth: current learner per circuit ---
+// --- Auth: current learner per circuit. Stub sign-in by default; Entra SSO when AzureAd is configured. ---
 builder.Services.AddScoped<LearnerSession>();
+builder.AddEntraAuth();
 
 var app = builder.Build();
 
@@ -69,6 +70,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseEntraAuth();   // no-op unless AzureAd is configured
 app.UseAntiforgery();
 
 app.MapStaticAssets();
