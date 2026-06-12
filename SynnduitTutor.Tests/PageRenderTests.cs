@@ -33,6 +33,7 @@ public class PageRenderTests : IDisposable
         _ctx.Services.AddSingleton<ScoringService>();
         _ctx.Services.AddSingleton(new DonutService(_db, donutOpts));
         _ctx.Services.AddSingleton<IRemediationService, StubRemediationService>();
+        _ctx.Services.AddSingleton<IAnswerGrader, StubAnswerGrader>();
         _ctx.Services.AddSingleton(session);
 
         // Sign in a real learner so the auth-guarded pages render their content.

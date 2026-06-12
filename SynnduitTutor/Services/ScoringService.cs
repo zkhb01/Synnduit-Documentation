@@ -8,6 +8,7 @@ public sealed class ItemResponse
     public List<string> SelectedOptionIds { get; set; } = new();   // mc/multi
     public List<string> OrderedOptionIds { get; set; } = new();    // order
     public bool? SelfAssessedCorrect { get; set; }                  // model-scored (short/scenario/classify/match)
+    public string? FreeText { get; set; }                           // the typed answer for model-scored items
 }
 
 public sealed record ItemResult(Item Item, bool Correct, bool WasModelScored);

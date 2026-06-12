@@ -32,15 +32,18 @@ builder.Services.AddScoped<StubRemediationService>();
 var anthropicOptions = builder.Configuration.GetSection("Anthropic").Get<AnthropicOptions>() ?? new AnthropicOptions();
 if (string.IsNullOrWhiteSpace(anthropicOptions.ApiKey))
     anthropicOptions.ApiKey = Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
+builder.Services.AddScoped<StubAnswerGrader>();
 if (!string.IsNullOrWhiteSpace(anthropicOptions.ApiKey))
 {
     builder.Services.AddSingleton(anthropicOptions);
     builder.Services.AddSingleton(new Anthropic.AnthropicClient { ApiKey = anthropicOptions.ApiKey });
     builder.Services.AddScoped<IRemediationService, ClaudeRemediationService>();
+    builder.Services.AddScoped<IAnswerGrader, ClaudeAnswerGrader>();
 }
 else
 {
     builder.Services.AddScoped<IRemediationService>(sp => sp.GetRequiredService<StubRemediationService>());
+    builder.Services.AddScoped<IAnswerGrader>(sp => sp.GetRequiredService<StubAnswerGrader>());
 }
 
 // --- Stub auth: current learner per circuit ---

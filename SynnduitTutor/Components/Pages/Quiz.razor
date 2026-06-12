@@ -3,6 +3,7 @@
 @inject LearnerSession Session
 @inject MasteryService Mastery
 @inject ScoringService Scoring
+@inject IAnswerGrader Grader
 @inject IRemediationService Remediation
 @inject NavigationManager Nav
 
@@ -33,7 +34,7 @@ else
                 <div class="card-body">
                     <p><strong>@n.</strong> @item.Stem
                         <span class="badge bg-light text-dark ms-1">@item.Difficulty</span>
-                        @if (!item.IsAutoScored) { <span class="badge bg-info text-dark">self-graded</span> }
+                        @if (!item.IsAutoScored) { <span class="badge bg-info text-dark">@(Grader.IsLive ? "Claude-graded" : "self-graded")</span> }
                     </p>
 
                     @switch (item.Type)
@@ -80,37 +81,44 @@ else
                             }
                             break;
 
-                        default: // short / scenario / classify / match — self-graded
+                        default: // short / scenario / classify / match — model-graded
                             <textarea class="form-control mb-2" rows="3" placeholder="Your answer…"
                                       @bind="_text[item.Id]"></textarea>
-                            <details class="mb-2">
-                                <summary class="small">Show sample answer &amp; rubric</summary>
-                                @if (item.SampleAnswer is not null)
-                                {
-                                    <p class="mt-2 mb-1"><em>@item.SampleAnswer</em></p>
-                                }
-                                @if (item.Rubric is { Count: > 0 })
-                                {
-                                    <ul class="small mb-0">@foreach (var r in item.Rubric) { <li>@r</li> }</ul>
-                                }
-                            </details>
-                            <div class="btn-group btn-group-sm" role="group">
-                                <input type="radio" class="btn-check" name="@(item.Id)_self" id="@(item.Id)_yes"
-                                       checked="@(_self.GetValueOrDefault(item.Id) == true)"
-                                       @onchange="() => _self[item.Id] = true" />
-                                <label class="btn btn-outline-success" for="@(item.Id)_yes">I covered the rubric</label>
-                                <input type="radio" class="btn-check" name="@(item.Id)_self" id="@(item.Id)_no"
-                                       checked="@(_self.GetValueOrDefault(item.Id) == false)"
-                                       @onchange="() => _self[item.Id] = false" />
-                                <label class="btn btn-outline-secondary" for="@(item.Id)_no">Not quite</label>
-                            </div>
+                            @if (Grader.IsLive)
+                            {
+                                <p class="small text-muted mb-0">Your answer will be graded against the rubric.</p>
+                            }
+                            else
+                            {
+                                <details class="mb-2">
+                                    <summary class="small">Show sample answer &amp; rubric</summary>
+                                    @if (item.SampleAnswer is not null)
+                                    {
+                                        <p class="mt-2 mb-1"><em>@item.SampleAnswer</em></p>
+                                    }
+                                    @if (item.Rubric is { Count: > 0 })
+                                    {
+                                        <ul class="small mb-0">@foreach (var r in item.Rubric) { <li>@r</li> }</ul>
+                                    }
+                                </details>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <input type="radio" class="btn-check" name="@(item.Id)_self" id="@(item.Id)_yes"
+                                           checked="@(_self.GetValueOrDefault(item.Id) == true)"
+                                           @onchange="() => _self[item.Id] = true" />
+                                    <label class="btn btn-outline-success" for="@(item.Id)_yes">I covered the rubric</label>
+                                    <input type="radio" class="btn-check" name="@(item.Id)_self" id="@(item.Id)_no"
+                                           checked="@(_self.GetValueOrDefault(item.Id) == false)"
+                                           @onchange="() => _self[item.Id] = false" />
+                                    <label class="btn btn-outline-secondary" for="@(item.Id)_no">Not quite</label>
+                                </div>
+                            }
                             break;
                     }
                 </div>
             </div>
         }
 
-        <button class="btn btn-primary" @onclick="SubmitAsync" disabled="@_submitting">Submit answers</button>
+        <button class="btn btn-primary" @onclick="SubmitAsync" disabled="@_submitting">@(_submitting ? "Grading…" : "Submit answers")</button>
     }
     else
     {
@@ -159,8 +167,16 @@ else
             <div class="card mb-2 border-@(r.Correct ? "success" : "danger")">
                 <div class="card-body py-2">
                     <div>@(r.Correct ? "✔" : "✗") <strong>@r.Item.Stem</strong>
-                        @if (r.WasModelScored) { <span class="badge bg-info text-dark">self-graded</span> }
+                        @if (r.WasModelScored) { <span class="badge bg-info text-dark">@(Grader.IsLive ? "Claude-graded" : "self-graded")</span> }
                     </div>
+                    @if (_grades.TryGetValue(r.Item.Id, out var g))
+                    {
+                        <div class="small mt-1">@g.Feedback</div>
+                        @if (g.Missed.Count > 0)
+                        {
+                            <div class="small text-muted mt-1">Missing: @string.Join("; ", g.Missed)</div>
+                        }
+                    }
                     @if (!string.IsNullOrEmpty(r.Item.Explanation))
                     {
                         <div class="small text-muted mt-1">@r.Item.Explanation</div>
@@ -211,6 +227,7 @@ else
     private readonly Dictionary<string, Dictionary<string, int>> _ranks = new();
     private readonly Dictionary<string, string> _text = new();
     private readonly Dictionary<string, bool?> _self = new();
+    private readonly Dictionary<string, GradeResult> _grades = new();
 
     private QuizResult? _result;
     private RemediationResult? _remediation;
@@ -240,7 +257,7 @@ else
 
     private void ResetInputs()
     {
-        _single.Clear(); _multi.Clear(); _ranks.Clear(); _text.Clear(); _self.Clear();
+        _single.Clear(); _multi.Clear(); _ranks.Clear(); _text.Clear(); _self.Clear(); _grades.Clear();
         _result = null; _remediation = null; _escalated = false;
         _awards = Array.Empty<DonutAward>(); _levelJustCompleted = false; _completedLevelName = null;
     }
@@ -276,8 +293,19 @@ else
                     if (_ranks.TryGetValue(item.Id, out var ranks))
                         resp.OrderedOptionIds = ranks.OrderBy(kv => kv.Value).Select(kv => kv.Key).ToList();
                     break;
-                default:
-                    resp.SelfAssessedCorrect = _self.GetValueOrDefault(item.Id);
+                default: // model-scored: short / scenario / classify / match
+                    var answer = _text.GetValueOrDefault(item.Id) ?? "";
+                    resp.FreeText = answer;
+                    if (Grader.IsLive)
+                    {
+                        var grade = await Grader.GradeAsync(item, answer);
+                        _grades[item.Id] = grade;
+                        resp.SelfAssessedCorrect = grade.Correct;
+                    }
+                    else
+                    {
+                        resp.SelfAssessedCorrect = _self.GetValueOrDefault(item.Id);
+                    }
                     break;
             }
             responses[item.Id] = resp;

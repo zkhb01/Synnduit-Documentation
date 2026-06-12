@@ -38,14 +38,16 @@ and mastery (mastery on pass, L0 first-attempt skip-on-pass, escalation after re
 | `Models/` | `ConceptGraph`, `ItemBank`, `Lesson` — shapes of the authored content |
 | `Services/CurriculumStore` | Loads + caches concept-graph.json, items/*.json, lessons/*.md |
 | `Services/GatingEngine` | Pure: concept status (locked/available/mastered/skipped) + level gates |
-| `Services/ScoringService` | Deterministic auto-scoring; model items self-assessed for now |
+| `Services/ScoringService` | Deterministic auto-scoring (mc/multi/order) |
+| `Services/IAnswerGrader` | Free-text grading: `StubAnswerGrader` (self-assess) or `ClaudeAnswerGrader` (rubric, when a key is set) |
 | `Services/MasteryService` | Per-learner per-concept mastery state (EF Core / SQLite) |
-| `Services/IRemediationService` | `StubRemediationService` now; `ClaudeRemediationService` later |
+| `Services/IRemediationService` | `StubRemediationService`, or `ClaudeRemediationService` when an Anthropic key is configured |
 | `Services/LearnerSession` | Stub auth (current learner per circuit); Entra SSO later |
 | `Components/Pages/` | `Home` (sign in), `Dashboard` (path), `Lesson`, `Quiz` |
 
 ## Next
 
 1. **Entra SSO** — replace `LearnerSession` with `Microsoft.Identity.Web`; key `Learner.ExternalId` to the Entra object id.
-2. **Live Claude remediation** — add `ClaudeRemediationService : IRemediationService` calling the Anthropic API, grounded in the lesson + the learner's wrong answers.
-3. **Model-item grading** — let Claude grade short/scenario answers against the rubric instead of self-assessment.
+2. **Top up thin item banks** — several L0 banks have only 4 items; aim for 5–8 so re-assessment always has fresh questions.
+
+Done: live Claude remediation (`ClaudeRemediationService`) and rubric grading of free-text items (`ClaudeAnswerGrader`) — both activate when an Anthropic API key is configured (`Anthropic:ApiKey` or `ANTHROPIC_API_KEY`).
