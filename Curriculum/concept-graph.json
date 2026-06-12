@@ -33,12 +33,12 @@
         {
           "id": "L1.2",
           "name": "Source vs Destination",
-          "objective": "Define source (origin) and destination (lands; CCSD = DDH); classify real systems.",
+          "objective": "Define source (origin) and destination (lands; CSSD = DDH); classify real systems.",
           "prereqs": ["L1.1"],
           "sources": ["README.md#1", "README.md#3"],
           "itemPoolId": "L1.2.items",
           "masteryThreshold": 0.8,
-          "remediationAngle": "Use the CCSD source/StarBridge table (README 5.1) as concrete grounding."
+          "remediationAngle": "Use the CSSD source/StarBridge table (README 5.1) as concrete grounding."
         },
         {
           "id": "L1.3",

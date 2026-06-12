@@ -52,7 +52,7 @@
         { "id": "d", "text": "One per source record" }
       ],
       "correct": ["a"],
-      "explanation": "There is one StarBridge database per Run. CCSD's Sync-SRC-DDH has three Runs, hence three StarBridge DBs.",
+      "explanation": "There is one StarBridge database per Run. CSSD's Sync-SRC-DDH has three Runs, hence three StarBridge DBs.",
       "misconceptions": {
         "b": "Each Run gets its own StarBridge so its bookkeeping stays isolated.",
         "c": "A StarBridge DB covers a Run's whole set of entities, not one DB per entity type."

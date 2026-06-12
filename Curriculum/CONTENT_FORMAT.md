@@ -43,7 +43,7 @@ sources: [README.md#1-what-is-synnduit]
 <the single sentence a learner must be able to say>
 
 ## The idea
-<canonical explanation, grounded in the cited sources, with one concrete CCSD example>
+<canonical explanation, grounded in the cited sources, with one concrete CSSD example>
 
 ## Why it matters
 <what breaks / what you can't do if you don't get this>

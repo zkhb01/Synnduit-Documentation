@@ -78,7 +78,7 @@
       "type": "mc",
       "difficulty": "synthesis",
       "scoring": "auto",
-      "stem": "Why does CCSD report roughly a 75% reduction in custom code by using Synnduit?",
+      "stem": "Why does CSSD report roughly a 75% reduction in custom code by using Synnduit?",
       "options": [
         { "id": "a", "text": "The destination database is smaller" },
         { "id": "b", "text": "The hard, reusable parts (diffing, dedup, change logging, thresholds, GC) live in the engine, so teams only write system-specific connectors" },

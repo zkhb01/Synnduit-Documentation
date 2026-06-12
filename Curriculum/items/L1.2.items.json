@@ -8,7 +8,7 @@
       "type": "mc",
       "difficulty": "recall",
       "scoring": "auto",
-      "stem": "At CCSD, which system is the destination for the Synnduit syncs?",
+      "stem": "At CSSD, which system is the destination for the Synnduit syncs?",
       "options": [
         { "id": "a", "text": "PowerSchool" },
         { "id": "b", "text": "HRAD (PeopleSoft HR)" },
@@ -16,7 +16,7 @@
         { "id": "d", "text": "ServiceNow" }
       ],
       "correct": ["c"],
-      "explanation": "At CCSD the destination is always the DDH — the district's single source of truth that data is synced into.",
+      "explanation": "At CSSD the destination is always the DDH — the district's single source of truth that data is synced into.",
       "misconceptions": {
         "a": "PowerSchool is a source system (School and Student APIs).",
         "b": "HRAD is a source system (PeopleSoft HR).",
@@ -29,7 +29,7 @@
       "type": "classify",
       "difficulty": "apply",
       "scoring": "model",
-      "stem": "Classify each system as Source or Destination in the CCSD integration: (1) PowerSchool, (2) DDH, (3) HRAD, (4) ServiceNow.",
+      "stem": "Classify each system as Source or Destination in the CSSD integration: (1) PowerSchool, (2) DDH, (3) HRAD, (4) ServiceNow.",
       "rubric": [
         "PowerSchool = Source",
         "DDH = Destination",

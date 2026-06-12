@@ -1,13 +1,13 @@
 # Synnduit — A Teammate-Friendly Introduction
 
-> A short onboarding doc for new teammates joining the CCSD integration team.
+> A short onboarding doc for new teammates joining the CSSD integration team.
 > Read this first, then dive into the deeper docs in `Documentation/`.
 
 ---
 
 ## 1. What is Synnduit?
 
-**Synnduit is an open-source data synchronization engine built in .NET.** It keeps data in sync between a *source* system (where data originates — HR, PowerSchool, JSON files, ServiceNow, etc.) and a *destination* system (where it needs to land — at CCSD that's the **DDH / District Data Hub**), continuously and over the long term.
+**Synnduit is an open-source data synchronization engine built in .NET.** It keeps data in sync between a *source* system (where data originates — HR, PowerSchool, JSON files, ServiceNow, etc.) and a *destination* system (where it needs to land — at CSSD that's the **DDH / District Data Hub**), continuously and over the long term.
 
 Its tagline is **"ETL meets version control"** — Synnduit doesn't just copy data, it tracks every change down to individual field values, and it remembers the link between source and destination records so the same record is updated next time, not duplicated.
 
@@ -53,7 +53,7 @@ You don't change the engine. You plug things into it:
 | **POCO** | The C# class describing one entity type (e.g. `Staff`, `Student`, `School`). |
 | **Mapping** | The persisted link between a source record's ID and the destination record's ID. |
 | **Transaction outcome** | What happened to one record in one run — e.g. `NewEntityCreated`, `ChangesDetectedAndMerged`, `NoChangesDetected`, `Rejected`, `ExceptionThrown` (11 outcomes total — see `Documentation/Synnduit Console.docx`). |
-| **DDH** | District Data Hub — CCSD's destination database, the "single source of truth". |
+| **DDH** | District Data Hub — CSSD's destination database, the "single source of truth". |
 
 ---
 
@@ -70,7 +70,7 @@ You don't change the engine. You plug things into it:
 
 ---
 
-## 5. A real CCSD example: `Sync-SRC-DDH`
+## 5. A real CSSD example: `Sync-SRC-DDH`
 
 The repo at `C:\Users\<you>\source\repos\Sync-SRC-DDH` is a working example — it implements the entity mappings that flow from our source systems into the DDH.
 
@@ -121,7 +121,7 @@ if %errorlevel% neq 0 (
 powershell.exe -File "UpdateAzureStaffWithLatestUserName.ps1"
 ```
 
-The shape is always: **`Synnduit <RunName> <RunGuid>`** — the GUID identifies the run inside StarBridge so history stays consistent across executions.
+The shape is always: **`Synnduit <RunName> <UserSecretGuid>`** — the GUID is a **UserSecret identifier**: Synnduit uses it to locate the environment-specific UserSecret JSON file (connection strings and other secrets) for the run, so the same run can execute in different environments (Prod, Local, etc.) against the appropriate set of secrets.
 
 ### 5.4 How a Run is wired together (`appsettings.json`)
 
@@ -221,7 +221,7 @@ That's it. You query your source however you want, return a collection of POCOs,
 ## 7. Suggested reading order for new teammates
 
 1. This README — the 10-minute overview.
-2. `Documentation/Synnduit Nov 2017.pptx` — the original CCSD overview deck.
+2. `Documentation/Synnduit Nov 2017.pptx` — the original CSSD overview deck.
 3. `Documentation/Features of a sync program.docx` — the feature checklist.
 4. `Documentation/Synnduit Console.docx` — the 11 transaction outcomes in plain English.
 5. `Documentation/Synnduit Deduplication sequence.docx` — how an insert decides "new vs. duplicate".
@@ -231,7 +231,7 @@ That's it. You query your source however you want, return a collection of POCOs,
 
 ---
 
-## 8. Where things live (CCSD environment)
+## 8. Where things live (CSSD environment)
 
 | Thing | Path |
 |---|---|

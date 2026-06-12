@@ -74,17 +74,19 @@
       "type": "mc",
       "difficulty": "recall",
       "scoring": "auto",
-      "stem": "How is a Run launched at CCSD, and what does the GUID in the command do?",
+      "stem": "How is a Run launched at CSSD, and what does the GUID in the command do?",
       "options": [
+        { "id": "b", "text": "Synnduit <RunName> <UserSecretGuid>; the GUID is a UserSecret identifier Synnduit uses to load that run's environment-specific secrets" },
         { "id": "a", "text": "Synnduit <RunName> <RunGuid>; the GUID identifies the run in StarBridge so history stays consistent across executions" },
-        { "id": "b", "text": "Synnduit <RunName>; the GUID is a license key" },
         { "id": "c", "text": "It is started from the dashboard; the GUID is the user's ID" },
         { "id": "d", "text": "Synnduit <RunGuid>; the GUID is generated fresh each run" }
       ],
-      "correct": ["a"],
-      "explanation": "Runs are CLI invocations of the form 'Synnduit <RunName> <RunGuid>'. The GUID ties the run to its StarBridge history so identity is stable across executions.",
+      "correct": ["b"],
+      "explanation": "Runs are CLI invocations of the form 'Synnduit <RunName> <UserSecretGuid>'. The GUID is a UserSecret identifier that points Synnduit at the environment-specific UserSecret JSON file (connection strings and other secrets) for the run.",
       "misconceptions": {
-        "d": "A fresh GUID each run would break history continuity; the GUID is stable per run."
+        "a": "The command shape is right, but the GUID is not a StarBridge history key — it locates the run's UserSecret file, which is how the same run targets different environments (Prod, Local, etc.).",
+        "c": "Runs are launched from the CLI (typically via Windows Task Scheduler), not from the dashboard.",
+        "d": "The GUID is stable per run, not generated fresh each execution, and the command includes the Run name before it."
       },
       "source": "README.md#53-how-a-run-is-launched"
     }

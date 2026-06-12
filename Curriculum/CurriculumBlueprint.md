@@ -8,7 +8,7 @@
 >
 > Source material: this repo's `README.md`, `Documentation/`, `DiagnosticScripts/`,
 > `ExceptionHistoryWithResolutions/`, plus `Synnduit-Database` (StarBridge schema),
-> `SynnduitDashboard`, the Synnduit engine source, and the CCSD example repos.
+> `SynnduitDashboard`, the Synnduit engine source, and the CSSD example repos.
 
 ---
 
@@ -79,9 +79,9 @@ Sample items: (MC) "Synnduit is: (a) one-time import (b) continuous sync engine 
 Remediation: contrast against a naive nightly copy script — show duplicates / no history, then how Synnduit's remembered links + change log fix it.
 
 **L1.2 — Source vs. Destination** · prereqs: L1.1 · source: README §1, §3
-Objective: Define source (where data originates) and destination (where it lands; at CCSD = DDH); classify real systems.
-Sample items: (Classify) "Source or Destination: PowerSchool, DDH, HRAD, ServiceNow." (MC) "CCSD destination = DDH ✓."
-Remediation: use the §5.1 CCSD table as concrete grounding.
+Objective: Define source (where data originates) and destination (where it lands; at CSSD = DDH); classify real systems.
+Sample items: (Classify) "Source or Destination: PowerSchool, DDH, HRAD, ServiceNow." (MC) "CSSD destination = DDH ✓."
+Remediation: use the §5.1 CSSD table as concrete grounding.
 
 **L1.3 — The engine model** · prereqs: L1.2 · source: README §2
 Objective: You don't modify the engine — you implement a source connector and a destination connector; the engine computes & applies the delta.
