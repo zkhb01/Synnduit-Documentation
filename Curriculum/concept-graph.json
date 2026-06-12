@@ -266,6 +266,76 @@
           "remediationAngle": "Extract the nullable-requirement doc; show wrong (int) vs right (int?) and why the engine needs the distinction."
         }
       ]
+    },
+    {
+      "id": "L2",
+      "name": "Coding: write feeds, sinks, and POCOs",
+      "order": 3,
+      "type": "coding",
+      "gate": "all-concepts-mastered",
+      "gatesLevel": null,
+      "concepts": [
+        {
+          "id": "L2.1",
+          "name": "Write a POCO",
+          "objective": "Author an entity POCO: a plain C# class with [EntityType(guid, destinationSystem)], the identifier attributes ([SourceSystemIdentifier] / [DestinationSystemIdentifier]), [EntityProperty] on tracked fields, and [DuplicationKey] on the natural business key — with every property nullable.",
+          "prereqs": ["L1.9", "L0.E2"],
+          "sources": ["README.md#5.5", "Staff.cs"],
+          "itemPoolId": "L2.1.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Start from Staff.cs and build the class up one attribute at a time; convert each value-type property to its nullable form (int -> int?)."
+        },
+        {
+          "id": "L2.2",
+          "name": "Implement a Feed",
+          "objective": "Write a source connector: [Feed(SourceSystem = typeof(...))] class XFeed : IFeed<X> whose LoadEntities() opens a DbContext, queries with LINQ, projects rows into POCOs, and returns a materialized snapshot (.ToList()).",
+          "prereqs": ["L2.1", "L0.G2", "L0.E1"],
+          "sources": ["README.md#5.6", "Sync-SRC-DDH StaffFeed.cs"],
+          "itemPoolId": "L2.2.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Walk StaffFeed.cs: the [Feed] attribute, IFeed<Staff>, and LoadEntities() returning .ToList() of projected Staff POCOs."
+        },
+        {
+          "id": "L2.3",
+          "name": "Implement a Sink",
+          "objective": "Write a destination connector: [Sink(DestinationSystem = typeof(...))] class XSink : ISink<X> implementing New/Create/Get/Update/Delete, receiving its destination service via the constructor (injection, not new).",
+          "prereqs": ["L2.1", "L0.G2", "L0.D1"],
+          "sources": ["README.md#3", "Sync-DDH-SPO sinks"],
+          "itemPoolId": "L2.3.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Map ISink<T>'s five members (New/Create/Get/Update/Delete) onto a real sink; note the service arrives via the constructor."
+        },
+        {
+          "id": "L2.4",
+          "name": "Sink + CacheFeed",
+          "objective": "Implement ICacheFeed<X> so the engine can re-read the destination's current state for diffing; commonly combined with the sink in one class (SinkAndCacheFeed).",
+          "prereqs": ["L2.3"],
+          "sources": ["README.md#3", "SinkAndCacheFeed.cs"],
+          "itemPoolId": "L2.4.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Why the engine needs a cache feed: to diff your snapshot against the destination's current state; show one class implementing both ISink<T> and ICacheFeed<T>."
+        },
+        {
+          "id": "L2.5",
+          "name": "Wire it up with MEF",
+          "objective": "Make the parts discoverable: [Feed]/[Sink] mark the connectors; publish a shared service with [Export(typeof(IService))] + [PartCreationPolicy(CreationPolicy.Shared)]; mark the injected constructor with [ImportingConstructor].",
+          "prereqs": ["L2.2", "L2.3", "L0.D2"],
+          "sources": ["TeamSiteWebPartService.cs", "Sync-DDH-SPO sinks"],
+          "itemPoolId": "L2.5.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "The DI you know vs the MEF Synnduit uses: annotate a real [Export]/[ImportingConstructor] pair, and show [Feed]/[Sink] as how the engine finds your parts."
+        },
+        {
+          "id": "L2.6",
+          "name": "Add it to a Run",
+          "objective": "Register the new entity in a Run's appsettings.json Segments: a Migration segment to push it in (parents before children) and a GarbageCollection segment to clean it up (children before parents).",
+          "prereqs": ["L2.2", "L1.7"],
+          "sources": ["README.md#5.4"],
+          "itemPoolId": "L2.6.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "The appsettings.json Segment list: place the new Migration after its parents and the GarbageCollection before them (reverse order)."
+        }
+      ]
     }
   ]
 }

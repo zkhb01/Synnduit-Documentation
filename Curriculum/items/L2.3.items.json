@@ -1,0 +1,99 @@
+{
+  "poolId": "L2.3.items",
+  "conceptId": "L2.3",
+  "conceptName": "Implement a Sink",
+  "items": [
+    {
+      "id": "L2.3.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which set of members does `ISink<X>` require you to implement?",
+      "options": [
+        { "id": "a", "text": "New / Create / Get / Update / Delete" },
+        { "id": "b", "text": "LoadEntities only" },
+        { "id": "c", "text": "Migrate / GarbageCollect" },
+        { "id": "d", "text": "Open / Read / Close" }
+      ],
+      "correct": ["a"],
+      "explanation": "ISink<X> is the destination contract: New, Create, Get, Update, Delete.",
+      "misconceptions": {
+        "b": "LoadEntities belongs to IFeed/ICacheFeed, not the sink's write contract."
+      },
+      "source": "README.md#3"
+    },
+    {
+      "id": "L2.3.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How should a sink obtain the service it uses to write to the destination?",
+      "options": [
+        { "id": "a", "text": "Call `new` on the concrete service in the sink" },
+        { "id": "b", "text": "Receive it as a constructor parameter (injection)" },
+        { "id": "c", "text": "Read it from a static global" },
+        { "id": "d", "text": "Look it up in StarBridge" }
+      ],
+      "correct": ["b"],
+      "explanation": "The sink declares the service as a constructor parameter and is handed one — constructor injection, wired by MEF.",
+      "misconceptions": {
+        "a": "New-ing the service hard-wires it and defeats injection/testability."
+      },
+      "source": "Sync-DDH-SPO sinks"
+    },
+    {
+      "id": "L2.3.q3",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Implement `CourseSink : ISink<Course>`. Mark it with [Sink], take an `ICourseService` via the constructor, and implement the five members by delegating to the service.",
+      "rubric": [
+        "[Sink(DestinationSystem = typeof(<SomeDestination>))] on the class",
+        "class CourseSink : ISink<Course>",
+        "Constructor takes ICourseService (injected, not new-ed)",
+        "Implements all five: New, Create, Get, Update, Delete",
+        "Create/Update/Delete/Get delegate to the service; New returns a fresh Course"
+      ],
+      "sampleAnswer": "[Sink(DestinationSystem = typeof(SchoolObjectModel))]\npublic class CourseSink : ISink<Course>\n{\n    private readonly ICourseService service;\n    [ImportingConstructor]\n    public CourseSink(ICourseService service) => this.service = service;\n\n    public Course New() => new Course();\n    public void Create(Course e) => this.service.Create(e);\n    public Course Get(Course e) => this.service.Get(e.Code);\n    public void Update(Course e) => this.service.Update(e);\n    public void Delete(Course e) => this.service.Delete(e.Code);\n}",
+      "source": "Sync-DDH-SPO sinks"
+    },
+    {
+      "id": "L2.3.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A teammate writes `class CourseSink : ISink<Course>` but implements only Create and Update. What happens?",
+      "options": [
+        { "id": "a", "text": "It compiles but skips the other operations at runtime" },
+        { "id": "b", "text": "It will not compile — ISink<Course> requires every member" },
+        { "id": "c", "text": "It compiles and the engine generates the missing members" },
+        { "id": "d", "text": "Only Delete is optional" }
+      ],
+      "correct": ["b"],
+      "explanation": "An interface is a contract: a class implementing ISink<Course> must supply all of its members or it won't compile.",
+      "misconceptions": {
+        "c": "The engine doesn't generate members; the compiler requires them."
+      },
+      "source": "README.md#3"
+    },
+    {
+      "id": "L2.3.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "When a Run's GarbageCollection segment removes a destination record whose source disappeared, which sink member does the engine call?",
+      "options": [
+        { "id": "a", "text": "Create" },
+        { "id": "b", "text": "Update" },
+        { "id": "c", "text": "Delete" },
+        { "id": "d", "text": "New" }
+      ],
+      "correct": ["c"],
+      "explanation": "Garbage collection removes orphaned destination records via the sink's Delete member.",
+      "misconceptions": {
+        "d": "New just hands back a blank entity to populate; it doesn't remove anything."
+      },
+      "source": "README.md#3"
+    }
+  ]
+}

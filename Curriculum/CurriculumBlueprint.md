@@ -27,11 +27,11 @@ Keep content **hybrid**: a reviewed canonical lesson + quiz bank per concept is 
 ```
 L1 Foundations (conceptual, open to all)
    → L0 Prerequisites (placement diagnostic; gates the coding levels)
-      → L2 Coding (write feeds, sinks, POCOs)   [future]
+      → L2 Coding (write feeds, sinks, POCOs)   [authored]
          → L3 Operations & troubleshooting       [future]
 ```
 
-L1 is deliberately code-free, so it has no prerequisites. L0 is a **placement diagnostic** that gates L2+ (where learners write code). A confident dev clears L0 quickly; gaps trigger targeted remediation.
+L1 is deliberately code-free, so it has no prerequisites. L0 is a **placement diagnostic** that gates L2+ (where learners write code). A confident dev clears L0 quickly; gaps trigger targeted remediation. **L2 is now authored** (see §5b); **L3** (operations & troubleshooting) remains future.
 
 ---
 
@@ -224,6 +224,40 @@ Remediation: extract the nullable-requirement doc; show wrong (`int`) vs right (
 ### L0 completion gate
 
 8–10 item diagnostic, one+ per concept. Auto-skip on pass; route misses to remediation, then re-check. Clearing all 8 unlocks L2.
+
+---
+
+## 5b. Level 2 — Coding (write a working integration)
+
+**Goal:** Take the recognize-level knowledge from L1/L0 to *write* level — author a POCO, a feed, a sink, wire them with MEF, and add them to a Run. Gated by L0 (`L0.gatesLevel = L2`); unlocks once L0 is cleared.
+
+### Dependency graph
+
+```
+L1.9 + L0.E2 ─▶ L2.1 Write a POCO
+                   ├─▶ L2.2 Implement a Feed   (+ L0.G2, L0.E1)
+                   └─▶ L2.3 Implement a Sink   (+ L0.G2, L0.D1)
+                          └─▶ L2.4 Sink + CacheFeed
+L2.2 + L2.3 + L0.D2 ─▶ L2.5 Wire it up with MEF
+L2.2 + L1.7 ─▶ L2.6 Add it to a Run
+```
+
+### Concepts
+
+- **L2.1 — Write a POCO** · author the entity class + attribute contract, all properties nullable · src: README §5.5, `Staff.cs`
+- **L2.2 — Implement a Feed** · `[Feed] class XFeed : IFeed<X>`; `LoadEntities()` queries + projects + `.ToList()` · src: README §5.6, `StaffFeed.cs`
+- **L2.3 — Implement a Sink** · `[Sink] class XSink : ISink<X>` with New/Create/Get/Update/Delete; service injected · src: README §3, Sync-DDH-SPO sinks
+- **L2.4 — Sink + CacheFeed** · `ICacheFeed<X>` to re-read destination state; usually one class with the sink · src: `SinkAndCacheFeed.cs`
+- **L2.5 — Wire it up with MEF** · `[Export]` + `[PartCreationPolicy(Shared)]` + `[ImportingConstructor]`; `[Feed]`/`[Sink]` discovery · src: `TeamSiteWebPartService.cs`
+- **L2.6 — Add it to a Run** · Migration (parents first) + GarbageCollection (children first) segments in `appsettings.json` · src: README §5.4
+
+### Assessment (interim)
+
+L2 items mix auto-scored concept checks (mc/order) with **model-scored code-writing items** (`type: scenario`/`short`, `scoring: model`) that carry a `rubric` + a reference `sampleAnswer`. The app's `ClaudeAnswerGrader` evaluates the submitted code against the rubric. This ships without lab infrastructure; a **run-and-verify lab** (sample source + disposable StarBridge, per the authoring notes) is the future upgrade for executing the learner's code rather than rubric-grading it.
+
+### L2 completion gate
+
+All 6 concepts mastered. Synthesis concepts: L2.5 (MEF wiring) and L2.6 (Run ordering).
 
 ---
 

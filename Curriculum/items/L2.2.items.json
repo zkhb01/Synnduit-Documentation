@@ -1,0 +1,94 @@
+{
+  "poolId": "L2.2.items",
+  "conceptId": "L2.2",
+  "conceptName": "Implement a Feed",
+  "items": [
+    {
+      "id": "L2.2.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which member of `IFeed<X>` produces the source snapshot?",
+      "options": [
+        { "id": "a", "text": "LoadEntities()" },
+        { "id": "b", "text": "Create()" },
+        { "id": "c", "text": "Get()" },
+        { "id": "d", "text": "Migrate()" }
+      ],
+      "correct": ["a"],
+      "explanation": "A feed implements LoadEntities(), which returns the full snapshot of source POCOs.",
+      "misconceptions": {
+        "b": "Create() is a sink member; the feed only reads."
+      },
+      "source": "README.md#5.6"
+    },
+    {
+      "id": "L2.2.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Why does `LoadEntities()` end its query with `.ToList()`?",
+      "options": [
+        { "id": "a", "text": "To sort the rows" },
+        { "id": "b", "text": "To materialize the query (run the SQL) while the DbContext is still open and return a concrete snapshot" },
+        { "id": "c", "text": "To delete the source rows after reading" },
+        { "id": "d", "text": "It has no effect and is optional" }
+      ],
+      "correct": ["b"],
+      "explanation": "EF defers execution; .ToList() forces it now, so the SQL runs before the using block disposes the context.",
+      "misconceptions": {
+        "d": "Without materializing, enumeration could happen after the context is disposed — a runtime error."
+      },
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L2.2.q3",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Sketch a `CourseFeed` that feeds `Course` from a source you query with EF. Include the [Feed] attribute, the interface, and a LoadEntities() that opens a context, projects rows into Course, and materializes.",
+      "rubric": [
+        "[Feed(SourceSystem = typeof(<SomeSource>))] on the class",
+        "class CourseFeed : IFeed<Course>",
+        "LoadEntities() returns IEntityCollection<Course>",
+        "Opens/uses a DbContext and queries it (e.g. .Where/.Select)",
+        "Projects rows into new Course { ... } POCOs",
+        "Materializes the query with .ToList()"
+      ],
+      "sampleAnswer": "[Feed(SourceSystem = typeof(PowerSchool.PowerSchool))]\npublic class CourseFeed : IFeed<Course>\n{\n    private readonly PsFactory factory;\n    public CourseFeed(PsFactory factory) => this.factory = factory;\n\n    public IEntityCollection<Course> LoadEntities()\n    {\n        using var ctx = this.factory.CreatePs();\n        return ctx.Courses\n            .Select(c => new Course { Code = c.Id, CourseNumber = c.Number, Title = c.Name })\n            .ToList();\n    }\n}",
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L2.2.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Your feed returns all 5,000 courses every run. Should you filter it down to 'only the changed ones' yourself?",
+      "options": [
+        { "id": "a", "text": "Yes — only return rows you know changed" },
+        { "id": "b", "text": "No — return the full snapshot; the engine diffs it against last run and processes only the delta" },
+        { "id": "c", "text": "Yes — otherwise every record is updated every run" },
+        { "id": "d", "text": "No — but you must delete unchanged rows first" }
+      ],
+      "correct": ["b"],
+      "explanation": "Snapshot in, delta out: you emit everything, the engine computes what changed. Unchanged records get NoChangesDetected.",
+      "misconceptions": {
+        "c": "Returning everything does NOT mean everything is updated — the engine only acts on real changes."
+      },
+      "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L2.2.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "What goes wrong if `LoadEntities()` returns an un-materialized `IQueryable` and the `using` block disposes the DbContext before the caller enumerates it?",
+      "rubric": [
+        "Deferred execution means the SQL runs on enumeration, which now happens after the context is disposed",
+        "Result is a runtime error (disposed context); fix is to materialize with .ToList() before returning"
+      ],
+      "sampleAnswer": "Because LINQ-to-Entities defers execution, the query tries to run when the caller enumerates it — but by then the using block has disposed the context, so it throws. Materializing with .ToList() before returning fixes it.",
+      "source": "Sync-SRC-DDH StaffFeed.cs"
+    }
+  ]
+}

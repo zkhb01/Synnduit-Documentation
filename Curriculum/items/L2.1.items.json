@@ -1,0 +1,93 @@
+{
+  "poolId": "L2.1.items",
+  "conceptId": "L2.1",
+  "conceptName": "Write a POCO",
+  "items": [
+    {
+      "id": "L2.1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which attribute marks a property so the engine tracks it for change detection?",
+      "options": [
+        { "id": "a", "text": "[EntityProperty]" },
+        { "id": "b", "text": "[EntityType]" },
+        { "id": "c", "text": "[SourceSystemIdentifier]" },
+        { "id": "d", "text": "[DuplicationKey]" }
+      ],
+      "correct": ["a"],
+      "explanation": "[EntityProperty] tags a field for change detection; a property without it is not tracked.",
+      "misconceptions": {
+        "d": "[DuplicationKey] drives dedup matching, not change tracking."
+      },
+      "source": "README.md#5.5"
+    },
+    {
+      "id": "L2.1.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A teammate adds `[EntityProperty] public int Grade { get; set; }` to a POCO and runs start misbehaving. What rule did they break?",
+      "options": [
+        { "id": "a", "text": "Properties must be private" },
+        { "id": "b", "text": "POCO properties must be nullable — it should be `int?`" },
+        { "id": "c", "text": "[EntityProperty] can't go on an int" },
+        { "id": "d", "text": "The property needs a [DuplicationKey]" }
+      ],
+      "correct": ["b"],
+      "explanation": "Synnduit requires POCO properties to be nullable; a non-nullable `int` breaks change detection/loading. Use `int?`.",
+      "misconceptions": {
+        "c": "[EntityProperty] is fine on numeric types — the problem is non-nullability."
+      },
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx"
+    },
+    {
+      "id": "L2.1.q3",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Write a minimal `Course` POCO: an [EntityType] (use any GUID and `typeof(SchoolObjectModel)`), a source identifier property `Code`, a tracked `Title`, and a `[DuplicationKey]` on `CourseNumber`. Remember the nullable rule.",
+      "rubric": [
+        "Class decorated with [EntityType(<guid>, typeof(SchoolObjectModel))]",
+        "[SourceSystemIdentifier] on the Code property",
+        "[EntityProperty] on the tracked field(s) (e.g. Title, CourseNumber)",
+        "[DuplicationKey] on CourseNumber",
+        "Every property is nullable (string?, etc.)"
+      ],
+      "sampleAnswer": "[EntityType(\"A1B2C3D4-0000-0000-0000-000000000001\", typeof(SchoolObjectModel))]\npublic class Course : Entity\n{\n    [SourceSystemIdentifier] public string? Code { get; set; }\n    [EntityProperty][DuplicationKey] public string? CourseNumber { get; set; }\n    [EntityProperty] public string? Title { get; set; }\n}",
+      "source": "Staff.cs"
+    },
+    {
+      "id": "L2.1.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which attribute identifies the natural business key the engine uses to match possible duplicates?",
+      "options": [
+        { "id": "a", "text": "[SourceSystemIdentifier]" },
+        { "id": "b", "text": "[DestinationSystemIdentifier]" },
+        { "id": "c", "text": "[DuplicationKey]" },
+        { "id": "d", "text": "[EntityType]" }
+      ],
+      "correct": ["c"],
+      "explanation": "[DuplicationKey] is the natural business key; the engine uses it to find a 'twin' destination record when there's no mapping yet.",
+      "misconceptions": {
+        "a": "The identifier attributes persist the mapping; [DuplicationKey] is what finds a duplicate."
+      },
+      "source": "README.md#5.5"
+    },
+    {
+      "id": "L2.1.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Why must every property on a Synnduit POCO be nullable?",
+      "rubric": [
+        "Synnduit requires nullable properties as a hard rule",
+        "Non-nullable properties cause subtle change-detection / load problems (and it's not a compile error, so the bug is silent)"
+      ],
+      "sampleAnswer": "Synnduit needs every POCO property nullable; a non-nullable property (e.g. int instead of int?) breaks change detection and loading in subtle ways. It compiles fine, so the bug is silent until runs misbehave.",
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx"
+    }
+  ]
+}
