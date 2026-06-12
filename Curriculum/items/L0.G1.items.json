@@ -69,6 +69,44 @@
       ],
       "sampleAnswer": "They are the same kind of Synnduit collection, but one contains Staff entities and the other contains Student entities — the type parameter is the only difference.",
       "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L0.G1.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How are `List<int>` and `List<Staff>` related?",
+      "options": [
+        { "id": "a", "text": "They are unrelated, separately written classes" },
+        { "id": "b", "text": "They are the same generic class List<T> with a different element type T" },
+        { "id": "c", "text": "List<Staff> inherits from List<int>" },
+        { "id": "d", "text": "One is a method, the other a class" }
+      ],
+      "correct": ["b"],
+      "explanation": "List<T> is one generic definition; supplying int or Staff for T produces a list of that element type.",
+      "misconceptions": {
+        "a": "There's a single List<T> definition; the type parameter is what varies."
+      },
+      "source": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics"
+    },
+    {
+      "id": "L0.G1.q6",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does `IEnumerable<Staff>` give you over an untyped collection of `object`?",
+      "options": [
+        { "id": "a", "text": "Compile-time type safety — the compiler knows every element is a Staff, with no casting" },
+        { "id": "b", "text": "Faster database queries" },
+        { "id": "c", "text": "Automatic sorting of the elements" },
+        { "id": "d", "text": "It limits the collection to a single element" }
+      ],
+      "correct": ["a"],
+      "explanation": "The generic parameter lets the compiler enforce the element type and removes the need to cast from object.",
+      "misconceptions": {
+        "d": "The generic parameter is the element type, not a size limit."
+      },
+      "source": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics"
     }
   ]
 }

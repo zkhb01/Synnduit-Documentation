@@ -69,6 +69,44 @@
       ],
       "sampleAnswer": "Because attributes are passive metadata the engine reads at runtime, leaving one off isn't a compile error. The code builds fine; the engine just never learns to track that field, so its changes are silently ignored.",
       "source": "Staff.cs; TeamSiteWebPart.cs"
+    },
+    {
+      "id": "L0.O2.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How does the Synnduit engine actually discover that a property is marked `[DuplicationKey]`?",
+      "options": [
+        { "id": "a", "text": "It reads the attribute via reflection at runtime" },
+        { "id": "b", "text": "The attribute runs code that registers itself when the class loads" },
+        { "id": "c", "text": "The compiler turns it into a method call" },
+        { "id": "d", "text": "It is listed in appsettings.json" }
+      ],
+      "correct": ["a"],
+      "explanation": "Attributes are metadata; frameworks like Synnduit inspect them with reflection to decide behavior — here, which field drives dedup.",
+      "misconceptions": {
+        "b": "Attributes don't execute themselves; something else reads them later."
+      },
+      "source": "https://learn.microsoft.com/dotnet/csharp/advanced-topics/reflection-and-attributes/"
+    },
+    {
+      "id": "L0.O2.q6",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "On Staff.cs, EmployeeId carries both `[EntityProperty]` and `[DuplicationKey]`. Is stacking multiple attributes on one member allowed?",
+      "options": [
+        { "id": "a", "text": "Yes — a member can carry multiple attributes, and the engine reads each" },
+        { "id": "b", "text": "No — only one attribute per member is permitted" },
+        { "id": "c", "text": "Only if they are written on separate lines" },
+        { "id": "d", "text": "Only on classes, never on properties" }
+      ],
+      "correct": ["a"],
+      "explanation": "A code element can have many attributes; here EmployeeId is both tracked for change detection and used as the dedup key.",
+      "misconceptions": {
+        "b": "Multiple attributes per member are fine and common in the POCO contract."
+      },
+      "source": "Staff.cs"
     }
   ]
 }

@@ -68,6 +68,45 @@
       ],
       "sampleAnswer": "The sink isn't tied to one concrete service, so you can supply a test double when unit-testing it (or swap the implementation) without changing the sink — it depends only on the interface.",
       "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
+    },
+    {
+      "id": "L0.D1.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "With `public StaffSink(IStaffService service)`, who creates the IStaffService instance the sink uses at runtime?",
+      "options": [
+        { "id": "a", "text": "The sink itself, in its constructor body" },
+        { "id": "b", "text": "Whatever composes the object — the DI container / composition root — which then passes it in" },
+        { "id": "c", "text": "StarBridge, when the run starts" },
+        { "id": "d", "text": "The source system the data comes from" }
+      ],
+      "correct": ["b"],
+      "explanation": "Constructor injection inverts creation: the sink declares what it needs, and the composition layer builds the service and supplies it.",
+      "misconceptions": {
+        "a": "If the sink created it, that would be the opposite of injection — the dependency would be hard-wired."
+      },
+      "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
+    },
+    {
+      "id": "L0.D1.q6",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which statements about constructor injection are true? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "The class receives its dependencies as constructor parameters" },
+        { "id": "b", "text": "It lets you substitute a test double when unit-testing the class" },
+        { "id": "c", "text": "The class must call `new` to build each dependency itself" },
+        { "id": "d", "text": "It hard-codes the class to one concrete implementation" }
+      ],
+      "correct": ["a", "b"],
+      "explanation": "Injection means the class is handed its dependencies (a), so it can be given a fake in tests (b). It specifically avoids new-ing (c) and coupling to a concrete type (d).",
+      "misconceptions": {
+        "c": "New-ing the dependency is exactly what injection avoids.",
+        "d": "Depending on the interface keeps the class decoupled from any one implementation."
+      },
+      "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
     }
   ]
 }

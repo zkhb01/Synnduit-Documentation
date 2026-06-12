@@ -72,6 +72,44 @@
       ],
       "sampleAnswer": "EF translates the query to SQL, and arbitrary C# in the middle either can't be translated or runs server-side unexpectedly. Calling .ToList() first pulls the rows into memory, so any complex transformation runs as plain in-memory C# — and you're not depending on the DbContext still being open.",
       "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L0.E1.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A feed builds a query but returns it (as IQueryable) without calling .ToList(), and the `using` block disposes the DbContext. What happens when the caller enumerates it?",
+      "options": [
+        { "id": "a", "text": "It works fine — the data was already loaded" },
+        { "id": "b", "text": "It throws, because deferred execution tries to hit the database through a disposed context" },
+        { "id": "c", "text": "It silently returns an empty collection" },
+        { "id": "d", "text": "It re-creates the context automatically" }
+      ],
+      "correct": ["b"],
+      "explanation": "Deferred execution runs the SQL on enumeration; if the context is already disposed, that fails — which is why feeds materialize with .ToList() before returning.",
+      "misconceptions": {
+        "a": "Nothing loaded yet — the query hadn't been enumerated while the context was alive."
+      },
+      "source": "https://learn.microsoft.com/ef/core/querying/"
+    },
+    {
+      "id": "L0.E1.q6",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which of these forces a LINQ-to-Entities query to execute against the database?",
+      "options": [
+        { "id": "a", "text": "Adding another `.Where(...)` clause" },
+        { "id": "b", "text": "Assigning the query to a variable" },
+        { "id": "c", "text": "Calling `.ToList()` on it" },
+        { "id": "d", "text": "Writing the query expression" }
+      ],
+      "correct": ["c"],
+      "explanation": ".ToList() enumerates the query, triggering the SQL. Building or composing the query (Where, assignment) stays deferred.",
+      "misconceptions": {
+        "a": "Where just composes more query — still deferred until enumeration."
+      },
+      "source": "https://learn.microsoft.com/ef/core/querying/"
     }
   ]
 }

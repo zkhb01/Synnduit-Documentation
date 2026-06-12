@@ -69,6 +69,44 @@
       ],
       "sampleAnswer": "It won't compile — implementing ISink<Staff> obligates the class to provide every member of the interface, not just Create and Update. The missing members are a compile error.",
       "source": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/interfaces"
+    },
+    {
+      "id": "L0.O1.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "StaffSink and StudentSink each implement ISink<T>. Why can the engine drive both with the same code?",
+      "options": [
+        { "id": "a", "text": "They share the ISink<T> contract, so the engine calls them polymorphically through that interface" },
+        { "id": "b", "text": "They must inherit from a common base class" },
+        { "id": "c", "text": "Their class names must match a naming pattern" },
+        { "id": "d", "text": "The engine recompiles them at runtime" }
+      ],
+      "correct": ["a"],
+      "explanation": "Programming to the interface lets the engine treat any implementer uniformly, without knowing the concrete class.",
+      "misconceptions": {
+        "b": "Interfaces don't require a shared base class — fulfilling the contract is enough."
+      },
+      "source": "ISink<T> member list mapped to a real sink"
+    },
+    {
+      "id": "L0.O1.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Can one class implement both `ISink<Staff>` and `ICacheFeed<Staff>` (as SinkAndCacheFeed does)?",
+      "options": [
+        { "id": "a", "text": "Yes — a class may implement multiple interfaces, supplying the members of each" },
+        { "id": "b", "text": "No — a class can implement only one interface" },
+        { "id": "c", "text": "Only if the two interfaces share a base interface" },
+        { "id": "d", "text": "Only by inheriting from both as base classes" }
+      ],
+      "correct": ["a"],
+      "explanation": "A class can fulfill several interface contracts at once — that's how one class can be both the sink and the cache feed.",
+      "misconceptions": {
+        "b": "Single-interface-only is a misconception; multiple interfaces are allowed (and common here)."
+      },
+      "source": "SinkAndCacheFeed.cs"
     }
   ]
 }
