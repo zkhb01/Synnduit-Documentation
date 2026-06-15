@@ -21,7 +21,10 @@ public sealed record QuizResult(
 
 /// <summary>
 /// Deterministic auto-scoring for mc / multi / order. Model-scored items (short, scenario,
-/// classify, match) are self-assessed in this core slice; Claude will grade them later.
+/// classify, match) are <b>practice</b>: they're still scored for per-item feedback (Claude or
+/// self-assessment), but they do not count toward the mastery score or the pass/fail gate — so an
+/// imperfect free-text grade can never wrongly advance or block a learner. Only auto-scored items
+/// drive <see cref="QuizResult.Score"/>, <see cref="QuizResult.Passed"/>, and the remediation set.
 /// </summary>
 public sealed class ScoringService
 {
@@ -51,8 +54,14 @@ public sealed class ScoringService
             results.Add(new ItemResult(item, ScoreItem(item, resp), !item.IsAutoScored));
         }
 
-        var score = results.Count == 0 ? 0 : (double)results.Count(r => r.Correct) / results.Count;
-        var wrong = results.Where(r => !r.Correct).Select(r => r.Item).ToList();
+        // Gate on objective (auto-scored) items only; model items are practice/feedback.
+        // Fallback: if a sample somehow has no auto items, score over all of them so the gate
+        // is still decidable.
+        var gating = results.Where(r => r.Item.IsAutoScored).ToList();
+        if (gating.Count == 0) gating = results;
+
+        var score = gating.Count == 0 ? 0 : (double)gating.Count(r => r.Correct) / gating.Count;
+        var wrong = gating.Where(r => !r.Correct).Select(r => r.Item).ToList();
         return new QuizResult(results, score, score >= threshold, wrong);
     }
 }

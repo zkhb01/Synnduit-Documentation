@@ -152,6 +152,14 @@ pulls *fresh* items (so author more than the gate samples — aim 5–8 per conc
   as `["a:2","b:1",...]` (left id : right id).
 - **short / scenario** — `scoring: "model"`; always supply `rubric` + `sampleAnswer`.
 
+**Gating vs. practice.** `scoring: "auto"` items (mc/multi/order) are the only ones that count toward
+the mastery score and the pass/fail gate. `scoring: "model"` items (short/scenario, and free-text
+classify/match) are **practice**: they're shown and given per-item feedback (Claude against the
+`rubric`, or learner self-check), but a right/wrong verdict never decides advancement — so an
+imperfect free-text grade can't wrongly pass or block a learner. Author each concept with **at least
+a few auto items** so its gate is decidable on objective scoring alone; use model items for the
+open-ended reflection/application that auto items can't capture.
+
 ### Authoring rules
 - Every item carries a `source` (file + anchor) — no ungrounded questions.
 - Spread difficulty: at least one `recall`, one `apply`, and (for synthesis concepts

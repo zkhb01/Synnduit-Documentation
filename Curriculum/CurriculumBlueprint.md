@@ -37,7 +37,7 @@ L1 is deliberately code-free, so it has no prerequisites. L0 is a **placement di
 
 ## 3. Shared mastery & remediation model
 
-- **Mastery threshold:** ≥ 80% on a concept's mapped items = mastered.
+- **Mastery threshold:** ≥ 80% on a concept's **auto-scored** items = mastered. Open-ended (`scoring: model`) items are **practice** — shown with feedback but excluded from the score/gate, so a fuzzy free-text grade never decides advancement (see `CONTENT_FORMAT.md` → Gating vs. practice).
 - **Level gate:** all concepts in the level mastered.
 - **Re-assessment:** pulls *different* items from the same concept's pool (no repeats).
 - **Remediation loop:** assess → diagnose weak concept(s) → targeted re-teach → re-assess → gate.

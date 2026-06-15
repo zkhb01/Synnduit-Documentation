@@ -87,7 +87,7 @@ public class PageRenderTests : IDisposable
         // KeyNotFoundException on the textarea bind.
         var cut = _ctx.Render<Quiz>(p => p.Add(x => x.ConceptId, "L1.1"));
         Assert.Contains("Submit answers", cut.Markup);
-        Assert.Contains("self-graded", cut.Markup);   // the model item rendered its self-grade UI
+        Assert.Contains("self-check", cut.Markup);   // the model item rendered its practice/self-check UI
     }
 
     [Fact]

@@ -38,7 +38,7 @@ and mastery (mastery on pass, L0 first-attempt skip-on-pass, escalation after re
 | `Models/` | `ConceptGraph`, `ItemBank`, `Lesson` — shapes of the authored content |
 | `Services/CurriculumStore` | Loads + caches concept-graph.json, items/*.json, lessons/*.md |
 | `Services/GatingEngine` | Pure: concept status (locked/available/mastered/skipped) + level gates |
-| `Services/ScoringService` | Deterministic auto-scoring (mc/multi/order) |
+| `Services/ScoringService` | Deterministic auto-scoring (mc/multi/order); gates on auto items only — model items are practice (feedback, not scored) |
 | `Services/IAnswerGrader` | Free-text grading: `StubAnswerGrader` (self-assess) or `ClaudeAnswerGrader` (rubric, when a key is set) |
 | `Services/MasteryService` | Per-learner per-concept mastery state (EF Core / SQLite) |
 | `Services/IRemediationService` | `StubRemediationService`, or `ClaudeRemediationService` when an Anthropic key is configured |

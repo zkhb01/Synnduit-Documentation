@@ -81,4 +81,38 @@ public class ScoringServiceTests
         Assert.Single(result.WrongItems);
         Assert.Equal("q5", result.WrongItems[0].Id);
     }
+
+    [Fact]
+    public void Model_items_are_practice_and_excluded_from_the_gate()
+    {
+        var items = new List<Item>
+        {
+            new() { Id = "q1", Type = "mc", Scoring = "auto", Correct = new() { "b" } },
+            new() { Id = "q2", Type = "mc", Scoring = "auto", Correct = new() { "b" } },
+            new() { Id = "q3", Type = "short", Scoring = "model" },   // practice, wrong below
+        };
+        var responses = new Dictionary<string, ItemResponse>
+        {
+            ["q1"] = new() { SelectedOptionIds = { "b" } },           // correct
+            ["q2"] = new() { SelectedOptionIds = { "b" } },           // correct
+            ["q3"] = new() { SelfAssessedCorrect = false },           // wrong — but doesn't count
+        };
+
+        var result = _scoring.Score(items, responses, threshold: 0.8);
+        Assert.Equal(1.0, result.Score, 3);          // 2/2 auto items — model item excluded
+        Assert.True(result.Passed);                   // passes despite the wrong open-ended item
+        Assert.Empty(result.WrongItems);              // a missed practice item is not "wrong" for gating
+        Assert.Equal(3, result.Items.Count);          // all three still appear in results for feedback
+    }
+
+    [Fact]
+    public void All_model_sample_falls_back_to_scoring_all_items()
+    {
+        var items = new List<Item> { new() { Id = "q1", Type = "short", Scoring = "model" } };
+        var responses = new Dictionary<string, ItemResponse> { ["q1"] = new() { SelfAssessedCorrect = true } };
+
+        var result = _scoring.Score(items, responses, threshold: 0.8);
+        Assert.Equal(1.0, result.Score, 3);   // no auto items → fall back so the gate stays decidable
+        Assert.True(result.Passed);
+    }
 }

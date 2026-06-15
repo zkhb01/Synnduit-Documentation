@@ -34,7 +34,7 @@ else
                 <div class="card-body">
                     <p><strong>@n.</strong> @item.Stem
                         <span class="badge bg-light text-dark ms-1">@item.Difficulty</span>
-                        @if (!item.IsAutoScored) { <span class="badge bg-info text-dark">@(Grader.IsLive ? "Claude-graded" : "self-graded")</span> }
+                        @if (!item.IsAutoScored) { <span class="badge bg-info text-dark">practice · @(Grader.IsLive ? "Claude feedback" : "self-check")</span> }
                     </p>
 
                     @switch (item.Type)
@@ -124,7 +124,15 @@ else
     {
         <div class="alert @(_result.Passed ? "alert-success" : "alert-warning")">
             <h4 class="mb-1">@((int)Math.Round(_result.Score * 100))% — @(_result.Passed ? "Mastered! ✔" : "Not yet")</h4>
-            <div>@(_result.Items.Count(r => r.Correct)) of @_result.Items.Count correct (pass @((int)(_concept.MasteryThreshold * 100))%).</div>
+            @{
+                var gradedItems = _result.Items.Where(r => !r.WasModelScored).ToList();
+                var practiceCount = _result.Items.Count - gradedItems.Count;
+            }
+            <div>@gradedItems.Count(r => r.Correct) of @gradedItems.Count graded questions correct (pass @((int)(_concept.MasteryThreshold * 100))%).</div>
+            @if (practiceCount > 0)
+            {
+                <div class="small mt-1">@practiceCount open-ended @(practiceCount == 1 ? "question is" : "questions are") practice — they show feedback below but don't count toward your score.</div>
+            }
             @if (_escalated)
             {
                 <div class="mt-2"><strong>Heads up:</strong> after repeated attempts, this concept is flagged for a mentor (@Store.Graph.MasteryModel.EscalationTarget).</div>
@@ -167,7 +175,7 @@ else
             <div class="card mb-2 border-@(r.Correct ? "success" : "danger")">
                 <div class="card-body py-2">
                     <div>@(r.Correct ? "✔" : "✗") <strong>@r.Item.Stem</strong>
-                        @if (r.WasModelScored) { <span class="badge bg-info text-dark">@(Grader.IsLive ? "Claude-graded" : "self-graded")</span> }
+                        @if (r.WasModelScored) { <span class="badge bg-info text-dark">practice · @(Grader.IsLive ? "Claude feedback" : "self-check")</span> }
                     </div>
                     @if (_grades.TryGetValue(r.Item.Id, out var g))
                     {
