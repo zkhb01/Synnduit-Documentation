@@ -1,6 +1,10 @@
 using System.Text;
 using System.Text.Json;
 using Markdig;
+using Markdig.Renderers;
+using Markdig.Renderers.Html;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using SynnduitTutor.Models;
 
 namespace SynnduitTutor.Services;
@@ -145,8 +149,37 @@ public sealed class CurriculumStore
         }
 
         lesson.MarkdownBody = body;
-        lesson.HtmlBody = Markdown.ToHtml(body, MdPipeline);
+        lesson.HtmlBody = RenderHtml(body);
         return lesson;
+    }
+
+    /// <summary>
+    /// Renders lesson Markdown to HTML, forcing external (http/https) links to open in a new tab
+    /// (<c>target="_blank" rel="noopener noreferrer"</c>). Otherwise an external link does a same-tab
+    /// navigation that leaves the Blazor app — and, when the app is viewed inside an embedded webview,
+    /// pages like a YouTube watch URL can crash that webview's player. Opening externally hands the
+    /// link to a real browser tab instead.
+    /// </summary>
+    private static string RenderHtml(string body)
+    {
+        var doc = Markdown.Parse(body, MdPipeline);
+        foreach (var link in doc.Descendants<LinkInline>())
+        {
+            if (link.IsImage || link.Url is not { } url) continue;
+            if (!url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) continue;
+
+            var attrs = link.GetAttributes();
+            attrs.AddProperty("target", "_blank");
+            attrs.AddProperty("rel", "noopener noreferrer");
+        }
+
+        var sw = new StringWriter();
+        var renderer = new HtmlRenderer(sw);
+        MdPipeline.Setup(renderer);
+        renderer.Render(doc);
+        sw.Flush();
+        return sw.ToString();
     }
 
     /// <summary>Walk up from the content root looking for a Curriculum/ folder with the graph file.</summary>

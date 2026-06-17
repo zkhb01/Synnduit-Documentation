@@ -81,6 +81,17 @@ public class PageRenderTests : IDisposable
     }
 
     [Fact]
+    public void Lesson_opens_external_links_in_a_new_tab()
+    {
+        // L0.D1 carries a curated YouTube video link; external links must open outside the app
+        // (target=_blank) so a same-tab nav doesn't leave the SPA / crash an embedded webview.
+        var cut = _ctx.Render<Lesson>(p => p.Add(x => x.ConceptId, "L0.D1"));
+        Assert.Contains("youtube.com/watch?v=tTJetZj3vg0", cut.Markup);
+        Assert.Contains("target=\"_blank\"", cut.Markup);
+        Assert.Contains("rel=\"noopener", cut.Markup);
+    }
+
+    [Fact]
     public void Quiz_renders_all_item_types_including_model_items()
     {
         // L1.1 includes a model-scored "short" item (L1.1.q2) — the case that previously threw
