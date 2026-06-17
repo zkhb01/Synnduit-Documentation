@@ -10,12 +10,12 @@
     "escalationTarget": "human-mentor",
     "contentStrategy": "hybrid: reviewed canonical lesson + quiz bank backbone; Claude supplies adaptive diagnosis, re-teaching, fresh items, and Q&A"
   },
-  "pathOrder": ["L1", "L0", "L2"],
+  "pathOrder": ["L0", "L1", "L2"],
   "levels": [
     {
       "id": "L1",
       "name": "Synnduit Foundations",
-      "order": 1,
+      "order": 2,
       "type": "conceptual",
       "gate": "all-concepts-mastered",
       "gatesLevel": null,
@@ -145,7 +145,7 @@
     {
       "id": "L0",
       "name": "Prerequisites: .NET substrate for Synnduit code",
-      "order": 2,
+      "order": 1,
       "type": "placement",
       "gate": "all-concepts-adequate",
       "gatesLevel": "L2",
