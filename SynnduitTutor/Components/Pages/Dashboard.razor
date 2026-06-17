@@ -33,8 +33,11 @@ else
     @foreach (var lv in _levels)
     {
         <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center"
+                 role="button" style="cursor:pointer" title="Show/hide lessons"
+                 @onclick="() => Toggle(lv.Level.Id)">
                 <span>
+                    <span class="me-2">@(IsCollapsed(lv.Level.Id) ? "▸" : "▾")</span>
                     <strong>@lv.Level.Id — @lv.Level.Name</strong>
                     @if (lv.Level.IsPlacement)
                     {
@@ -56,6 +59,8 @@ else
                     }
                 </span>
             </div>
+            @if (!IsCollapsed(lv.Level.Id))
+            {
             <div class="list-group list-group-flush">
                 @foreach (var cv in lv.Concepts)
                 {
@@ -87,6 +92,7 @@ else
                     </div>
                 }
             </div>
+            }
         </div>
     }
 }
@@ -96,6 +102,7 @@ else
     private DonutBalance? _balance;
     private bool _redeeming;
     private string? _redeemError;
+    private readonly HashSet<string> _collapsed = new();   // level ids whose lessons are hidden
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,6 +110,17 @@ else
         var map = await Mastery.GetMasteryMapAsync(Session.LearnerId!.Value);
         _levels = Gating.BuildOverview(map);
         _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value);
+
+        // Default: hide completed and locked levels; leave the level(s) you're working on open.
+        foreach (var lv in _levels)
+            if (lv.Complete || !lv.Unlocked) _collapsed.Add(lv.Level.Id);
+    }
+
+    private bool IsCollapsed(string levelId) => _collapsed.Contains(levelId);
+
+    private void Toggle(string levelId)
+    {
+        if (!_collapsed.Add(levelId)) _collapsed.Remove(levelId);   // Add fails if present → expand
     }
 
     private async Task RedeemAsync()

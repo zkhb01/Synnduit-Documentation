@@ -53,6 +53,16 @@ public class PageRenderTests : IDisposable
     }
 
     [Fact]
+    public void Dashboard_collapses_locked_levels_by_default()
+    {
+        // New learner: L2 (Coding) is gated by L0, which isn't done → L2 is locked, so its
+        // lessons are collapsed away by default; the level header still shows.
+        var cut = _ctx.Render<Dashboard>();
+        Assert.Contains("L2 — Coding", cut.Markup);   // collapsed section header present
+        Assert.DoesNotContain("L2.1", cut.Markup);    // its concept rows hidden until expanded
+    }
+
+    [Fact]
     public async Task Voucher_page_renders_certificate_with_manager_placeholder()
     {
         var store = TestSupport.RealStore();
