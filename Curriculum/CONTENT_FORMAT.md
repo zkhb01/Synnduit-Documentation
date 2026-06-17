@@ -72,6 +72,10 @@ prereqs: []
 genericObjective: <copied from concept-graph.json>
 synnduitObjective: <copied from concept-graph.json>
 externalSource: Microsoft Learn - C# generics
+externalUrl: https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics
+externalVideo: https://www.youtube.com/watch?v=...          # optional, curated video
+externalVideoPulled: 2026-06-17                            # date the link was sourced/checked
+externalVideoPublished: 2024-03 (approx)                   # optional; the video's own age, approximate
 authoredSource: Sync-SRC-DDH StaffFeed.cs
 skipOnPass: true
 synnduitCritical: false
@@ -82,6 +86,11 @@ synnduitCritical: false
 ## Generic skill (curated — don't re-teach)
 <one short paragraph + the external link; "if you're solid here the placement item passes
  and you skip ahead">
+
+📺 Video: [Title](externalVideo URL) — pulled <date> · published ~<month year>
+<!-- Curated video for the generic skill. Always carry a `pulled` date so a learner can judge
+     staleness; verify the link by hand (YouTube links rot). Omit the whole line if there's no
+     good external video (e.g. the Synnduit-specific nullable-POCO rule in L0.E2). -->
 
 ## The Synnduit slice
 <the authored teaching: how this generic skill shows up in real Synnduit code, grounded in
