@@ -1,0 +1,96 @@
+{
+  "poolId": "L3.2.items",
+  "conceptId": "L3.2",
+  "conceptName": "Read a run in StarBridge",
+  "items": [
+    {
+      "id": "L3.2.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which StarBridge table holds one row per processed record with its outcome?",
+      "options": [
+        { "id": "a", "text": "EntityTransaction" },
+        { "id": "b", "text": "EntityValueChange" },
+        { "id": "c", "text": "Mapping" },
+        { "id": "d", "text": "Operation" }
+      ],
+      "correct": ["a"],
+      "explanation": "EntityTransaction records each processed record and its Outcome.",
+      "misconceptions": {
+        "b": "EntityValueChange holds the field-level diffs, not the per-record outcome."
+      },
+      "source": "DiagnosticScripts/Starbridge-Transactions.sql"
+    },
+    {
+      "id": "L3.2.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How is the transaction Outcome stored in EntityTransaction?",
+      "options": [
+        { "id": "a", "text": "As an integer code (1-11)" },
+        { "id": "b", "text": "As the text name, e.g. 'ExceptionThrown'" },
+        { "id": "c", "text": "As a bit flag" },
+        { "id": "d", "text": "It isn't stored — only printed to the console" }
+      ],
+      "correct": ["a"],
+      "explanation": "Outcome is an integer 1-11 mapping to the EntityTransactionOutcome enum (L1.10).",
+      "misconceptions": {
+        "b": "You filter on the integer (e.g. Outcome = 11), not the name string."
+      },
+      "source": "Documentation/Synnduit Console.docx"
+    },
+    {
+      "id": "L3.2.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "To list every record that threw an exception, you filter EntityTransaction on which Outcome value?",
+      "options": [
+        { "id": "a", "text": "Outcome = 2 (Rejected)" },
+        { "id": "b", "text": "Outcome = 3 (NoChangesDetected)" },
+        { "id": "c", "text": "Outcome = 10 (NewEntityCreated)" },
+        { "id": "d", "text": "Outcome = 11 (ExceptionThrown)" }
+      ],
+      "correct": ["d"],
+      "explanation": "11 = ExceptionThrown. (2 = Rejected is 'try again later', not an error.)",
+      "misconceptions": {
+        "a": "Rejected (2) isn't an exception; it's a deferred-processing outcome."
+      },
+      "source": "DiagnosticScripts/Starbridge-Transactions.sql"
+    },
+    {
+      "id": "L3.2.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You need 'what field changed, from what value to what value' for an entity. Where do you look?",
+      "options": [
+        { "id": "a", "text": "EntityValueChange" },
+        { "id": "b", "text": "EntityTransaction.Outcome" },
+        { "id": "c", "text": "The Mapping table" },
+        { "id": "d", "text": "appsettings.json" }
+      ],
+      "correct": ["a"],
+      "explanation": "EntityValueChange holds the field-level diffs; EntityTransaction only says what happened to the record overall.",
+      "misconceptions": {
+        "b": "Outcome tells you the record was merged/created/etc., not which fields changed."
+      },
+      "source": "README.md#6"
+    },
+    {
+      "id": "L3.2.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Last night's run threw some exceptions. Which StarBridge tables/columns give you (a) which records threw and (b) the actual error text?",
+      "rubric": [
+        "(a) EntityTransaction filtered to Outcome = 11 identifies which records threw",
+        "(b) The error text lives in Operation/Message (joined via OperationMessage), not in EntityTransaction"
+      ],
+      "sampleAnswer": "EntityTransaction with Outcome = 11 tells me which records threw. The message text isn't there — it's in the Operation/Message tables (joined through OperationMessage), which the ExceptionRejections script surfaces.",
+      "source": "README.md#6"
+    }
+  ]
+}

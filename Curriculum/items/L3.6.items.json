@@ -1,0 +1,96 @@
+{
+  "poolId": "L3.6.items",
+  "conceptId": "L3.6",
+  "conceptName": "Monitor with the Synnduit Dashboard",
+  "items": [
+    {
+      "id": "L3.6.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What can the Synnduit Dashboard be pointed at?",
+      "options": [
+        { "id": "a", "text": "Any StarBridge database" },
+        { "id": "b", "text": "Only the source systems" },
+        { "id": "c", "text": "The destination (DDH) directly" },
+        { "id": "d", "text": "The Windows Task Scheduler" }
+      ],
+      "correct": ["a"],
+      "explanation": "The dashboard sits on top of any StarBridge DB for a visual history of its runs.",
+      "misconceptions": {
+        "c": "It reads StarBridge's bookkeeping, not the destination tables."
+      },
+      "source": "Documentation/Synnduit Dashboard.docx"
+    },
+    {
+      "id": "L3.6.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Roughly how many StarBridge databases does CSSD run in production?",
+      "options": [
+        { "id": "a", "text": "1" },
+        { "id": "b", "text": "3" },
+        { "id": "c", "text": "8" },
+        { "id": "d", "text": "One per entity type" }
+      ],
+      "correct": ["c"],
+      "explanation": "CSSD runs 8 production StarBridge databases; the dashboard can point at any of them.",
+      "misconceptions": {
+        "d": "StarBridge DBs are per Run/sync grouping, not per entity type."
+      },
+      "source": "Documentation/Synnduit Dashboard.docx"
+    },
+    {
+      "id": "L3.6.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "When is the dashboard the right tool, versus the diagnostic SQL scripts?",
+      "options": [
+        { "id": "a", "text": "Dashboard to notice/monitor at a glance; scripts to pinpoint the offending records and read message text" },
+        { "id": "b", "text": "Dashboard for everything; the scripts are obsolete" },
+        { "id": "c", "text": "Scripts to monitor; dashboard to mutate data" },
+        { "id": "d", "text": "They do exactly the same thing" }
+      ],
+      "correct": ["a"],
+      "explanation": "Use the dashboard to spot a run that needs attention; drop to the scripts to find the specific records and error text.",
+      "misconceptions": {
+        "b": "The scripts are still where deep, record-level triage happens."
+      },
+      "source": "README.md#6"
+    },
+    {
+      "id": "L3.6.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You point the dashboard at an older StarBridge DB and it shows little/nothing. Likely cause?",
+      "options": [
+        { "id": "a", "text": "The DB lacks the Console views the dashboard reads; run the dashboard's setup scripts to create them" },
+        { "id": "b", "text": "The DB has too much data" },
+        { "id": "c", "text": "The dashboard only works on the destination" },
+        { "id": "d", "text": "StarBridge must be empty to be shown" }
+      ],
+      "correct": ["a"],
+      "explanation": "The dashboard reads StarBridge's Console views; an older DB that predates them needs the setup scripts (from the SynnduitDashboard repo) run first.",
+      "misconceptions": {
+        "b": "Data volume isn't the issue; the missing Console views are."
+      },
+      "source": "Documentation/Synnduit Dashboard.docx"
+    },
+    {
+      "id": "L3.6.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Explain how you'd use the dashboard and the diagnostic scripts together to investigate a run that looks off.",
+      "rubric": [
+        "Use the dashboard to notice the problem run (e.g. a spike in exceptions or an unusual delete count) — the monitoring/visibility layer",
+        "Drop to the diagnostic scripts / StarBridge tables to pinpoint the specific records and read the exception text — the root-cause layer"
+      ],
+      "sampleAnswer": "I'd use the dashboard to spot which run looks off — say a spike of exceptions or an unusually high delete count — since it gives the visual run history. Then I'd switch to the diagnostic scripts (ExceptionRejections, Transactions, SeeMappingIssues) against that StarBridge DB to find the exact records and read the message text and trace the cause.",
+      "source": "README.md#6"
+    }
+  ]
+}

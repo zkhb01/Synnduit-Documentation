@@ -10,7 +10,7 @@
     "escalationTarget": "human-mentor",
     "contentStrategy": "hybrid: reviewed canonical lesson + quiz bank backbone; Claude supplies adaptive diagnosis, re-teaching, fresh items, and Q&A"
   },
-  "pathOrder": ["L0", "L1", "L2"],
+  "pathOrder": ["L0", "L1", "L2", "L3"],
   "levels": [
     {
       "id": "L1",
@@ -273,7 +273,7 @@
       "order": 3,
       "type": "coding",
       "gate": "all-concepts-mastered",
-      "gatesLevel": null,
+      "gatesLevel": "L3",
       "concepts": [
         {
           "id": "L2.1",
@@ -334,6 +334,76 @@
           "itemPoolId": "L2.6.items",
           "masteryThreshold": 0.8,
           "remediationAngle": "The appsettings.json Segment list: place the new Migration after its parents and the GarbageCollection before them (reverse order)."
+        }
+      ]
+    },
+    {
+      "id": "L3",
+      "name": "Operations & troubleshooting",
+      "order": 4,
+      "type": "operations",
+      "gate": "all-concepts-mastered",
+      "gatesLevel": null,
+      "concepts": [
+        {
+          "id": "L3.1",
+          "name": "Run a sync and read the console",
+          "objective": "Scheduled runs have no console, so re-run the .cmd manually to watch live progress; read each segment's transaction-outcome counts (NoChangesDetected, ChangesDetectedAndMerged, NewEntityCreated, Rejected, ExceptionThrown, ...) to see at a glance what the run did.",
+          "prereqs": ["L2.6", "L1.10"],
+          "sources": ["Documentation/Synnduit Console.docx", "README.md#6", "README.md#5.3"],
+          "itemPoolId": "L3.1.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Re-run a .cmd from a command prompt and map the printed per-segment counts to L1.10's outcomes — e.g. all NoChangesDetected is a clean no-op run; any ExceptionThrown needs follow-up."
+        },
+        {
+          "id": "L3.2",
+          "name": "Read a run in StarBridge",
+          "objective": "When the console isn't enough, query StarBridge: EntityTransaction holds a per-record Outcome (integer 1-11), EntityValueChange holds field-level diffs, and Operation/Message rows hold rejection/warning/exception text.",
+          "prereqs": ["L1.5", "L1.10"],
+          "sources": ["Documentation/Synnduit Console.docx", "DiagnosticScripts/Starbridge-Transactions.sql", "README.md#6"],
+          "itemPoolId": "L3.2.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Open EntityTransaction filtered by Outcome (11 = ExceptionThrown, 9 = ReferredForManualDeduplication, 2 = Rejected); the integer codes are exactly L1.10's outcomes."
+        },
+        {
+          "id": "L3.3",
+          "name": "Diagnose with the SQL scripts",
+          "objective": "The DiagnosticScripts/ folder is a triage toolbox: Transactions (outcomes), ExceptionRejections (Operation/Message text by Type: 1=Rejection, 3=Exception), SeeMappingIssues (duplicate mappings), ValueChange (field diffs), SerializedEntityData, Deletions. Pick the script that matches the symptom.",
+          "prereqs": ["L3.2"],
+          "sources": ["DiagnosticScripts/When and How to use these scripts.docx", "DiagnosticScripts/Starbridge-ExceptionRejections.sql", "DiagnosticScripts/Starbridge-SeeMappingIssues.sql"],
+          "itemPoolId": "L3.3.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Match symptom to script: exception/rejection text -> ExceptionRejections; a record that duplicated -> SeeMappingIssues; 'what field changed' -> ValueChange."
+        },
+        {
+          "id": "L3.4",
+          "name": "When a threshold aborts a run",
+          "objective": "Abort thresholds (segment/run exception counts, orphan-mapping %, garbage-collection %) deliberately halt a run to protect the destination from a bad feed. Recognize the abort and respond: investigate the source feed first, and only raise the threshold if the large change is legitimately expected.",
+          "prereqs": ["L1.12"],
+          "sources": ["README.md#4", "README.md#5.4", "Documentation/ProposedAbortThresholdOptions.docx", "Documentation/Synnduit Deletion limit threshold setting demo.docx"],
+          "itemPoolId": "L3.4.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "A garbage-collection/orphan abort usually means the source returned far fewer rows than expected (a broken feed) — fix the source before touching the threshold; the threshold did its job."
+        },
+        {
+          "id": "L3.5",
+          "name": "Resolve a sync exception",
+          "objective": "Read the exception text, trace it to a root cause, and apply the fix. Worked examples: 'Unable to resolve reference identifier' = the entity's source system isn't in its [SharedSourceSystemIdentifiers] list; a UNIQUE KEY violation = a missing StarBridge mapping; 'No sink exists for X' = a connector isn't wired/discovered.",
+          "prereqs": ["L3.2", "L2.5", "L2.6"],
+          "sources": ["ExceptionHistoryWithResolutions/Synnduit - Unable to resolve reference identifier.docx", "ExceptionHistoryWithResolutions/System.InvalidOperationException - No sink exists for the xxx entity type.docx", "ExceptionHistoryWithResolutions/SqlException - Violation of UNIQUE KEY constraint - no starbridge Mapping record.rtf"],
+          "itemPoolId": "L3.5.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Treat the message literally and search the ExceptionHistoryWithResolutions/ folder for the same error — most production exceptions there map to a small, known fix."
+        },
+        {
+          "id": "L3.6",
+          "name": "Monitor with the Synnduit Dashboard",
+          "objective": "The Synnduit Dashboard points at any StarBridge DB (CSSD runs 8 in production) for a visual history of runs and outcomes. Use it for at-a-glance monitoring; drop to the SQL scripts for deep triage.",
+          "prereqs": ["L3.2"],
+          "sources": ["Documentation/Synnduit Dashboard.docx", "README.md#6"],
+          "itemPoolId": "L3.6.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "The dashboard sits on top of StarBridge's Console views; if an older DB lacks them, the dashboard's setup scripts create them first."
         }
       ]
     }

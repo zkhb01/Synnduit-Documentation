@@ -1,0 +1,97 @@
+{
+  "poolId": "L3.4.items",
+  "conceptId": "L3.4",
+  "conceptName": "When a threshold aborts a run",
+  "items": [
+    {
+      "id": "L3.4.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the garbage-collection / orphan percentage abort threshold protect against?",
+      "options": [
+        { "id": "a", "text": "Deleting or orphaning too much of the destination because of a bad source feed" },
+        { "id": "b", "text": "The run taking too long" },
+        { "id": "c", "text": "Duplicate POCO classes" },
+        { "id": "d", "text": "A full disk on the StarBridge server" }
+      ],
+      "correct": ["a"],
+      "explanation": "The percentage thresholds halt a run that would delete/orphan more than the allowed share of the destination — the classic symptom of a broken feed returning too few rows.",
+      "misconceptions": {
+        "b": "It's about how much would be removed, not runtime."
+      },
+      "source": "README.md#4"
+    },
+    {
+      "id": "L3.4.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A run aborts with a garbage-collection percentage error. What's the first thing to check?",
+      "options": [
+        { "id": "a", "text": "Raise the threshold and re-run" },
+        { "id": "b", "text": "How many source rows the feed loaded (a suspiciously low count = a broken feed)" },
+        { "id": "c", "text": "Restart the StarBridge SQL server" },
+        { "id": "d", "text": "Delete the orphaned mappings manually" }
+      ],
+      "correct": ["b"],
+      "explanation": "Check the source row count first ('Loading source system entities ... N loaded'); a broken feed returning too few rows is the usual trigger.",
+      "misconceptions": {
+        "a": "Raising the threshold first can turn a caught problem into data loss."
+      },
+      "source": "README.md#5.4"
+    },
+    {
+      "id": "L3.4.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "When is it appropriate to raise an abort threshold so the run completes?",
+      "options": [
+        { "id": "a", "text": "Whenever an abort is slowing you down" },
+        { "id": "b", "text": "Only once you've confirmed the large change is legitimate and expected (e.g. a real bulk removal)" },
+        { "id": "c", "text": "Never — thresholds can't be changed" },
+        { "id": "d", "text": "Any time the source feed looks fine at a glance" }
+      ],
+      "correct": ["b"],
+      "explanation": "Raise it deliberately only when the big change is genuinely expected; otherwise the abort is correctly protecting the destination.",
+      "misconceptions": {
+        "a": "Forcing the run through to save time is exactly how a bad feed wipes the destination."
+      },
+      "source": "Documentation/ProposedAbortThresholdOptions.docx"
+    },
+    {
+      "id": "L3.4.q4",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "An overnight run aborts: 'garbage-collection percentage exceeded.' The console shows the Staff feed loaded 120 entities; it normally loads ~5,000. What happened, and what do you do?",
+      "rubric": [
+        "The source feed is broken/incomplete (120 vs ~5,000) — likely an outage, bad filter, or credential issue",
+        "The engine saw ~4,880 records as 'disappeared' and was about to garbage-collect them; the threshold aborted to protect the destination",
+        "Fix the source/feed and re-run; do NOT raise the threshold to force it through"
+      ],
+      "sampleAnswer": "The Staff feed only returned 120 of ~5,000, so it's broken (source outage, a bad query/filter, or a credential problem). The engine would have treated the ~4,880 missing records as deletions, and the GC threshold aborted to stop that — it did its job. I fix the source feed and re-run; I do not raise the threshold to push it through.",
+      "source": "Documentation/Synnduit Deletion limit threshold setting demo.docx"
+    },
+    {
+      "id": "L3.4.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which threshold is about 'too many errors' rather than 'too much deletion'?",
+      "options": [
+        { "id": "a", "text": "SegmentAbortThreshold / RunAbortThreshold (exception counts)" },
+        { "id": "b", "text": "GarbageCollectionPercentageAbortThreshold" },
+        { "id": "c", "text": "OrphanMappingPercentageAbortThreshold" },
+        { "id": "d", "text": "There is no error-count threshold" }
+      ],
+      "correct": ["a"],
+      "explanation": "Segment/Run abort thresholds count exceptions; the percentage thresholds bound how much of the destination can be deleted/orphaned.",
+      "misconceptions": {
+        "b": "The GC percentage threshold bounds deletion, not error count."
+      },
+      "source": "README.md#5.4"
+    }
+  ]
+}

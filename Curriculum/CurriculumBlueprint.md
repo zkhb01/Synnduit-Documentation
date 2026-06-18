@@ -28,10 +28,10 @@ Keep content **hybrid**: a reviewed canonical lesson + quiz bank per concept is 
 L1 Foundations (conceptual, open to all)
    → L0 Prerequisites (placement diagnostic; gates the coding levels)
       → L2 Coding (write feeds, sinks, POCOs)   [authored]
-         → L3 Operations & troubleshooting       [future]
+         → L3 Operations & troubleshooting       [authored]
 ```
 
-L1 is deliberately code-free, so it has no prerequisites. L0 is a **placement diagnostic** that gates L2+ (where learners write code). A confident dev clears L0 quickly; gaps trigger targeted remediation. **L2 is now authored** (see §5b); **L3** (operations & troubleshooting) remains future.
+L1 is deliberately code-free, so it has no prerequisites. L0 is a **placement diagnostic** that gates L2+ (where learners write code). A confident dev clears L0 quickly; gaps trigger targeted remediation. **L2 and L3 are now authored** (see §5b, §5c) — the full L1 → L0 → L2 → L3 path exists.
 
 ---
 
@@ -258,6 +258,40 @@ L2 items mix auto-scored concept checks (mc/order) with **model-scored code-writ
 ### L2 completion gate
 
 All 6 concepts mastered. Synthesis concepts: L2.5 (MEF wiring) and L2.6 (Run ordering).
+
+---
+
+## 5c. Level 3 — Operations & troubleshooting
+
+**Goal:** Run, read, monitor, and fix syncs in production. Where L2 writes the integration, L3 keeps it healthy. Gated by L2 (`L2.gatesLevel = L3`); unlocks once L2 is cleared. Grounded in the repo's real ops material: `Documentation/Synnduit Console.docx`, `DiagnosticScripts/`, `ExceptionHistoryWithResolutions/`, and `Documentation/Synnduit Dashboard.docx`.
+
+### Dependency graph
+
+```
+L2.6 + L1.10 ─▶ L3.1 Run a sync & read the console
+L1.5 + L1.10 ─▶ L3.2 Read a run in StarBridge
+                   └─▶ L3.3 Diagnose with the SQL scripts
+                   └─▶ L3.6 Monitor with the Dashboard
+L1.12 ─▶ L3.4 When a threshold aborts a run
+L3.2 + L2.5 + L2.6 ─▶ L3.5 Resolve a sync exception
+```
+
+### Concepts
+
+- **L3.1 — Run a sync & read the console** · re-run the .cmd manually; read per-segment outcome counts · src: Synnduit Console.docx, README §6 / §5.3
+- **L3.2 — Read a run in StarBridge** · EntityTransaction (Outcome 1-11), EntityValueChange (diffs), Operation/Message (text) · src: Synnduit Console.docx, `Starbridge-Transactions.sql`
+- **L3.3 — Diagnose with the SQL scripts** · match symptom to script (ExceptionRejections, SeeMappingIssues, ValueChange, …) · src: `DiagnosticScripts/`
+- **L3.4 — When a threshold aborts a run** · abort thresholds protect the destination from a bad feed; check the source before raising them · src: README §4 / §5.4, threshold docs
+- **L3.5 — Resolve a sync exception** · read text → root cause → fix, via the real cases (reference-id / UNIQUE-KEY / no-sink) · src: `ExceptionHistoryWithResolutions/`
+- **L3.6 — Monitor with the Synnduit Dashboard** · visual run history over any StarBridge DB (CSSD has 8); scripts for deep triage · src: Synnduit Dashboard.docx
+
+### Assessment
+
+Same model as L2: auto-scored concept checks (mc) plus model-scored **troubleshooting scenarios** (`scoring: model`, rubric + reference answer) graded by `ClaudeAnswerGrader`. Per the practice-only rule, scenarios give feedback but the gate is decided by the auto items (each concept has ≥3).
+
+### L3 completion gate
+
+All 6 concepts mastered. Synthesis concepts: L3.3 (diagnostic toolbox) and L3.5 (root-cause resolution).
 
 ---
 

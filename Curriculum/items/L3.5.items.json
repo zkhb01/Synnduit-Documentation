@@ -1,0 +1,92 @@
+{
+  "poolId": "L3.5.items",
+  "conceptId": "L3.5",
+  "conceptName": "Resolve a sync exception",
+  "items": [
+    {
+      "id": "L3.5.q1",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A Section migration throws 'Unable to resolve reference identifier (Property: StaffId; Source System ID: 0017738)'. What's the typical root cause?",
+      "options": [
+        { "id": "a", "text": "The referenced entity's source system isn't listed in its [SharedSourceSystemIdentifiers], so that source id has no mapping" },
+        { "id": "b", "text": "StarBridge is offline" },
+        { "id": "c", "text": "The destination column is misspelled" },
+        { "id": "d", "text": "The threshold aborted the run" }
+      ],
+      "correct": ["a"],
+      "explanation": "The child referenced a Staff by a source id the engine couldn't map — because Staff hadn't registered that source system. Add it to the entity's [SharedSourceSystemIdentifiers].",
+      "misconceptions": {
+        "b": "The engine resolved most ids fine; this is a per-entity mapping gap, not an outage."
+      },
+      "source": "ExceptionHistoryWithResolutions/Synnduit - Unable to resolve reference identifier.docx"
+    },
+    {
+      "id": "L3.5.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A run throws 'SqlException: Violation of UNIQUE KEY constraint ... Cannot insert duplicate key'. What does this usually mean?",
+      "options": [
+        { "id": "a", "text": "The engine tried to Create a record that already exists because StarBridge had no mapping linking it (so it didn't Update)" },
+        { "id": "b", "text": "Two runs executed at the same time" },
+        { "id": "c", "text": "The POCO has a non-nullable property" },
+        { "id": "d", "text": "The dashboard views are missing" }
+      ],
+      "correct": ["a"],
+      "explanation": "No StarBridge mapping meant the engine treated an existing record as new and tried to Insert it. The fix is to establish the mapping (or let [DuplicationKey] dedup match it) so it Updates instead.",
+      "misconceptions": {
+        "c": "The nullable rule causes change-detection problems, not a UNIQUE KEY insert violation."
+      },
+      "source": "ExceptionHistoryWithResolutions/SqlException - Violation of UNIQUE KEY constraint - no starbridge Mapping record.rtf"
+    },
+    {
+      "id": "L3.5.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "'System.InvalidOperationException: No sink exists for the X entity type' points to a problem with:",
+      "options": [
+        { "id": "a", "text": "Connector wiring/discovery — the [Sink] for X is missing, mis-typed, or not discoverable by MEF" },
+        { "id": "b", "text": "The source data being empty" },
+        { "id": "c", "text": "A network timeout to the destination" },
+        { "id": "d", "text": "An abort threshold" }
+      ],
+      "correct": ["a"],
+      "explanation": "MEF couldn't bind a sink for X — usually a missing/incorrect [Sink(DestinationSystem=...)] attribute (or a duplicate/ambiguous one). Check the connector's wiring (L2.5).",
+      "misconceptions": {
+        "b": "Empty source data wouldn't say 'no sink exists' — that's about discoverability of the connector."
+      },
+      "source": "ExceptionHistoryWithResolutions/System.InvalidOperationException - No sink exists for the xxx entity type.docx"
+    },
+    {
+      "id": "L3.5.q4",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "A run throws 'No sink exists for the Course entity type', yet CourseSink compiles fine. What's wrong, and how do you fix it?",
+      "rubric": [
+        "It compiles but MEF didn't discover/bind a sink for Course",
+        "Cause: the [Sink(DestinationSystem = typeof(...))] attribute is missing, wrong, or duplicated/ambiguous so MEF can't bind exactly one",
+        "Fix: ensure exactly one correctly-attributed ISink<Course> so MEF discovers it"
+      ],
+      "sampleAnswer": "Compiling isn't the same as being discovered: Synnduit finds connectors via MEF attributes, not by type. 'No sink exists for Course' means MEF couldn't bind one — almost always the [Sink(DestinationSystem = typeof(...))] attribute is missing or wrong on CourseSink (or there are two and it's ambiguous). Fix the attribute so there's exactly one discoverable ISink<Course>.",
+      "source": "ExceptionHistoryWithResolutions/System.InvalidOperationException - No sink exists for the xxx entity type.docx"
+    },
+    {
+      "id": "L3.5.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Describe your loop for resolving an unfamiliar Synnduit exception.",
+      "rubric": [
+        "Get the exact message text (console, or EntityException / Operation-Message in StarBridge)",
+        "Search ExceptionHistoryWithResolutions/ for that error — most are already documented",
+        "Trace to the root cause and apply the documented fix (and add a new entry if it's novel)"
+      ],
+      "sampleAnswer": "First get the exact message — from the console or from StarBridge (the Operation/Message text). Then search the ExceptionHistoryWithResolutions/ folder for that error; most production exceptions are already there with a root cause and fix. Apply the documented fix, and if it's a new one, add it to the folder.",
+      "source": "ExceptionHistoryWithResolutions/Synnduit - Unable to resolve reference identifier.docx"
+    }
+  ]
+}
