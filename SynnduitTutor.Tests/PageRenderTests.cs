@@ -112,6 +112,16 @@ public class PageRenderTests : IDisposable
     }
 
     [Fact]
+    public void Quiz_renders_code_sample_answers_as_a_vscode_block()
+    {
+        // L2.1 has a model item whose sample answer is C# code. In self-check mode (stub grader),
+        // the "Show sample answer" details renders it as a VS Code-styled, line-numbered block.
+        var cut = _ctx.Render<Quiz>(p => p.Add(x => x.ConceptId, "L2.1"));
+        Assert.Contains("class=\"vscode", cut.Markup);          // editor-pane styling
+        Assert.Contains("class=\"ln\"", cut.Markup);            // left line-number gutter
+    }
+
+    [Fact]
     public void Quiz_submit_scores_and_shows_results()
     {
         var cut = _ctx.Render<Quiz>(p => p.Add(x => x.ConceptId, "L1.1"));

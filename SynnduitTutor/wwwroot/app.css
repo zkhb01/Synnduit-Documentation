@@ -379,3 +379,33 @@ details[open] > summary { margin-bottom: .4rem; }
     .donut { filter: none; }
     * { animation: none !important; }
 }
+
+/* ---- Code sample answers: VS Code "Dark+" editor pane ---- */
+.vscode {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    border: 1px solid #2b2b2b;
+    border-radius: 6px;
+    padding: .6rem 0;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Cascadia Mono', Consolas, 'Courier New', monospace;
+    font-size: .82rem;
+    line-height: 1.55;
+    tab-size: 4;
+}
+.vscode code { color: inherit; background: none; padding: 0; font-family: inherit; }
+.vscode .cl { display: block; white-space: pre; padding: 0 .8rem; }
+.vscode .cl:hover { background: #2a2d2e; }            /* VS Code line hover */
+.vscode .ln {
+    display: inline-block;
+    width: 2.5em;
+    margin-right: 1em;
+    text-align: right;
+    color: #858585;                                    /* editor line-number gray */
+    user-select: none;
+}
+.vscode .k  { color: #569cd6; }                        /* keyword */
+.vscode .s  { color: #ce9178; }                        /* string */
+.vscode .c  { color: #6a9955; }                        /* comment */
+.vscode .a  { color: #dcdcaa; }                        /* attribute */
+.vscode .nm { color: #b5cea8; }                        /* number */

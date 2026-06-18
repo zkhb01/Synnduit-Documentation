@@ -94,7 +94,14 @@ else
                                     <summary class="small">Show sample answer &amp; rubric</summary>
                                     @if (item.SampleAnswer is not null)
                                     {
-                                        <p class="mt-2 mb-1"><em>@item.SampleAnswer</em></p>
+                                        @if (CodeHighlighter.LooksLikeCode(item.SampleAnswer))
+                                        {
+                                            <pre class="vscode mt-2 mb-1"><code>@CodeHighlighter.Highlight(item.SampleAnswer)</code></pre>
+                                        }
+                                        else
+                                        {
+                                            <p class="mt-2 mb-1"><em>@item.SampleAnswer</em></p>
+                                        }
                                     }
                                     @if (item.Rubric is { Count: > 0 })
                                     {
