@@ -1,4 +1,7 @@
 @inherits LayoutComponentBase
+@inject NavigationManager Nav
+@inject LearnerSession Session
+@inject MasteryService Mastery
 
 <div class="page">
     <div class="sidebar">
@@ -12,7 +15,14 @@
         </div>
 
         <article class="content px-4">
-            @Body
+            @if (_ready)
+            {
+                @Body
+            }
+            else
+            {
+                <p><em>Loading…</em></p>
+            }
         </article>
     </main>
 </div>
@@ -22,3 +32,35 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private bool _ready;
+
+    // The host app (SDM) already knows who the user is and passes them on the URL (?id=&name=).
+    // Preload that learner so the course opens as them with no sign-in step. This is a convenience
+    // preload, not an authentication boundary. Gating @Body until it finishes keeps a page's own
+    // not-signed-in redirect from firing before the preload completes.
+    protected override async Task OnInitializedAsync()
+    {
+        await PreloadLearnerFromUrl();
+        _ready = true;
+    }
+
+    private async Task PreloadLearnerFromUrl()
+    {
+        if (Session.IsSignedIn) return;
+
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(
+            Nav.ToAbsoluteUri(Nav.Uri).Query);
+
+        if (!query.TryGetValue("id", out var id) || string.IsNullOrWhiteSpace(id))
+            return;
+
+        var name = query.TryGetValue("name", out var n) && !string.IsNullOrWhiteSpace(n)
+            ? n.ToString()
+            : id.ToString();
+
+        var learner = await Mastery.GetOrCreateLearnerAsync(name, "sdm:" + id);
+        Session.SignIn(learner.Id, learner.DisplayName);
+    }
+}
