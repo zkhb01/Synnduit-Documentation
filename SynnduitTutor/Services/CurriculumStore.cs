@@ -182,16 +182,22 @@ public sealed class CurriculumStore
         return sw.ToString();
     }
 
-    /// <summary>Walk up from the content root looking for a Curriculum/ folder with the graph file.</summary>
+    /// <summary>
+    /// Resolves a curriculum folder. An explicit, existing path (absolute or relative to the CWD)
+    /// wins; otherwise <paramref name="configured"/> is treated as a folder name to locate by walking
+    /// up from the content root (defaulting to "Curriculum"). This lets each course name its own
+    /// sibling folder (e.g. "Curriculum-SDM") without baking machine-specific absolute paths into config.
+    /// </summary>
     public static string? ResolveCurriculumRoot(string? configured, string contentRoot)
     {
-        if (!string.IsNullOrWhiteSpace(configured))
-            return Directory.Exists(configured) ? Path.GetFullPath(configured) : null;
+        if (!string.IsNullOrWhiteSpace(configured) && Directory.Exists(configured))
+            return Path.GetFullPath(configured);
 
+        var folderName = string.IsNullOrWhiteSpace(configured) ? "Curriculum" : configured;
         var dir = new DirectoryInfo(contentRoot);
         for (var i = 0; i < 8 && dir is not null; i++, dir = dir.Parent)
         {
-            var candidate = Path.Combine(dir.FullName, "Curriculum");
+            var candidate = Path.Combine(dir.FullName, folderName);
             if (File.Exists(Path.Combine(candidate, "concept-graph.json")))
                 return candidate;
         }

@@ -1,0 +1,98 @@
+{
+  "poolId": "S1.2.items",
+  "conceptId": "S1.2",
+  "conceptName": "How SDM is built (two repos, one app)",
+  "items": [
+    {
+      "id": "S1.2.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What are SDM's two repositories?",
+      "options": [
+        { "id": "a", "text": "An Angular SPA front-end and an ASP.NET Core back-end" },
+        { "id": "b", "text": "A SQL database project and a reporting service" },
+        { "id": "c", "text": "Two separate Angular apps, one per environment" },
+        { "id": "d", "text": "A mobile app and a desktop app" }
+      ],
+      "correct": ["a"],
+      "explanation": "SupplementalDataManagerClient is the Angular SPA; SupplementalDataManager is the ASP.NET Core backend that hosts it and serves the API.",
+      "misconceptions": {
+        "b": "The database is DDH/SchoolObjectModel, accessed by the backend — not one of SDM's two repos.",
+        "c": "There's one SPA repo, deployed per environment via config, not a repo per environment.",
+        "d": "SDM is a web app, not a mobile/desktop pair."
+      },
+      "source": "README.md#architecture-overview"
+    },
+    {
+      "id": "S1.2.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which statement about the ASP.NET Core backend is correct?",
+      "options": [
+        { "id": "a", "text": "It only exposes the /api/* endpoints; a separate server hosts the SPA" },
+        { "id": "b", "text": "It both hosts the Angular SPA (from wwwroot) and exposes the /api/* REST controllers" },
+        { "id": "c", "text": "It runs the Angular build at request time in the browser" },
+        { "id": "d", "text": "It connects to the database without EF Core, using raw files" }
+      ],
+      "correct": ["b"],
+      "explanation": "The backend does both jobs from one origin: it serves the built SPA out of wwwroot and exposes ~30 REST controllers under /api/*.",
+      "misconceptions": {
+        "a": "There's no separate SPA host — the same backend serves both the SPA and the API.",
+        "c": "The SPA is pre-built and served as static files; the backend doesn't compile Angular per request.",
+        "d": "Data access is through EF Core against the SchoolObjectModel database."
+      },
+      "source": "SupplementalDataManagerClient/README.md#architecture-overview"
+    },
+    {
+      "id": "S1.2.q3",
+      "type": "order",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Put a browser request for a data screen in the order it flows through SDM.",
+      "options": [
+        { "id": "a", "text": "Browser requests /Iapetus (SPA) or calls /api/*" },
+        { "id": "b", "text": "ASP.NET Core backend handles the request" },
+        { "id": "c", "text": "EF Core reads/writes the SchoolObjectModel database" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "Browser → backend → EF Core → SchoolObjectModel DB. The backend is the single hop between the SPA and the database.",
+      "source": "README.md#architecture-overview"
+    },
+    {
+      "id": "S1.2.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is \"Iapetus\" in SDM?",
+      "options": [
+        { "id": "a", "text": "The name of the SQL database" },
+        { "id": "b", "text": "The sub-path the Angular SPA is mounted under (its base-href and the backend route must match)" },
+        { "id": "c", "text": "The authentication provider" },
+        { "id": "d", "text": "The CI/CD pipeline" }
+      ],
+      "correct": ["b"],
+      "explanation": "The SPA is built with --base-href Iapetus and served at /Iapetus/*; both repos must agree on the name (the backend has a matching IapetusController route).",
+      "misconceptions": {
+        "a": "The database is SchoolObjectModel (DDH), not Iapetus.",
+        "c": "Authentication is Entra ID; Iapetus is just the SPA mount path.",
+        "d": "Deployments are manual today; Iapetus isn't a pipeline."
+      },
+      "source": "SupplementalDataManagerClient/README.md#architecture-overview"
+    },
+    {
+      "id": "S1.2.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "At deploy time, what has to happen with the Angular build output, and why?",
+      "rubric": [
+        "The Angular app is built and its dist/ output is copied into the backend's wwwroot/",
+        "Because the backend hosts the SPA from one origin (so the same app serves both the SPA and /api/*)"
+      ],
+      "sampleAnswer": "You build the Angular app and copy its dist/supplemental-data-manager output into the backend's wwwroot/. The backend serves those files, so the SPA and the /api/* endpoints come from one app and one origin.",
+      "source": "SupplementalDataManagerClient/README.md#architecture-overview"
+    }
+  ]
+}
