@@ -4,10 +4,15 @@
 
 @code {
     // Redirect only once the component is interactive. Doing this in OnInitialized would run
-    // during static prerender, where NavigateTo throws NavigationException.
+    // during static prerender, where NavigateTo throws NavigationException. We carry the page the
+    // learner originally requested as ?returnUrl so sign-in can send them straight back to it.
     protected override void OnAfterRender(bool firstRender)
     {
-        if (firstRender)
-            Nav.NavigateTo("/", replace: true);
+        if (!firstRender) return;
+        var requested = Nav.ToBaseRelativePath(Nav.Uri);
+        var target = Nav.BaseUri + (string.IsNullOrEmpty(requested)
+            ? ""
+            : "?returnUrl=" + Uri.EscapeDataString(requested));
+        Nav.NavigateTo(target, replace: true);
     }
 }

@@ -13,10 +13,10 @@ public sealed class DonutService(IDbContextFactory<TutorDbContext> dbFactory, Do
 
     public bool CanRedeem(DonutBalance b) => b.Available >= options.RedeemThresholdPoints;
 
-    public async Task<DonutBalance> GetBalanceAsync(int learnerId)
+    public async Task<DonutBalance> GetBalanceAsync(int learnerId, string courseId)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
-        var awards = await db.DonutAwards.Where(a => a.LearnerId == learnerId).ToListAsync();
+        var awards = await db.DonutAwards.Where(a => a.LearnerId == learnerId && a.CourseId == courseId).ToListAsync();
         var earned = awards.Sum(a => a.Points);
         var redeemed = awards.Where(a => a.VoucherId != null).Sum(a => a.Points);
         return new DonutBalance(earned, earned - redeemed, redeemed);
@@ -26,10 +26,10 @@ public sealed class DonutService(IDbContextFactory<TutorDbContext> dbFactory, Do
     /// Redeems all currently-unredeemed donuts onto a new voucher. Requires the configured minimum
     /// (default 6). Throws <see cref="InvalidOperationException"/> if below threshold.
     /// </summary>
-    public async Task<Voucher> RedeemAsync(int learnerId, string milestone)
+    public async Task<Voucher> RedeemAsync(int learnerId, string courseId, string milestone)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
-        var unredeemed = await db.DonutAwards.Where(a => a.LearnerId == learnerId && a.VoucherId == null).ToListAsync();
+        var unredeemed = await db.DonutAwards.Where(a => a.LearnerId == learnerId && a.CourseId == courseId && a.VoucherId == null).ToListAsync();
         var points = unredeemed.Sum(a => a.Points);
         if (points < options.RedeemThresholdPoints)
             throw new InvalidOperationException(
@@ -38,6 +38,7 @@ public sealed class DonutService(IDbContextFactory<TutorDbContext> dbFactory, Do
         var voucher = new Voucher
         {
             LearnerId = learnerId,
+            CourseId = courseId,
             Code = NewCode(),
             Points = points,
             Milestone = string.IsNullOrWhiteSpace(milestone) ? "Milestone reached" : milestone,
@@ -59,10 +60,10 @@ public sealed class DonutService(IDbContextFactory<TutorDbContext> dbFactory, Do
         return await db.Vouchers.FindAsync(id);
     }
 
-    public async Task<List<Voucher>> GetVouchersAsync(int learnerId)
+    public async Task<List<Voucher>> GetVouchersAsync(int learnerId, string courseId)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
-        return await db.Vouchers.Where(v => v.LearnerId == learnerId)
+        return await db.Vouchers.Where(v => v.LearnerId == learnerId && v.CourseId == courseId)
             .OrderByDescending(v => v.IssuedUtc).ToListAsync();
     }
 

@@ -1,5 +1,5 @@
-@page "/quiz/{ConceptId}"
-@inject CurriculumStore Store
+@page "/{Course}/quiz/{ConceptId}"
+@inject CourseCatalog Catalog
 @inject LearnerSession Session
 @inject MasteryService Mastery
 @inject ScoringService Scoring
@@ -9,18 +9,23 @@
 
 <PageTitle>Quiz: @(_concept?.Name ?? ConceptId) — Synnduit Tutor</PageTitle>
 
-@if (!Session.IsSignedIn)
+@if (_store is null)
+{
+    <p class="text-danger">Unknown course <code>@Course</code>.</p>
+    <a href="">← All courses</a>
+}
+else if (!Session.IsSignedIn)
 {
     <RedirectToHome />
 }
 else if (_concept is null)
 {
     <p class="text-danger">Concept <code>@ConceptId</code> not found.</p>
-    <a href="/dashboard">← My path</a>
+    <a href="@($"{Course}/dashboard")">← My path</a>
 }
 else
 {
-    <div class="mb-2"><a href="@($"/lesson/{_concept.Id}")" class="text-decoration-none">← Lesson</a></div>
+    <div class="mb-2"><a href="@($"{Course}/lesson/{_concept.Id}")" class="text-decoration-none">← Lesson</a></div>
     <h2>Check: @_concept.Id — @_concept.Name</h2>
     <p class="text-muted">Pass mark: @((int)(_concept.MasteryThreshold * 100))%. @_items.Count question(s).</p>
 
@@ -142,7 +147,7 @@ else
             }
             @if (_escalated)
             {
-                <div class="mt-2"><strong>Heads up:</strong> after repeated attempts, this concept is flagged for a mentor (@Store.Graph.MasteryModel.EscalationTarget).</div>
+                <div class="mt-2"><strong>Heads up:</strong> after repeated attempts, this concept is flagged for a mentor (@_store!.Graph.MasteryModel.EscalationTarget).</div>
             }
         </div>
 
@@ -172,7 +177,7 @@ else
                     <div class="eyebrow">Milestone</div>
                     <h3 class="mb-1">@_completedLevelName — gate cleared</h3>
                     <p class="mb-2">Every concept in this level is mastered. Head to your path to redeem your donut voucher.</p>
-                    <a class="btn btn-primary btn-sm" href="/dashboard">Go to my path →</a>
+                    <a class="btn btn-primary btn-sm" href="@($"{Course}/dashboard")">Go to my path →</a>
                 </div>
             </div>
         }
@@ -219,10 +224,10 @@ else
         }
 
         <div class="mt-3 d-flex gap-2">
-            <a class="btn btn-outline-secondary" href="/dashboard">← My path</a>
+            <a class="btn btn-outline-secondary" href="@($"{Course}/dashboard")">← My path</a>
             @if (!_result.Passed)
             {
-                <a class="btn btn-primary" href="@($"/lesson/{_concept.Id}")">Re-read lesson</a>
+                <a class="btn btn-primary" href="@($"{Course}/lesson/{_concept.Id}")">Re-read lesson</a>
                 <button class="btn btn-outline-primary" @onclick="Retry">Try fresh questions</button>
             }
         </div>
@@ -230,8 +235,10 @@ else
 }
 
 @code {
+    [Parameter] public string Course { get; set; } = "";
     [Parameter] public string ConceptId { get; set; } = "";
 
+    private CurriculumStore? _store;
     private Concept? _concept;
     private List<Item> _items = new();
     private bool _submitting;
@@ -252,18 +259,19 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        if (!Session.IsSignedIn) return;   // markup redirects to Home
-        _concept = Store.Graph.FindConcept(ConceptId);
+        _store = Catalog.GetStore(Course);
+        if (_store is null || !Session.IsSignedIn) return;   // markup handles unknown course / redirect
+        _concept = _store.Graph.FindConcept(ConceptId);
         if (_concept is null) return;
         await LoadItemsAsync();
     }
 
     private async Task LoadItemsAsync()
     {
-        var m = await Mastery.GetMasteryAsync(Session.LearnerId!.Value, _concept!.Id);
+        var m = await Mastery.GetMasteryAsync(Session.LearnerId!.Value, Course, _concept!.Id);
         var seen = new HashSet<string>((m?.SeenItemIdsCsv ?? "")
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-        _items = Store.SelectItems(_concept.ItemPoolId, seen, 5);
+        _items = _store!.SelectItems(_concept.ItemPoolId, seen, 5);
         ResetInputs();
         // Seed text entries so the two-way @bind getter on model-item textareas never indexes a missing key.
         foreach (var it in _items)
@@ -328,7 +336,7 @@ else
 
         _result = Scoring.Score(_items, responses, _concept!.MasteryThreshold);
         var outcome = await Mastery.RecordAttemptAsync(
-            Session.LearnerId!.Value, _concept, _result, _items.Select(i => i.Id));
+            Session.LearnerId!.Value, Course, _concept, _result, _items.Select(i => i.Id));
         _escalated = outcome.Mastery.EscalatedToMentor;
         _awards = outcome.NewAwards;
         _levelJustCompleted = outcome.LevelJustCompleted;
@@ -336,7 +344,7 @@ else
 
         if (!_result.Passed)
         {
-            var lesson = Store.GetLesson(_concept.Id);
+            var lesson = _store!.GetLesson(_concept.Id);
             _remediation = await Remediation.RemediateAsync(_concept, lesson, _result.WrongItems, responses);
         }
 

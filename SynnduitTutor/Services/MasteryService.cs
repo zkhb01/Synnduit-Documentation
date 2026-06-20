@@ -20,7 +20,7 @@ public sealed record AttemptOutcome(
 /// Uses an IDbContextFactory so each operation gets a short-lived context (safe under Blazor Server).
 /// </summary>
 public sealed class MasteryService(
-    IDbContextFactory<TutorDbContext> dbFactory, CurriculumStore store, DonutOptions donuts)
+    IDbContextFactory<TutorDbContext> dbFactory, CourseCatalog catalog, DonutOptions donuts)
 {
     public async Task<List<Learner>> GetLearnersAsync()
     {
@@ -47,18 +47,19 @@ public sealed class MasteryService(
         return await db.Learners.FindAsync(learnerId);
     }
 
-    public async Task<Dictionary<string, ConceptMastery>> GetMasteryMapAsync(int learnerId)
+    public async Task<Dictionary<string, ConceptMastery>> GetMasteryMapAsync(int learnerId, string courseId)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         return await db.ConceptMastery
-            .Where(m => m.LearnerId == learnerId)
+            .Where(m => m.LearnerId == learnerId && m.CourseId == courseId)
             .ToDictionaryAsync(m => m.ConceptId);
     }
 
-    public async Task<ConceptMastery?> GetMasteryAsync(int learnerId, string conceptId)
+    public async Task<ConceptMastery?> GetMasteryAsync(int learnerId, string courseId, string conceptId)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
-        return await db.ConceptMastery.FirstOrDefaultAsync(m => m.LearnerId == learnerId && m.ConceptId == conceptId);
+        return await db.ConceptMastery.FirstOrDefaultAsync(
+            m => m.LearnerId == learnerId && m.CourseId == courseId && m.ConceptId == conceptId);
     }
 
     /// <summary>
@@ -67,19 +68,23 @@ public sealed class MasteryService(
     /// donuts (base + first-attempt / perfect-score / critical bonuses) and a level-completion bonus.
     /// </summary>
     public async Task<AttemptOutcome> RecordAttemptAsync(
-        int learnerId, Concept concept, QuizResult result, IEnumerable<string> servedItemIds)
+        int learnerId, string courseId, Concept concept, QuizResult result, IEnumerable<string> servedItemIds)
     {
+        var graph = (catalog.GetStore(courseId)
+                     ?? throw new InvalidOperationException($"Unknown course '{courseId}'.")).Graph;
+
         await using var db = await dbFactory.CreateDbContextAsync();
         var now = DateTime.UtcNow;
 
-        var existing = await db.ConceptMastery.FirstOrDefaultAsync(x => x.LearnerId == learnerId && x.ConceptId == concept.Id);
+        var existing = await db.ConceptMastery.FirstOrDefaultAsync(
+            x => x.LearnerId == learnerId && x.CourseId == courseId && x.ConceptId == concept.Id);
         var isFirstAttempt = existing is null;
         var wasMastered = existing?.Mastered == true;
 
         var m = existing;
         if (m is null)
         {
-            m = new ConceptMastery { LearnerId = learnerId, ConceptId = concept.Id };
+            m = new ConceptMastery { LearnerId = learnerId, CourseId = courseId, ConceptId = concept.Id };
             db.ConceptMastery.Add(m);
         }
 
@@ -87,7 +92,7 @@ public sealed class MasteryService(
         m.LastAttemptUtc = now;
         if (result.Score > m.BestScore) m.BestScore = result.Score;
 
-        var placement = store.Graph.LevelOf(concept)?.IsPlacement == true;
+        var placement = graph.LevelOf(concept)?.IsPlacement == true;
         var passed = result.Score >= concept.MasteryThreshold;
 
         if (passed)
@@ -99,7 +104,7 @@ public sealed class MasteryService(
         else if (!isFirstAttempt)
         {
             m.RemediationCycles++;
-            if (m.RemediationCycles >= store.Graph.MasteryModel.RemediationCycleLimitBeforeEscalation)
+            if (m.RemediationCycles >= graph.MasteryModel.RemediationCycleLimitBeforeEscalation)
                 m.EscalatedToMentor = true;
         }
 
@@ -116,7 +121,7 @@ public sealed class MasteryService(
             void Add(string reason, int points)
             {
                 if (points <= 0) return;
-                awards.Add(new DonutAward { LearnerId = learnerId, Reason = reason, ConceptId = concept.Id, Points = points, EarnedUtc = now });
+                awards.Add(new DonutAward { LearnerId = learnerId, CourseId = courseId, Reason = reason, ConceptId = concept.Id, Points = points, EarnedUtc = now });
             }
             Add("Mastered", donuts.Award.ConceptMastered);
             if (isFirstAttempt) Add("FirstAttempt", donuts.Award.FirstAttemptBonus);
@@ -132,22 +137,22 @@ public sealed class MasteryService(
         string? completedLevelId = null, completedLevelName = null;
         if (justMastered)
         {
-            var level = store.Graph.LevelOf(concept);
+            var level = graph.LevelOf(concept);
             if (level is not null)
             {
                 var ids = level.Concepts.Select(c => c.Id).ToList();
                 var doneCount = await db.ConceptMastery.CountAsync(x =>
-                    x.LearnerId == learnerId && ids.Contains(x.ConceptId) && (x.Mastered || x.SkippedByPlacement));
+                    x.LearnerId == learnerId && x.CourseId == courseId && ids.Contains(x.ConceptId) && (x.Mastered || x.SkippedByPlacement));
 
                 if (doneCount == ids.Count)
                 {
                     var already = await db.DonutAwards.AnyAsync(a =>
-                        a.LearnerId == learnerId && a.LevelId == level.Id && a.Reason == "LevelComplete");
+                        a.LearnerId == learnerId && a.CourseId == courseId && a.LevelId == level.Id && a.Reason == "LevelComplete");
                     if (!already)
                     {
                         var bonus = new DonutAward
                         {
-                            LearnerId = learnerId, Reason = "LevelComplete", LevelId = level.Id,
+                            LearnerId = learnerId, CourseId = courseId, Reason = "LevelComplete", LevelId = level.Id,
                             Points = donuts.Award.LevelCompletionBonus, EarnedUtc = now
                         };
                         db.DonutAwards.Add(bonus);

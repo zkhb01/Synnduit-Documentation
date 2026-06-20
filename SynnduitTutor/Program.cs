@@ -14,8 +14,8 @@ var dbPath = builder.Configuration["Database:Path"]
 Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
 builder.Services.AddDbContextFactory<TutorDbContext>(o => o.UseSqlite($"Data Source={dbPath}"));
 
-// --- Curriculum (read-only authored content) ---
-builder.Services.AddSingleton<CurriculumStore>();
+// --- Curriculum (read-only authored content), one store per training course ---
+builder.Services.AddSingleton<CourseCatalog>();
 
 // --- Donut incentive config (appsettings: "Donuts") ---
 var donutOptions = builder.Configuration.GetSection("Donuts").Get<DonutOptions>() ?? new DonutOptions();
@@ -59,9 +59,18 @@ using (var scope = app.Services.CreateScope())
     using var db = factory.CreateDbContext();
     db.Database.EnsureCreated();
 
-    // Fail fast if the curriculum can't be located/parsed.
-    _ = scope.ServiceProvider.GetRequiredService<CurriculumStore>().Graph;
+    // Fail fast if any configured course's curriculum can't be located/parsed.
+    var catalog = scope.ServiceProvider.GetRequiredService<CourseCatalog>();
+    foreach (var course in catalog.Courses)
+        _ = catalog.GetStore(course.Id)!.Graph;
 }
+
+// Hosting under a sub-path (e.g. behind SDM's IIS site at "/Tutor"). Set Hosting:PathBase to "/Tutor"
+// in production; leave empty to serve at the site root (local dev). The <base href> in App.razor reads
+// the same value so in-app (base-relative) links resolve correctly under the prefix.
+var pathBase = (app.Configuration["Hosting:PathBase"] ?? "").Trim().TrimEnd('/');
+if (!string.IsNullOrEmpty(pathBase))
+    app.UsePathBase(pathBase);
 
 if (!app.Environment.IsDevelopment())
 {

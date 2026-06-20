@@ -1,13 +1,19 @@
-@page "/dashboard"
+@page "/{Course}/dashboard"
 @inject LearnerSession Session
 @inject MasteryService Mastery
 @inject GatingEngine Gating
 @inject DonutService Donuts
+@inject CourseCatalog Catalog
 @inject NavigationManager Nav
 
-<PageTitle>My path — Synnduit Tutor</PageTitle>
+<PageTitle>My path — @(_course?.Name ?? "Tutor")</PageTitle>
 
-@if (!Session.IsSignedIn)
+@if (_course is null)
+{
+    <p class="text-danger">Unknown course <code>@Course</code>.</p>
+    <a href="">← All courses</a>
+}
+else if (!Session.IsSignedIn)
 {
     <RedirectToHome />
 }
@@ -17,7 +23,7 @@ else if (_levels is null)
 }
 else
 {
-    <div class="eyebrow">Your progress</div>
+    <div class="eyebrow">@_course.Name · your progress</div>
     <h1>@Session.DisplayName's path</h1>
     <p class="lead">Master every concept in a level to clear its gate. Locked concepts open once their prerequisites are done.</p>
 
@@ -84,7 +90,7 @@ else
                             }
                             else
                             {
-                                <a class="btn btn-sm btn-outline-primary" href="@($"/lesson/{cv.Concept.Id}")">
+                                <a class="btn btn-sm btn-outline-primary" href="@($"{Course}/lesson/{cv.Concept.Id}")">
                                     @(cv.Status is ConceptStatus.Mastered or ConceptStatus.Skipped ? "Review" : "Open")
                                 </a>
                             }
@@ -98,18 +104,25 @@ else
 }
 
 @code {
+    [Parameter] public string Course { get; set; } = "";
+
+    private CourseDefinition? _course;
     private IReadOnlyList<LevelView>? _levels;
     private DonutBalance? _balance;
     private bool _redeeming;
     private string? _redeemError;
     private readonly HashSet<string> _collapsed = new();   // level ids whose lessons are hidden
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        if (!Session.IsSignedIn) return;
-        var map = await Mastery.GetMasteryMapAsync(Session.LearnerId!.Value);
-        _levels = Gating.BuildOverview(map);
-        _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value);
+        _course = Catalog.GetCourse(Course);
+        var store = Catalog.GetStore(Course);
+        if (_course is null || store is null || !Session.IsSignedIn) return;
+
+        _collapsed.Clear();
+        var map = await Mastery.GetMasteryMapAsync(Session.LearnerId!.Value, Course);
+        _levels = Gating.BuildOverview(store.Graph, map);
+        _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value, Course);
 
         // Default: hide completed and locked levels; leave the level(s) you're working on open.
         foreach (var lv in _levels)
@@ -131,13 +144,13 @@ else
         try
         {
             var milestone = BuildMilestoneLabel();
-            var voucher = await Donuts.RedeemAsync(Session.LearnerId!.Value, milestone);
-            Nav.NavigateTo($"/voucher/{voucher.Id}");
+            var voucher = await Donuts.RedeemAsync(Session.LearnerId!.Value, Course, milestone);
+            Nav.NavigateTo($"{Course}/voucher/{voucher.Id}");
         }
         catch (InvalidOperationException ex)
         {
             _redeemError = ex.Message;
-            _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value);
+            _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value, Course);
             _redeeming = false;
         }
     }

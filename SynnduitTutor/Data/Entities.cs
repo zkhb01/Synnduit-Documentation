@@ -20,6 +20,10 @@ public sealed class ConceptMastery
     public int LearnerId { get; set; }
     public Learner? Learner { get; set; }
 
+    /// <summary>The course (curriculum) this mastery row belongs to. A learner has independent
+    /// progress per course, so gating/mastery is always scoped by (LearnerId, CourseId, ConceptId).</summary>
+    public string CourseId { get; set; } = "";
+
     public string ConceptId { get; set; } = "";
 
     /// <summary>Best score (0..1) the learner has achieved on this concept's items.</summary>
@@ -48,6 +52,9 @@ public sealed class DonutAward
     public int LearnerId { get; set; }
     public Learner? Learner { get; set; }
 
+    /// <summary>The course this award was earned in.</summary>
+    public string CourseId { get; set; } = "";
+
     /// <summary>Mastered | FirstAttempt | Perfect | Critical | LevelComplete</summary>
     public string Reason { get; set; } = "";
     public string? ConceptId { get; set; }
@@ -65,6 +72,9 @@ public sealed class Voucher
     public int Id { get; set; }
     public int LearnerId { get; set; }
     public Learner? Learner { get; set; }
+
+    /// <summary>The course whose donuts this voucher redeems.</summary>
+    public string CourseId { get; set; } = "";
 
     public string Code { get; set; } = "";
     public int Points { get; set; }

@@ -19,13 +19,13 @@ public sealed class TutorDbContext(DbContextOptions<TutorDbContext> options) : D
 
         b.Entity<ConceptMastery>(e =>
         {
-            e.HasIndex(x => new { x.LearnerId, x.ConceptId }).IsUnique();
+            e.HasIndex(x => new { x.LearnerId, x.CourseId, x.ConceptId }).IsUnique();
         });
 
         b.Entity<DonutAward>(e =>
         {
-            e.HasIndex(x => new { x.LearnerId, x.VoucherId });
-            e.HasIndex(x => new { x.LearnerId, x.LevelId, x.Reason });
+            e.HasIndex(x => new { x.LearnerId, x.CourseId, x.VoucherId });
+            e.HasIndex(x => new { x.LearnerId, x.CourseId, x.LevelId, x.Reason });
         });
 
         b.Entity<Voucher>(e =>

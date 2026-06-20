@@ -1,22 +1,27 @@
-@page "/lesson/{ConceptId}"
-@inject CurriculumStore Store
+@page "/{Course}/lesson/{ConceptId}"
+@inject CourseCatalog Catalog
 @inject LearnerSession Session
 
 <PageTitle>@(_concept?.Name ?? ConceptId) — Synnduit Tutor</PageTitle>
 
-@if (!Session.IsSignedIn)
+@if (_store is null)
+{
+    <p class="text-danger">Unknown course <code>@Course</code>.</p>
+    <a href="">← All courses</a>
+}
+else if (!Session.IsSignedIn)
 {
     <RedirectToHome />
 }
 else if (_concept is null)
 {
     <p class="text-danger">Concept <code>@ConceptId</code> was not found.</p>
-    <a href="/dashboard">← Back to my path</a>
+    <a href="@($"{Course}/dashboard")">← Back to my path</a>
 }
 else
 {
     <div class="mb-3">
-        <a href="/dashboard" class="text-decoration-none">← My path</a>
+        <a href="@($"{Course}/dashboard")" class="text-decoration-none">← My path</a>
     </div>
 
     @if (_lesson is not null)
@@ -37,19 +42,22 @@ else
         <small class="text-muted">
             @if (_lesson?.Get("sources") is { Length: > 0 } src) { <span>Sources: @src</span> }
         </small>
-        <a class="btn btn-primary" href="@($"/quiz/{_concept.Id}")">Check my understanding →</a>
+        <a class="btn btn-primary" href="@($"{Course}/quiz/{_concept.Id}")">Check my understanding →</a>
     </div>
 }
 
 @code {
+    [Parameter] public string Course { get; set; } = "";
     [Parameter] public string ConceptId { get; set; } = "";
 
+    private CurriculumStore? _store;
     private Concept? _concept;
     private Models.Lesson? _lesson;
 
     protected override void OnParametersSet()
     {
-        _concept = Store.Graph.FindConcept(ConceptId);
-        _lesson = _concept is null ? null : Store.GetLesson(ConceptId);
+        _store = Catalog.GetStore(Course);
+        _concept = _store?.Graph.FindConcept(ConceptId);
+        _lesson = _concept is null ? null : _store!.GetLesson(ConceptId);
     }
 }

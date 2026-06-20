@@ -1,4 +1,4 @@
-@page "/voucher/{Id:int}"
+@page "/{Course}/voucher/{Id:int}"
 @inject DonutService Donuts
 @inject MasteryService Mastery
 @inject LearnerSession Session
@@ -13,12 +13,12 @@
 else if (_voucher is null)
 {
     <p class="text-danger">Voucher not found.</p>
-    <a href="/dashboard">← My path</a>
+    <a href="@($"{Course}/dashboard")">← My path</a>
 }
 else
 {
     <div class="voucher-actions">
-        <a href="/dashboard" class="btn btn-outline-secondary btn-sm">← My path</a>
+        <a href="@($"{Course}/dashboard")" class="btn btn-outline-secondary btn-sm">← My path</a>
         <button class="btn btn-primary btn-sm" @onclick="PrintAsync">🖨 Print voucher</button>
     </div>
 
@@ -69,6 +69,7 @@ else
 }
 
 @code {
+    [Parameter] public string Course { get; set; } = "";
     [Parameter] public int Id { get; set; }
 
     private Data.Voucher? _voucher;

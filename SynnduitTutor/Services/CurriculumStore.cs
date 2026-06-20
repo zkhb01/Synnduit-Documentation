@@ -183,7 +183,7 @@ public sealed class CurriculumStore
     }
 
     /// <summary>Walk up from the content root looking for a Curriculum/ folder with the graph file.</summary>
-    private static string? ResolveCurriculumRoot(string? configured, string contentRoot)
+    public static string? ResolveCurriculumRoot(string? configured, string contentRoot)
     {
         if (!string.IsNullOrWhiteSpace(configured))
             return Directory.Exists(configured) ? Path.GetFullPath(configured) : null;

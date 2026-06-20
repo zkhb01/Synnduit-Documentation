@@ -17,9 +17,10 @@ public sealed record LevelView(Level Level, IReadOnlyList<ConceptView> Concepts,
 
 /// <summary>
 /// Pure gating logic: given a learner's mastery state, decide which concepts are locked /
-/// available / mastered, and whether each level's gate is satisfied.
+/// available / mastered, and whether each level's gate is satisfied. Stateless — the caller supplies
+/// the course's <see cref="ConceptGraph"/>, so one engine serves every course.
 /// </summary>
-public sealed class GatingEngine(CurriculumStore store)
+public sealed class GatingEngine
 {
     public bool IsDone(ConceptMastery? m) => m is not null && (m.Mastered || m.SkippedByPlacement);
 
@@ -33,9 +34,8 @@ public sealed class GatingEngine(CurriculumStore store)
         return prereqsDone ? ConceptStatus.Available : ConceptStatus.Locked;
     }
 
-    public IReadOnlyList<LevelView> BuildOverview(IReadOnlyDictionary<string, ConceptMastery> mastery)
+    public IReadOnlyList<LevelView> BuildOverview(ConceptGraph graph, IReadOnlyDictionary<string, ConceptMastery> mastery)
     {
-        var graph = store.Graph;
         var views = new List<LevelView>();
 
         // A level is "unlocked" if it's first in path order, or every level that gates it is complete.

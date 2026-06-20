@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@inject IConfiguration Config
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/" />
+    <base href="@BaseHref" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..520&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" />
@@ -22,3 +23,15 @@
 </body>
 
 </html>
+
+@code {
+    // Mirrors Hosting:PathBase (see Program.cs). "/Tutor" → base href "/Tutor/"; empty → "/".
+    private string BaseHref
+    {
+        get
+        {
+            var pathBase = (Config["Hosting:PathBase"] ?? "").Trim().Trim('/');
+            return pathBase.Length == 0 ? "/" : $"/{pathBase}/";
+        }
+    }
+}

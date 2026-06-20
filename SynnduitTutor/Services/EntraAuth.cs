@@ -45,7 +45,7 @@ public static class EntraAuth
         // Minimal endpoints — no Razor Pages UI package needed.
         app.MapGet("/auth/login", (string? returnUrl) =>
             Results.Challenge(
-                new AuthenticationProperties { RedirectUri = returnUrl ?? "/dashboard" },
+                new AuthenticationProperties { RedirectUri = string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl },
                 [OpenIdConnectDefaults.AuthenticationScheme]));
 
         app.MapGet("/auth/logout", () =>

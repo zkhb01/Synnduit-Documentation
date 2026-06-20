@@ -23,6 +23,13 @@ internal static class TestSupport
     public static CurriculumStore RealStore() =>
         new(FindCurriculumRoot(), NullLogger<CurriculumStore>.Instance);
 
+    /// <summary>The course id used throughout the tests.</summary>
+    public const string CourseId = "synnduit";
+
+    /// <summary>A single-course catalog wrapping the real curriculum store.</summary>
+    public static CourseCatalog Catalog(CurriculumStore store) =>
+        CourseCatalog.Single(CourseId, "Synnduit Tutorial", store);
+
     /// <summary>Default donut config (all bonuses = 1, level bonus = 3, threshold = 6).</summary>
     public static DonutOptions DonutOpts() => new();
 
