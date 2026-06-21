@@ -1,0 +1,78 @@
+{
+  "poolId": "S2.2.items",
+  "conceptId": "S2.2",
+  "conceptName": "How the menu is built (management tasks)",
+  "items": [
+    {
+      "id": "S2.2.q1",
+      "type": "order",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Put the steps SDM uses to build a user's menu in order.",
+      "options": [
+        { "id": "a", "text": "Read the user's DA-* AAD groups" },
+        { "id": "b", "text": "Map those groups to management tasks (via SQL)" },
+        { "id": "c", "text": "Include only the links whose task the user holds" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "Groups → management tasks → emit only the entitled links. That chain is why the menu is per-user.",
+      "source": "README.md#architecture-overview"
+    },
+    {
+      "id": "S2.2.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A user is missing the \"Schools\" item from their menu. What's the most likely cause?",
+      "options": [
+        { "id": "a", "text": "They lack the DA-* group that maps to the management task granting that link" },
+        { "id": "b", "text": "The link was removed from the codebase" },
+        { "id": "c", "text": "Their browser zoom is too high" },
+        { "id": "d", "text": "The database is offline" }
+      ],
+      "correct": ["a"],
+      "explanation": "Links appear only when the user holds the matching management task, which comes from their AAD groups. A missing item almost always means a missing group.",
+      "misconceptions": {
+        "b": "The link exists in the catalog; it's just not granted to this user.",
+        "c": "Rendering isn't the issue — the link wasn't emitted for this user.",
+        "d": "A DB outage wouldn't selectively drop one menu item."
+      },
+      "source": "SYSTEMS.md#where-this-fits"
+    },
+    {
+      "id": "S2.2.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which menu item is shown to every authenticated user regardless of their management tasks?",
+      "options": [
+        { "id": "a", "text": "Schools" },
+        { "id": "b", "text": "Training" },
+        { "id": "c", "text": "Standalone Groups" },
+        { "id": "d", "text": "Staff" }
+      ],
+      "correct": ["b"],
+      "explanation": "The Training menu is appended unconditionally from configuration — it isn't gated by a management task, unlike the data-management links.",
+      "misconceptions": {
+        "a": "Schools is task-gated like the other data links.",
+        "c": "Standalone Groups is task-gated.",
+        "d": "Staff is task-gated."
+      },
+      "source": "README.md#architecture-overview"
+    },
+    {
+      "id": "S2.2.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Two staff open SDM and see different menus. Explain why, in terms of the group → task → link chain.",
+      "rubric": [
+        "Each user's DA-* AAD groups map (via SQL) to a set of management tasks",
+        "A link is emitted only if the user holds the task that grants it, so different groups → different tasks → different links",
+        "Therefore the menu is computed per user, not a fixed list"
+      ],
+      "sampleAnswer": "SDM reads each user's DA-* groups, maps them to management tasks, and emits only the links whose task the user holds. The two staff belong to different groups, so they get different tasks and therefore different links — the menu is built per user, not a fixed list.",
+      "source": "README.md#architecture-overview"
+    }
+  ]
+}

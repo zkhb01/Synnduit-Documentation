@@ -1,0 +1,82 @@
+{
+  "poolId": "S2.4.items",
+  "conceptId": "S2.4",
+  "conceptName": "Notifications and the temp-job workflow",
+  "items": [
+    {
+      "id": "S2.4.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How does SDM send its email notifications?",
+      "options": [
+        { "id": "a", "text": "Through the shared Cssd.IT.EmailNotifications library (MailKit/SMTP)" },
+        { "id": "b", "text": "By writing directly to each user's mailbox file" },
+        { "id": "c", "text": "Via the Sync-* fleet" },
+        { "id": "d", "text": "It doesn't send email at all" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM uses the shared Cssd.IT.EmailNotifications library (MailKit) for events like on-hold / temp-job merges.",
+      "misconceptions": {
+        "b": "It relays via SMTP, not by writing mailbox files.",
+        "c": "The syncs move data; email is SDM's own notification path.",
+        "d": "It does send notifications for certain staffing events."
+      },
+      "source": "README.md#email-notifications"
+    },
+    {
+      "id": "S2.4.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "On a developer's machine, an action that should email doesn't actually send. Why is that expected?",
+      "options": [
+        { "id": "a", "text": "DisableEmailNotifications is true in dev — the message is logged, not sent" },
+        { "id": "b", "text": "Email is permanently removed from SDM" },
+        { "id": "c", "text": "The developer's machine has no network" },
+        { "id": "d", "text": "Notifications only work on weekends" }
+      ],
+      "correct": ["a"],
+      "explanation": "Dev sets DisableEmailNotifications: true, so emails are written to the audit log rather than delivered. Prod/staging relay through the corporate SMTP.",
+      "misconceptions": {
+        "b": "Email works in deployed environments; it's just disabled in dev.",
+        "c": "It's a config flag, not a connectivity issue.",
+        "d": "There's no day-of-week gating."
+      },
+      "source": "README.md#email-notifications"
+    },
+    {
+      "id": "S2.4.q3",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which staffing categories does SDM manage that drive these notifications (the HR-gap staffing)? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "Temporary jobs lasting under six weeks" },
+        { "id": "b", "text": "Contractors" },
+        { "id": "c", "text": "Vendors" },
+        { "id": "d", "text": "Permanent full-time teachers managed by HR" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "SDM covers staffing HR doesn't manage — temp jobs under six weeks, contractors, and vendors. Permanent staff remain HR's system of record.",
+      "misconceptions": {
+        "d": "Permanent HR-managed staff are HR's responsibility, not the HR-gap that SDM fills."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S2.4.q4",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "A teammate says \"email is broken — I created a temp job locally and no notification arrived.\" How do you respond?",
+      "rubric": [
+        "Notes that in dev DisableEmailNotifications is true, so nothing is actually sent",
+        "Points out the message is written to the audit log instead — check there to confirm it would have fired",
+        "Optionally notes prod/staging relay via corporate SMTP (under the service account), so delivery works there"
+      ],
+      "sampleAnswer": "That's expected on dev — DisableEmailNotifications is set to true, so the notification is logged to the audit log rather than actually sent. Check the log to confirm it would have fired. In staging/prod the servers relay through the corporate SMTP under the app's service account, so delivery works there.",
+      "source": "README.md#email-notifications"
+    }
+  ]
+}

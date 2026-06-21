@@ -1,0 +1,89 @@
+{
+  "poolId": "S2.3.items",
+  "conceptId": "S2.3",
+  "conceptName": "Editing the record: audit and soft-delete",
+  "items": [
+    {
+      "id": "S2.3.q1",
+      "type": "multi",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does an SDM-edited domain entity in DDH typically carry? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "A GUID Id" },
+        { "id": "b", "text": "CreatedBy / UpdatedBy audit fields" },
+        { "id": "c", "text": "A soft-delete flag" },
+        { "id": "d", "text": "The user's password" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "Entities use a GUID Id, CreatedBy/UpdatedBy audit fields, and a soft-delete flag — making edits attributable and reversible. They do not store passwords.",
+      "misconceptions": {
+        "d": "Credentials aren't stored on domain entities; auth is handled by Entra."
+      },
+      "source": "SYSTEMS.md#compliance--data-handling"
+    },
+    {
+      "id": "S2.3.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A user \"deletes\" a record in SDM. What actually happens?",
+      "options": [
+        { "id": "a", "text": "The row is marked deleted with a soft-delete flag (reversible), not physically removed" },
+        { "id": "b", "text": "The row is permanently dropped from the database" },
+        { "id": "c", "text": "Nothing — SDM can't delete" },
+        { "id": "d", "text": "The whole table is truncated" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM uses soft delete — a flag marks the record deleted, so it's recoverable and its history is preserved.",
+      "misconceptions": {
+        "b": "Soft delete means it isn't physically removed.",
+        "c": "SDM can delete — softly.",
+        "d": "Only the single record is flagged, nothing is truncated."
+      },
+      "source": "SYSTEMS.md#compliance--data-handling"
+    },
+    {
+      "id": "S2.3.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How would you answer \"who last changed this record, and when?\"",
+      "options": [
+        { "id": "a", "text": "Read the entity's UpdatedBy field (and the AuditLog for the full who/what/when trail)" },
+        { "id": "b", "text": "There's no way to tell — SDM keeps no record" },
+        { "id": "c", "text": "Ask the Sync-* fleet, which stores edit history" },
+        { "id": "d", "text": "Check the browser history" }
+      ],
+      "correct": ["a"],
+      "explanation": "The UpdatedBy audit field plus the AuditLog rows give an attributable who/what/when trail for every change.",
+      "misconceptions": {
+        "b": "Changes are audited via CreatedBy/UpdatedBy and the AuditLog.",
+        "c": "The syncs propagate data; SDM's edits are audited in DDH.",
+        "d": "Audit lives in DDH, not the browser."
+      },
+      "source": "README.md#solution-structure"
+    },
+    {
+      "id": "S2.3.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Where do the edited records and their audit trail actually live?",
+      "options": [
+        { "id": "a", "text": "In the DistrictDataHub (DDH) database — SDM holds no data of its own" },
+        { "id": "b", "text": "In SDM's own separate database" },
+        { "id": "c", "text": "In the browser's local storage" },
+        { "id": "d", "text": "In the Angular app's memory" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM is the editor; the data and its audit live in DDH. That's why the audit travels with the data the Sync-* fleet then reads.",
+      "misconceptions": {
+        "b": "SDM has no data store of its own; it reads/writes DDH.",
+        "c": "Nothing authoritative is stored in the browser.",
+        "d": "The SPA is stateless; data lives in DDH."
+      },
+      "source": "SYSTEMS.md#compliance--data-handling"
+    }
+  ]
+}
