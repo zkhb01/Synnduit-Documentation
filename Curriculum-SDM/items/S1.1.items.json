@@ -88,14 +88,14 @@
       "stem": "The name \"Supplemental Data Manager\" points at its core job. What does SDM primarily manage?",
       "options": [
         { "id": "a", "text": "A backup copy of everything already in DDH" },
-        { "id": "b", "text": "System-of-record sources, augmented with supplemental data that downstream apps need but DDH itself doesn't hold" },
+        { "id": "b", "text": "System-of-record data (imported into DDH), augmented there with the supplemental attributes downstream apps need that the source systems don't provide" },
         { "id": "c", "text": "Only the look-and-feel settings of the sync tools" },
         { "id": "d", "text": "The HR system's master staff records" }
       ],
       "correct": ["b"],
-      "explanation": "SDM's core role is to manage system-of-record sources and augment them with the extra data downstream consumers require that DDH doesn't carry — the \"supplemental\" in the name.",
+      "explanation": "SDM's core role is to take the imported system-of-record data and maintain, in DDH, the extra attributes downstream consumers require that the source systems don't provide — the \"supplemental\" in the name.",
       "misconceptions": {
-        "a": "SDM isn't a backup — it manages data DDH doesn't hold, not a copy of what DDH already has.",
+        "a": "SDM isn't a backup — it maintains supplemental attributes in DDH, not a copy of data that already exists.",
         "c": "It manages real district data (and the sync config), not just UI settings.",
         "d": "HR remains the system of record for the staff it manages; SDM fills the gaps HR doesn't cover."
       },

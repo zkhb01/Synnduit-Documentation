@@ -23,12 +23,12 @@
         {
           "id": "S1.1",
           "name": "What SDM is",
-          "objective": "Explain that SDM manages supplemental data (system-of-record sources augmented with data downstream apps need but DDH doesn't hold) and is the human, RACI self-serve editor for the CSSD-curated portion of DDH, where people make the authoritative edits the Sync-* fleet then propagates.",
+          "objective": "Explain that SDM maintains supplemental data in DDH — the extra attributes downstream apps need that the source systems don't provide, layered onto the imported system-of-record data — and is the human, RACI self-serve editor for the CSSD-curated portion of DDH, where people make the authoritative edits the Sync-* fleet then propagates.",
           "prereqs": [],
           "sources": ["README.md#purpose--business-context", "SYSTEMS.md#purpose-in-the-enterprise"],
           "itemPoolId": "S1.1.items",
           "masteryThreshold": 0.8,
-          "remediationAngle": "Two anchors: (1) 'supplemental' — SDM holds/manages data DDH doesn't, plus the sync config; (2) RACI self-serve — the data owners edit their own data. Contrast with the mechanical Sync-* fleet that just propagates the result."
+          "remediationAngle": "Two anchors: (1) 'supplemental' — SDM maintains, in DDH, the attributes the source systems don't provide (plus the sync config); the data lives in DDH, SDM is the editor; (2) RACI self-serve — the data owners edit their own data. Contrast with the mechanical Sync-* fleet that just propagates the result."
         },
         {
           "id": "S1.2",
