@@ -1,0 +1,92 @@
+{
+  "poolId": "L2.4.items",
+  "conceptId": "L2.4",
+  "conceptName": "Sink + CacheFeed",
+  "items": [
+    {
+      "id": "L2.4.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does an `ICacheFeed<X>` let the engine read?",
+      "options": [
+        { "id": "a", "text": "The source system's rows" },
+        { "id": "b", "text": "The destination's current state, so the engine can diff against it" },
+        { "id": "c", "text": "The StarBridge exception log" },
+        { "id": "d", "text": "The appsettings.json configuration" }
+      ],
+      "correct": ["b"],
+      "explanation": "The cache feed re-reads the destination's current entities so the engine can compute the diff and garbage-collect.",
+      "misconceptions": {
+        "a": "Reading the source is the IFeed's job; the cache feed reads the destination."
+      },
+      "source": "README.md#3"
+    },
+    {
+      "id": "L2.4.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Why is the cache feed usually implemented on the same class as the sink?",
+      "options": [
+        { "id": "a", "text": "A class can implement only one interface, so they must merge" },
+        { "id": "b", "text": "Both talk to the destination, so one class avoids duplicating that access code — and a class can implement multiple interfaces" },
+        { "id": "c", "text": "The engine requires them to share a base class" },
+        { "id": "d", "text": "It makes the feed read the source faster" }
+      ],
+      "correct": ["b"],
+      "explanation": "The sink already knows how to reach the destination; implementing ICacheFeed<T> on the same class reuses that — and one class can implement several interfaces.",
+      "misconceptions": {
+        "a": "A class can implement many interfaces; that's exactly what makes the combination possible."
+      },
+      "source": "SinkAndCacheFeed.cs"
+    },
+    {
+      "id": "L2.4.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "The cache feed's LoadEntities() reads from which side?",
+      "options": [
+        { "id": "a", "text": "The source system" },
+        { "id": "b", "text": "The destination system" },
+        { "id": "c", "text": "StarBridge" },
+        { "id": "d", "text": "Both at once" }
+      ],
+      "correct": ["b"],
+      "explanation": "The cache feed reports the destination's current entities; the source-side snapshot comes from the IFeed.",
+      "misconceptions": {
+        "a": "That's the IFeed. The cache feed is the destination-side reader."
+      },
+      "source": "README.md#3"
+    },
+    {
+      "id": "L2.4.q4",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Take an existing `CourseSink : ISink<Course>` and make one class that is both the sink and the cache feed. Show the class declaration and a LoadEntities() that returns the destination's current courses.",
+      "rubric": [
+        "Single class implements both ISink<Course> and ICacheFeed<Course>",
+        "Keeps the [Sink] attribute and the injected service",
+        "LoadEntities() returns IEntityCollection<Course> from the destination service (e.g. service.GetAll())",
+        "Materializes the result (e.g. .ToList())"
+      ],
+      "sampleAnswer": "[Sink(DestinationSystem = typeof(SchoolObjectModel))]\npublic class CourseSinkAndCacheFeed : ISink<Course>, ICacheFeed<Course>\n{\n    private readonly ICourseService service;\n    [ImportingConstructor]\n    public CourseSinkAndCacheFeed(ICourseService service) => this.service = service;\n\n    // ISink<Course> members: New / Create / Get / Update / Delete ...\n\n    public IEntityCollection<Course> LoadEntities() => this.service.GetAll().ToList();\n}",
+      "source": "SinkAndCacheFeed.cs"
+    },
+    {
+      "id": "L2.4.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Besides the source feed, why does the engine also need a cache feed?",
+      "rubric": [
+        "The source feed only provides the source snapshot",
+        "The engine needs the destination's current state to diff against (and to garbage-collect) — that's what the cache feed supplies"
+      ],
+      "sampleAnswer": "The source feed gives the engine the new source snapshot, but to know what actually changed on the destination — and to garbage-collect records whose source disappeared — the engine must also read the destination's current state. The cache feed provides that.",
+      "source": "README.md#3"
+    }
+  ]
+}

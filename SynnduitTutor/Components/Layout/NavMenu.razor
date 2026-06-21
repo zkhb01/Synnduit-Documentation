@@ -1,0 +1,37 @@
+@inject LearnerSession Session
+@inject IConfiguration Config
+
+<div class="brand">
+    <a class="brand-lockup" href="">
+        <span class="crest"><img src="brand/ccsd-mark.png" alt="Calgary Catholic School District" /></span>
+        <span class="wordmark">
+            <span class="wm-1">Synnduit</span>
+            <span class="wm-2">Tutor</span>
+        </span>
+    </a>
+    <div class="brand-sub">Integration learning path</div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">@(Session.IsSignedIn ? "All courses" : "Sign in")</NavLink>
+        </div>
+    </nav>
+
+    @if (Session.IsSignedIn)
+    {
+        <div class="learner-chip">
+            <span class="lc-label">Signed in</span>
+            <span class="lc-name">@Session.DisplayName</span>
+        </div>
+        @if (Config.IsEntraConfigured())
+        {
+            <div class="nav-item">
+                <a class="nav-link" href="auth/logout">Sign out</a>
+            </div>
+        }
+    }
+</div>

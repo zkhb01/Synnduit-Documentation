@@ -1,0 +1,91 @@
+{
+  "poolId": "L3.1.items",
+  "conceptId": "L3.1",
+  "conceptName": "Run a sync and read the console",
+  "items": [
+    {
+      "id": "L3.1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "A run is scheduled via Windows Task Scheduler. How do you see its live console output?",
+      "options": [
+        { "id": "a", "text": "Open the scheduled task's log tab — it captures the console" },
+        { "id": "b", "text": "Re-run the Run's .cmd manually from a command prompt" },
+        { "id": "c", "text": "You can't — runs never produce console output" },
+        { "id": "d", "text": "Read it from the EntityValueChange table" }
+      ],
+      "correct": ["b"],
+      "explanation": "Scheduled runs have no visible console; re-running the .cmd manually shows live per-segment progress.",
+      "misconceptions": {
+        "d": "EntityValueChange holds field diffs after the fact, not live console output."
+      },
+      "source": "Documentation/Synnduit Console.docx"
+    },
+    {
+      "id": "L3.1.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A segment finishes with almost all 'No changes detected' and 'Exception thrown: 0'. What does that indicate?",
+      "options": [
+        { "id": "a", "text": "A healthy no-op run — the source matched what was already synced" },
+        { "id": "b", "text": "A failed run that synced nothing" },
+        { "id": "c", "text": "An initial load" },
+        { "id": "d", "text": "A threshold abort" }
+      ],
+      "correct": ["a"],
+      "explanation": "Mostly NoChangesDetected with no exceptions means the snapshot matched last run's state — nothing to do, which is healthy.",
+      "misconceptions": {
+        "c": "An initial load shows a wave of New entity created, not No changes detected."
+      },
+      "source": "Documentation/Synnduit Console.docx"
+    },
+    {
+      "id": "L3.1.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A segment reports 'Rejected: 8'. Is that an error to fix?",
+      "options": [
+        { "id": "a", "text": "Yes — every rejection is a failure that must be corrected" },
+        { "id": "b", "text": "No — Rejected means 'can't be processed yet' (e.g. a dependency not migrated this pass), not an error" },
+        { "id": "c", "text": "No — Rejected means the records were deleted" },
+        { "id": "d", "text": "Yes — it means the destination is down" }
+      ],
+      "correct": ["b"],
+      "explanation": "Rejected is a preprocessor 'try again later' outcome (often a parent not yet present); it isn't an error by itself. ExceptionThrown is the one to chase.",
+      "misconceptions": {
+        "a": "Rejections are expected during ordered migrations; they often clear on a later pass."
+      },
+      "source": "Documentation/Synnduit Console.docx"
+    },
+    {
+      "id": "L3.1.q4",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "A run's Section segment ends with 'New entity created: 0' and 'Exception thrown: 47'. What do you conclude, and what's your next step?",
+      "rubric": [
+        "47 exceptions is a real problem that needs follow-up (unlike Rejected)",
+        "Next step is to get the exception detail/text — query StarBridge (EntityTransaction Outcome=11) and the Operation/Message text, or use the diagnostic scripts",
+        "Identify the affected entity/segment (Section) to scope the fix"
+      ],
+      "sampleAnswer": "47 ExceptionThrown means 47 records errored — that needs investigation. The console only gives the count, so I'd go to StarBridge: EntityTransaction filtered to Outcome = 11 for which Section records threw, and the Operation/Message rows (or the ExceptionRejections script) for the actual error text, then trace the root cause.",
+      "source": "Documentation/Synnduit Console.docx"
+    },
+    {
+      "id": "L3.1.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Why is there no console to read from the scheduled run, and how do you get one?",
+      "rubric": [
+        "Runs are launched by Windows Task Scheduler, which doesn't surface the console",
+        "Re-run the same command / .cmd manually from a command prompt to watch live progress"
+      ],
+      "sampleAnswer": "The scheduler runs the command headless, so there's no console to watch. To see live progress you re-run the Run's .cmd yourself from a command prompt.",
+      "source": "Documentation/Synnduit Console.docx"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "poolId": "L0.D1.items",
+  "conceptId": "L0.D1",
+  "conceptName": "DI & constructor injection",
+  "items": [
+    {
+      "id": "L0.D1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "A class has the constructor `public StaffSink(IStaffService service)`. What does this tell you?",
+      "options": [
+        { "id": "a", "text": "The class creates its own IStaffService with `new`" },
+        { "id": "b", "text": "The class is handed an IStaffService from outside (constructor injection)" },
+        { "id": "c", "text": "IStaffService is a static helper" },
+        { "id": "d", "text": "The class inherits from IStaffService" }
+      ],
+      "correct": ["b"],
+      "explanation": "Declaring a dependency as a constructor parameter is constructor injection — the class receives it rather than constructing it.",
+      "misconceptions": {
+        "a": "The whole point of DI is that the class does NOT new-up its dependency."
+      },
+      "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
+    },
+    {
+      "id": "L0.D1.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is 'inversion of control'?",
+      "options": [
+        { "id": "a", "text": "A class controls when the program exits" },
+        { "id": "b", "text": "A class declares the dependencies it needs and receives them, instead of creating them itself" },
+        { "id": "c", "text": "Reversing the order of method calls" },
+        { "id": "d", "text": "Running code on a background thread" }
+      ],
+      "correct": ["b"],
+      "explanation": "IoC moves the responsibility for creating/supplying dependencies out of the class and into the caller/container.",
+      "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
+    },
+    {
+      "id": "L0.D1.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "In a Synnduit sink, how does it obtain the service it uses to talk to the destination?",
+      "options": [
+        { "id": "a", "text": "It calls `new` on the concrete service class" },
+        { "id": "b", "text": "It declares the service as a constructor parameter and is given one" },
+        { "id": "c", "text": "It reads it from a global static variable" },
+        { "id": "d", "text": "It queries StarBridge for it" }
+      ],
+      "correct": ["b"],
+      "explanation": "The sink takes its service via the constructor; something else creates and supplies it.",
+      "misconceptions": {
+        "a": "Sinks receive their service via injection, not by new-ing it."
+      },
+      "source": "any Sync-DDH-SPO sink constructor"
+    },
+    {
+      "id": "L0.D1.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Name one practical benefit of a sink receiving `ITeamSiteWebPartService` by injection instead of writing `new TeamSiteWebPartService(...)`.",
+      "rubric": [
+        "Identifies a real DI benefit: testability (swap a fake/mock), loose coupling to the concrete type, or centralized lifetime/config management"
+      ],
+      "sampleAnswer": "The sink isn't tied to one concrete service, so you can supply a test double when unit-testing it (or swap the implementation) without changing the sink — it depends only on the interface.",
+      "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
+    },
+    {
+      "id": "L0.D1.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "With `public StaffSink(IStaffService service)`, who creates the IStaffService instance the sink uses at runtime?",
+      "options": [
+        { "id": "a", "text": "The sink itself, in its constructor body" },
+        { "id": "b", "text": "Whatever composes the object — the DI container / composition root — which then passes it in" },
+        { "id": "c", "text": "StarBridge, when the run starts" },
+        { "id": "d", "text": "The source system the data comes from" }
+      ],
+      "correct": ["b"],
+      "explanation": "Constructor injection inverts creation: the sink declares what it needs, and the composition layer builds the service and supplies it.",
+      "misconceptions": {
+        "a": "If the sink created it, that would be the opposite of injection — the dependency would be hard-wired."
+      },
+      "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
+    },
+    {
+      "id": "L0.D1.q6",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which statements about constructor injection are true? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "The class receives its dependencies as constructor parameters" },
+        { "id": "b", "text": "It lets you substitute a test double when unit-testing the class" },
+        { "id": "c", "text": "The class must call `new` to build each dependency itself" },
+        { "id": "d", "text": "It hard-codes the class to one concrete implementation" }
+      ],
+      "correct": ["a", "b"],
+      "explanation": "Injection means the class is handed its dependencies (a), so it can be given a fake in tests (b). It specifically avoids new-ing (c) and coupling to a concrete type (d).",
+      "misconceptions": {
+        "c": "New-ing the dependency is exactly what injection avoids.",
+        "d": "Depending on the interface keeps the class decoupled from any one implementation."
+      },
+      "source": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection"
+    }
+  ]
+}

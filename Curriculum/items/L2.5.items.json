@@ -1,0 +1,91 @@
+{
+  "poolId": "L2.5.items",
+  "conceptId": "L2.5",
+  "conceptName": "Wire it up with MEF",
+  "items": [
+    {
+      "id": "L2.5.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does `[ImportingConstructor]` tell MEF?",
+      "options": [
+        { "id": "a", "text": "Which constructor to use and inject dependencies into" },
+        { "id": "b", "text": "That the class is a feed" },
+        { "id": "c", "text": "To run the constructor on a background thread" },
+        { "id": "d", "text": "That the property is tracked for change detection" }
+      ],
+      "correct": ["a"],
+      "explanation": "[ImportingConstructor] marks the constructor MEF should resolve and inject imports into.",
+      "misconceptions": {
+        "d": "That's [EntityProperty] on a POCO — unrelated to MEF construction."
+      },
+      "source": "TeamSiteWebPartService.cs"
+    },
+    {
+      "id": "L2.5.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How does the engine discover the feed and sink you wrote?",
+      "options": [
+        { "id": "a", "text": "You register them in Program.cs with services.AddScoped(...)" },
+        { "id": "b", "text": "MEF scans for the [Feed] / [Sink] attributes and loads those parts — no container registration" },
+        { "id": "c", "text": "They must be listed in appsettings.json by class name" },
+        { "id": "d", "text": "The engine reads their source code at runtime" }
+      ],
+      "correct": ["b"],
+      "explanation": "Synnduit uses MEF: [Feed]/[Sink] mark discoverable parts the engine finds automatically — there's no Startup/Program registration call.",
+      "misconceptions": {
+        "a": "That's Microsoft.Extensions.DI; Synnduit composes with MEF attributes instead."
+      },
+      "source": "Sync-DDH-SPO sinks"
+    },
+    {
+      "id": "L2.5.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "What do `[Export(typeof(ICourseService))]` + `[PartCreationPolicy(CreationPolicy.Shared)]` on CourseService do together?",
+      "options": [
+        { "id": "a", "text": "Publish the class as the ICourseService implementation, as a single shared instance" },
+        { "id": "b", "text": "Create a new ICourseService for every import" },
+        { "id": "c", "text": "Mark CourseService as a POCO entity" },
+        { "id": "d", "text": "Register a StarBridge table" }
+      ],
+      "correct": ["a"],
+      "explanation": "[Export] publishes the part as the named interface; CreationPolicy.Shared makes MEF hand out one shared instance.",
+      "misconceptions": {
+        "b": "Shared means a single instance; NonShared would create one per import."
+      },
+      "source": "TeamSiteWebPartService.cs"
+    },
+    {
+      "id": "L2.5.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences: how does a sink end up holding its destination service, given Synnduit uses MEF (not Microsoft.Extensions.DI)?",
+      "rubric": [
+        "The service class is published with [Export(typeof(IService))] (often [PartCreationPolicy(Shared)])",
+        "The sink's constructor is marked [ImportingConstructor]; MEF matches the export to the constructor parameter and injects it"
+      ],
+      "sampleAnswer": "The service is exported with [Export(typeof(IService))] as a shared part. The sink's [ImportingConstructor] tells MEF which constructor to build; MEF finds the matching export and passes it into that constructor.",
+      "source": "TeamSiteWebPartService.cs"
+    },
+    {
+      "id": "L2.5.q5",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "You have `class CourseService : ICourseService` and a `CourseSink`. Add the MEF attributes that publish CourseService as a single shared part and the attribute that lets MEF inject it into CourseSink's constructor.",
+      "rubric": [
+        "[Export(typeof(ICourseService))] on CourseService",
+        "[PartCreationPolicy(CreationPolicy.Shared)] on CourseService",
+        "[ImportingConstructor] on the CourseSink constructor that takes ICourseService"
+      ],
+      "sampleAnswer": "[Export(typeof(ICourseService))]\n[PartCreationPolicy(CreationPolicy.Shared)]\npublic class CourseService : ICourseService { /* ... */ }\n\n[Sink(DestinationSystem = typeof(SchoolObjectModel))]\npublic class CourseSink : ISink<Course>\n{\n    [ImportingConstructor]\n    public CourseSink(ICourseService service) { /* ... */ }\n}",
+      "source": "TeamSiteWebPartService.cs"
+    }
+  ]
+}

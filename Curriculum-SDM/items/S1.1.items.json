@@ -1,0 +1,144 @@
+{
+  "poolId": "S1.1.items",
+  "conceptId": "S1.1",
+  "conceptName": "What SDM is",
+  "items": [
+    {
+      "id": "S1.1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which best describes what SDM is?",
+      "options": [
+        { "id": "a", "text": "An automated tool that syncs data between HR, Entra, AD, and SharePoint" },
+        { "id": "b", "text": "An admin portal where authorized people make the authoritative edits to district data" },
+        { "id": "c", "text": "A reporting dashboard for viewing district data" },
+        { "id": "d", "text": "The District Data Hub (DDH) database itself" }
+      ],
+      "correct": ["b"],
+      "explanation": "SDM is the human-editorial portal: people make the authoritative edits that the Sync-* fleet then propagates.",
+      "misconceptions": {
+        "a": "That's the Sync-* family's job — mechanical reconciliation. SDM is where humans make the editorial calls.",
+        "c": "SDM is for editing the authoritative record, not just viewing reports.",
+        "d": "DDH is the database SDM edits; SDM is the app on top of it."
+      },
+      "source": "README.md#purpose"
+    },
+    {
+      "id": "S1.1.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Where does SDM sit relative to the Sync-* fleet and DDH?",
+      "options": [
+        { "id": "a", "text": "Syncs load DDH → humans edit in SDM → syncs propagate the edits outward" },
+        { "id": "b", "text": "SDM loads DDH first, then the syncs let humans edit it" },
+        { "id": "c", "text": "SDM replaces the syncs entirely" },
+        { "id": "d", "text": "SDM only runs after all syncs are disabled" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM is the editorial layer in the middle: bulk data loads into DDH, humans correct/extend it in SDM, and the Sync-DDH-* fleet carries the result out to AD/Entra/SharePoint.",
+      "misconceptions": {
+        "b": "Humans edit the data that already lives in DDH; SDM doesn't do the bulk load.",
+        "c": "SDM complements the syncs — it doesn't replace their mechanical reconciliation.",
+        "d": "SDM and the syncs operate together, not mutually exclusively."
+      },
+      "source": "SYSTEMS.md#purpose-in-the-enterprise"
+    },
+    {
+      "id": "S1.1.q3",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which of these are things a human would do in SDM (rather than something the Sync-* fleet does automatically)? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "Add a newly opened school" },
+        { "id": "b", "text": "Correct a security group's membership" },
+        { "id": "c", "text": "Mechanically reconcile HR records into DDH every night" },
+        { "id": "d", "text": "Fix a staff member's job assignment" }
+      ],
+      "correct": ["a", "b", "d"],
+      "explanation": "Adding a school, correcting a membership, and fixing a job assignment are editorial judgement calls — SDM's purpose. Nightly mechanical reconciliation is the Sync-* fleet.",
+      "misconceptions": {
+        "c": "That bulk, rule-based reconciliation is exactly what the syncs do — not a human editorial action in SDM."
+      },
+      "source": "README.md#purpose"
+    },
+    {
+      "id": "S1.1.q4",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "A new teammate says: \"SDM is just one of the sync tools — it moves data between systems on a schedule.\" Correct them in two or three sentences.",
+      "rubric": [
+        "Identifies the misconception: SDM is not an automated sync; the Sync-* family does the mechanical movement",
+        "States what SDM actually is: the portal where authorized humans make authoritative edits to district data (DDH)",
+        "Optionally notes the flow: those edits then propagate outward via the syncs"
+      ],
+      "sampleAnswer": "Not quite — the mechanical, scheduled movement between HR, Entra, AD, and SharePoint is the Sync-* fleet's job. SDM is the opposite: it's the admin portal where authorized people make the authoritative editorial changes to the district's data in DDH, and the syncs then carry those changes out to the other systems.",
+      "source": "SYSTEMS.md#purpose-in-the-enterprise"
+    },
+    {
+      "id": "S1.1.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "The name \"Supplemental Data Manager\" points at its core job. What does SDM primarily manage?",
+      "options": [
+        { "id": "a", "text": "A backup copy of everything already in DDH" },
+        { "id": "b", "text": "System-of-record sources, augmented with supplemental data that downstream apps need but DDH itself doesn't hold" },
+        { "id": "c", "text": "Only the look-and-feel settings of the sync tools" },
+        { "id": "d", "text": "The HR system's master staff records" }
+      ],
+      "correct": ["b"],
+      "explanation": "SDM's core role is to manage system-of-record sources and augment them with the extra data downstream consumers require that DDH doesn't carry — the \"supplemental\" in the name.",
+      "misconceptions": {
+        "a": "SDM isn't a backup — it manages data DDH doesn't hold, not a copy of what DDH already has.",
+        "c": "It manages real district data (and the sync config), not just UI settings.",
+        "d": "HR remains the system of record for the staff it manages; SDM fills the gaps HR doesn't cover."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S1.1.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "SDM is designed around a RACI self-serve model. What does that mean in practice?",
+      "options": [
+        { "id": "a", "text": "A central IT team keys in every change on users' behalf" },
+        { "id": "b", "text": "Editorial responsibility sits with the people who own the data, who maintain it themselves" },
+        { "id": "c", "text": "Every change needs manager sign-off before it can be saved" },
+        { "id": "d", "text": "The syncs decide who is allowed to edit each record" }
+      ],
+      "correct": ["b"],
+      "explanation": "The RACI self-serve model puts editing in the hands of the data owners (the data-owners team and delegated school staff) rather than a central team.",
+      "misconceptions": {
+        "a": "That's the opposite of self-serve — the point is the owners do their own edits.",
+        "c": "There's no universal sign-off gate; ownership is distributed to the data owners.",
+        "d": "Authorization is AAD-group-driven, but the self-serve model is about who does the editing, not the syncs."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S1.1.q7",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "As SDM evolved, its scope widened beyond editing DDH entities. Which of the following did it take on? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "The volatile template/configuration JSON files that drive the syncs" },
+        { "id": "b", "text": "Staffing categories HR doesn't manage — temporary jobs under six weeks, contractors, and vendors" },
+        { "id": "c", "text": "Running the mechanical nightly sync reconciliations itself" },
+        { "id": "d", "text": "Becoming the system of record for all HR staff data" }
+      ],
+      "correct": ["a", "b"],
+      "explanation": "Over time SDM absorbed the sync template/config JSON and the HR-gap staffing categories (temp jobs under six weeks, contractors, vendors). It still doesn't run the syncs, nor does it replace HR as the staff system of record.",
+      "misconceptions": {
+        "c": "The Sync-* fleet runs the reconciliations; SDM manages the data and config, not the sync execution.",
+        "d": "HR remains the system of record for the staff it manages; SDM only covers the gaps."
+      },
+      "source": "README.md#purpose--business-context"
+    }
+  ]
+}

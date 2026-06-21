@@ -1,0 +1,81 @@
+{
+  "poolId": "S1.3.items",
+  "conceptId": "S1.3",
+  "conceptName": "Authorization via AAD groups",
+  "items": [
+    {
+      "id": "S1.3.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How does SDM decide what a signed-in user is allowed to see and do?",
+      "options": [
+        { "id": "a", "text": "From the user's Entra (AAD) DA-* group claims on their OIDC token" },
+        { "id": "b", "text": "From a permissions table configured inside SDM" },
+        { "id": "c", "text": "From the user's job title in PowerSchool" },
+        { "id": "d", "text": "Everyone who signs in gets the same access" }
+      ],
+      "correct": ["a"],
+      "explanation": "Authorization reads the DA-* group claims Entra puts on the sign-in token; SDM doesn't keep its own permissions store.",
+      "misconceptions": {
+        "b": "SDM only reads the AAD group claims — permissions aren't configured in SDM itself.",
+        "c": "Access is driven by AAD group membership, not a PowerSchool title.",
+        "d": "Different groups grant different access, so menus and rights differ per user."
+      },
+      "source": "README.md#authentication"
+    },
+    {
+      "id": "S1.3.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A user gets a 403 Forbidden when opening a Staff screen. What's the most likely cause?",
+      "options": [
+        { "id": "a", "text": "They're missing the DA-* AAD group that grants access to that area" },
+        { "id": "b", "text": "The feature is broken and needs a code fix" },
+        { "id": "c", "text": "The database is down" },
+        { "id": "d", "text": "Their browser cache is stale" }
+      ],
+      "correct": ["a"],
+      "explanation": "In SDM a 403 almost always means the user lacks the required DA-* group — authorization is group-claim-driven.",
+      "misconceptions": {
+        "b": "A 403 is an authorization result, not a crash — the feature works for users who have the group.",
+        "c": "A database outage would not present as a targeted 403 on one area.",
+        "d": "Caching doesn't produce a 403; the group check does."
+      },
+      "source": "README.md#configuration"
+    },
+    {
+      "id": "S1.3.q3",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which statements about SDM's authorization are true? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "Sign-in is via Entra ID using OpenID Connect (OIDC)" },
+        { "id": "b", "text": "The DA-* groups are maintained upstream (by Sync-DDH-AAD), not inside SDM" },
+        { "id": "c", "text": "Two users can see different menus depending on their groups" },
+        { "id": "d", "text": "To grant someone access, you edit a permissions setting in SDM" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "SDM signs in via OIDC, reads DA-* group claims (maintained upstream), and tailors the menu per user. Granting access means changing group membership upstream — not a setting in SDM.",
+      "misconceptions": {
+        "d": "SDM only reads the group claims; you change access by changing AAD group membership upstream."
+      },
+      "source": "README.md#authentication"
+    },
+    {
+      "id": "S1.3.q4",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Why might two CSSD staff open SDM and see different menu items?",
+      "rubric": [
+        "The menu is built from the user's DA-* group claims (each link maps to a management task a group grants)",
+        "Different group membership → different management tasks → different menu"
+      ],
+      "sampleAnswer": "SDM builds each person's menu from their DA-* group claims — each menu item corresponds to a management task that some DA-* group grants. Because the two users belong to different groups, they're granted different tasks and therefore see different menus.",
+      "source": "README.md#authentication"
+    }
+  ]
+}

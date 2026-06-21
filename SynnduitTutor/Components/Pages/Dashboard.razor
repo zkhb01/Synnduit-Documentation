@@ -1,0 +1,171 @@
+@page "/{Course}/dashboard"
+@inject LearnerSession Session
+@inject MasteryService Mastery
+@inject GatingEngine Gating
+@inject DonutService Donuts
+@inject CourseCatalog Catalog
+@inject NavigationManager Nav
+
+<PageTitle>My path — @(_course?.Name ?? "Tutor")</PageTitle>
+
+@if (_course is null)
+{
+    <p class="text-danger">Unknown course <code>@Course</code>.</p>
+    <a href="">← All courses</a>
+}
+else if (!Session.IsSignedIn)
+{
+    <RedirectToHome />
+}
+else if (_levels is null)
+{
+    <p><em>Loading your path…</em></p>
+}
+else
+{
+    <div class="eyebrow">@_course.Name · your progress</div>
+    <h1>@Session.DisplayName's path</h1>
+    <p class="lead">Master every concept in a level to clear its gate. Locked concepts open once their prerequisites are done.</p>
+
+    @if (_balance is not null)
+    {
+        <DonutJar Balance="_balance" Threshold="Donuts.Threshold" OnRedeem="RedeemAsync" Redeeming="_redeeming" />
+        @if (_redeemError is not null)
+        {
+            <p class="text-muted small mb-3">@_redeemError</p>
+        }
+    }
+
+    @foreach (var lv in _levels)
+    {
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center"
+                 role="button" style="cursor:pointer" title="Show/hide lessons"
+                 @onclick="() => Toggle(lv.Level.Id)">
+                <span>
+                    <span class="me-2">@(IsCollapsed(lv.Level.Id) ? "▸" : "▾")</span>
+                    <strong>@lv.Level.Id — @lv.Level.Name</strong>
+                    @if (lv.Level.IsPlacement)
+                    {
+                        <span class="badge bg-info text-dark ms-2">placement</span>
+                    }
+                </span>
+                <span>
+                    @if (lv.Complete)
+                    {
+                        <span class="badge bg-success">gate cleared</span>
+                    }
+                    else if (!lv.Unlocked)
+                    {
+                        <span class="badge bg-secondary">locked</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-light text-dark">@lv.Concepts.Count(c => c.Status is ConceptStatus.Mastered or ConceptStatus.Skipped)/@lv.Concepts.Count done</span>
+                    }
+                </span>
+            </div>
+            @if (!IsCollapsed(lv.Level.Id))
+            {
+            <div class="list-group list-group-flush">
+                @foreach (var cv in lv.Concepts)
+                {
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="me-2">@StatusIcon(cv.Status)</span>
+                            <strong>@cv.Concept.Id</strong> — @cv.Concept.Name
+                            @if (cv.Critical)
+                            {
+                                <span class="badge bg-warning text-dark ms-2" title="Synnduit-critical concept">★ critical</span>
+                            }
+                            @if (cv.Attempts > 0)
+                            {
+                                <small class="text-muted ms-2">best @((int)Math.Round(cv.BestScore * 100))%</small>
+                            }
+                        </div>
+                        <div>
+                            @if (cv.Status == ConceptStatus.Locked)
+                            {
+                                <span class="text-muted small">needs @string.Join(", ", cv.Concept.Prereqs)</span>
+                            }
+                            else
+                            {
+                                <a class="btn btn-sm btn-outline-primary" href="@($"{Course}/lesson/{cv.Concept.Id}")">
+                                    @(cv.Status is ConceptStatus.Mastered or ConceptStatus.Skipped ? "Review" : "Open")
+                                </a>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            }
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public string Course { get; set; } = "";
+
+    private CourseDefinition? _course;
+    private IReadOnlyList<LevelView>? _levels;
+    private DonutBalance? _balance;
+    private bool _redeeming;
+    private string? _redeemError;
+    private readonly HashSet<string> _collapsed = new();   // level ids whose lessons are hidden
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _course = Catalog.GetCourse(Course);
+        var store = Catalog.GetStore(Course);
+        if (_course is null || store is null || !Session.IsSignedIn) return;
+
+        _collapsed.Clear();
+        var map = await Mastery.GetMasteryMapAsync(Session.LearnerId!.Value, Course);
+        _levels = Gating.BuildOverview(store.Graph, map);
+        _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value, Course);
+
+        // Default: hide completed and locked levels; leave the level(s) you're working on open.
+        foreach (var lv in _levels)
+            if (lv.Complete || !lv.Unlocked) _collapsed.Add(lv.Level.Id);
+    }
+
+    private bool IsCollapsed(string levelId) => _collapsed.Contains(levelId);
+
+    private void Toggle(string levelId)
+    {
+        if (!_collapsed.Add(levelId)) _collapsed.Remove(levelId);   // Add fails if present → expand
+    }
+
+    private async Task RedeemAsync()
+    {
+        if (_redeeming || _levels is null) return;
+        _redeeming = true;
+        _redeemError = null;
+        try
+        {
+            var milestone = BuildMilestoneLabel();
+            var voucher = await Donuts.RedeemAsync(Session.LearnerId!.Value, Course, milestone);
+            Nav.NavigateTo($"{Course}/voucher/{voucher.Id}");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _redeemError = ex.Message;
+            _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value, Course);
+            _redeeming = false;
+        }
+    }
+
+    private string BuildMilestoneLabel()
+    {
+        var cleared = _levels!.Where(l => l.Complete).Select(l => l.Level.Name).ToList();
+        return cleared.Count > 0 ? string.Join(" + ", cleared) : "Synnduit Foundations — in progress";
+    }
+
+    private static MarkupString StatusIcon(ConceptStatus s) => new(s switch
+    {
+        ConceptStatus.Mastered => "<span title='mastered' style='color:#5d7a44'>✔</span>",
+        ConceptStatus.Skipped  => "<span title='skipped (placement)' style='color:#b18d4d'>⏭</span>",
+        ConceptStatus.Available => "<span title='available' style='color:#8a6c33'>✠</span>",
+        _ => "<span title='locked' style='color:#b6ad99'>🔒</span>"
+    });
+}

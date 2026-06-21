@@ -1,0 +1,66 @@
+{
+  "version": "0.1",
+  "generated": "2026-06-20",
+  "source": "SupplementalDataManager README.md, SYSTEMS.md, CLAUDE.md; SupplementalDataManagerClient README.md",
+  "companionDoc": "../Curriculum/CONTENT_FORMAT.md",
+  "masteryModel": {
+    "defaultThreshold": 0.8,
+    "reassessmentUsesFreshItems": true,
+    "remediationCycleLimitBeforeEscalation": 2,
+    "escalationTarget": "human-mentor",
+    "contentStrategy": "reviewed canonical lesson + quiz bank backbone; Claude supplies adaptive diagnosis, re-teaching, fresh items, and Q&A"
+  },
+  "pathOrder": ["S1"],
+  "levels": [
+    {
+      "id": "S1",
+      "name": "SDM Foundations",
+      "order": 1,
+      "type": "conceptual",
+      "gate": "all-concepts-mastered",
+      "gatesLevel": null,
+      "concepts": [
+        {
+          "id": "S1.1",
+          "name": "What SDM is",
+          "objective": "Explain that SDM manages supplemental data (system-of-record sources augmented with data downstream apps need but DDH doesn't hold) and is the human, RACI self-serve editor for the CSSD-curated portion of DDH, where people make the authoritative edits the Sync-* fleet then propagates.",
+          "prereqs": [],
+          "sources": ["README.md#purpose--business-context", "SYSTEMS.md#purpose-in-the-enterprise"],
+          "itemPoolId": "S1.1.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Two anchors: (1) 'supplemental' — SDM holds/manages data DDH doesn't, plus the sync config; (2) RACI self-serve — the data owners edit their own data. Contrast with the mechanical Sync-* fleet that just propagates the result."
+        },
+        {
+          "id": "S1.2",
+          "name": "How SDM is built (two repos, one app)",
+          "objective": "Describe SDM as one deployed web app from two repos: an Angular SPA served at /Iapetus plus an ASP.NET Core 8 backend (REST /api/* and SPA host) over the SchoolObjectModel SQL database via EF Core.",
+          "prereqs": ["S1.1"],
+          "sources": ["README.md#architecture-overview", "SupplementalDataManagerClient/README.md#architecture-overview"],
+          "itemPoolId": "S1.2.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Trace a single request: browser asks for /Iapetus (SPA shell) or /api/* (JSON) -> ASP.NET Core backend -> EF Core -> SchoolObjectModel DB."
+        },
+        {
+          "id": "S1.3",
+          "name": "Authorization via AAD groups",
+          "objective": "Explain that SDM authorizes by Entra (AAD) group claims: DA-* groups (maintained by Sync-DDH-AAD) arrive on the OIDC token and decide which menu items and data a user gets; a 403 means a missing DA-* group.",
+          "prereqs": ["S1.2"],
+          "sources": ["README.md#authentication", "README.md#configuration"],
+          "itemPoolId": "S1.3.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Trace one sign-in: Entra OIDC -> group claims -> the menu (management tasks) filtered by the user's DA-* groups -> an API check that returns 200 or 403."
+        },
+        {
+          "id": "S1.4",
+          "name": "The core domain entities",
+          "objective": "Name the main things SDM manages — Schools, Staff (and jobs), the three Data-Owner security groups, Standalone Groups, the org structures (Municipal Divisions, District Programs, Wards, Trustee Positions), and Site Security — and that edits write to DDH with CreatedBy/UpdatedBy audit.",
+          "prereqs": ["S1.1"],
+          "sources": ["SupplementalDataManagerClient/README.md#routes", "README.md#solution-structure"],
+          "itemPoolId": "S1.4.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Group the nouns: people (Staff, Vendor Reps), org structure (Schools, Municipal Divisions, Wards, District Programs, Trustee Positions), and access (Data Owners, Standalone Groups, Site Security)."
+        }
+      ]
+    }
+  ]
+}

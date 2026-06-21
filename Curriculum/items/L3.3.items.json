@@ -1,0 +1,91 @@
+{
+  "poolId": "L3.3.items",
+  "conceptId": "L3.3",
+  "conceptName": "Diagnose with the SQL scripts",
+  "items": [
+    {
+      "id": "L3.3.q1",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You need the actual exception message text for a failing run. Which diagnostic script is the right starting point?",
+      "options": [
+        { "id": "a", "text": "Starbridge-ExceptionRejections.sql" },
+        { "id": "b", "text": "Starbridge-Deletions.sql" },
+        { "id": "c", "text": "Starbridge-SerializedEntityData.sql" },
+        { "id": "d", "text": "Starbridge-Cleanup.sql" }
+      ],
+      "correct": ["a"],
+      "explanation": "ExceptionRejections joins Operation -> Message to surface the rejection/warning/exception text.",
+      "misconceptions": {
+        "d": "Cleanup mutates data — never reach for it just to read messages."
+      },
+      "source": "DiagnosticScripts/Starbridge-ExceptionRejections.sql"
+    },
+    {
+      "id": "L3.3.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A user reports a record showing up twice in the destination. Which script finds the cause?",
+      "options": [
+        { "id": "a", "text": "Starbridge-SeeMappingIssues.sql (records with more than one active mapping)" },
+        { "id": "b", "text": "Starbridge-ValueChange.sql" },
+        { "id": "c", "text": "Starbridge-Transactions.sql" },
+        { "id": "d", "text": "Starbridge-Table-LastEventNotification.sql" }
+      ],
+      "correct": ["a"],
+      "explanation": "SeeMappingIssues groups mappings and flags those with COUNT(*) > 1 — duplicate active mappings are the usual cause of a doubled record.",
+      "misconceptions": {
+        "b": "ValueChange shows field diffs, not duplicate mappings."
+      },
+      "source": "DiagnosticScripts/Starbridge-SeeMappingIssues.sql"
+    },
+    {
+      "id": "L3.3.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "In Starbridge-ExceptionRejections.sql, a Message Type of 3 means:",
+      "options": [
+        { "id": "a", "text": "Rejection" },
+        { "id": "b", "text": "Warning" },
+        { "id": "c", "text": "Exception" },
+        { "id": "d", "text": "Information" }
+      ],
+      "correct": ["c"],
+      "explanation": "Type codes: 1 = Rejection, 2 = Warning, 3 = Exception, 4 = Information.",
+      "misconceptions": {
+        "a": "Rejection is Type 1; exceptions are Type 3."
+      },
+      "source": "DiagnosticScripts/Starbridge-ExceptionRejections.sql"
+    },
+    {
+      "id": "L3.3.q4",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "A teammate is about to run Starbridge-Cleanup.sql on production just to 'see what's failing'. What do you advise?",
+      "rubric": [
+        "Cleanup-type scripts mutate data — they are not for read-only diagnosis",
+        "For 'what's failing' use a read-only script (ExceptionRejections / Transactions) instead",
+        "Read any script before running it; prefer read-only scripts on production"
+      ],
+      "sampleAnswer": "Don't — Cleanup mutates StarBridge data and isn't a diagnostic. To see what's failing, run a read-only script like ExceptionRejections (for the message text) or Transactions (for outcomes). Always read a script before running it, especially on production.",
+      "source": "DiagnosticScripts/When and How to use these scripts.docx"
+    },
+    {
+      "id": "L3.3.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Where does the exception text live (not just the outcome), and how does ExceptionRejections.sql get it?",
+      "rubric": [
+        "The text is in the Message table, linked to an Operation via OperationMessage",
+        "ExceptionRejections joins Operation -> OperationMessage -> Message (and out to EntityType / SourceSystemEntityId) and filters by Message Type"
+      ],
+      "sampleAnswer": "The message text is in the Message table, tied to an Operation through OperationMessage. ExceptionRejections does those joins (Operation -> OperationMessage -> Message, plus EntityType/SourceSystemEntityId) so you can read the exception/rejection text by Type.",
+      "source": "DiagnosticScripts/Starbridge-ExceptionRejections.sql"
+    }
+  ]
+}

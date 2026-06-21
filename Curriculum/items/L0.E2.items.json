@@ -1,0 +1,94 @@
+{
+  "poolId": "L0.E2.items",
+  "conceptId": "L0.E2",
+  "conceptName": "POCOs & the nullable requirement",
+  "items": [
+    {
+      "id": "L0.E2.q1",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You add `public int Grade { get; set; }` to a POCO. It compiles and runs, but some Grade changes never sync to the destination. What rule did you break?",
+      "options": [
+        { "id": "a", "text": "Synnduit POCO properties must be nullable; a bare non-nullable int breaks change detection" },
+        { "id": "b", "text": "Grade must be a string" },
+        { "id": "c", "text": "Every property needs a [DuplicationKey]" },
+        { "id": "d", "text": "POCOs cannot have integer properties at all" }
+      ],
+      "correct": ["a"],
+      "explanation": "Synnduit requires properties to be nullable. A non-nullable int prevents the engine from reliably detecting changes, so updates are silently missed.",
+      "misconceptions": {
+        "b": "The type doesn't need to become a string — it needs to become nullable (int?) or use a nullable proxy.",
+        "d": "Integers are fine; they just need to be nullable (int?)."
+      },
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx.md"
+    },
+    {
+      "id": "L0.E2.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Why does Synnduit require POCO properties to be nullable?",
+      "options": [
+        { "id": "a", "text": "To save database space" },
+        { "id": "b", "text": "So the engine can represent 'no value' and tell it apart from a real default (0, false), which change detection depends on" },
+        { "id": "c", "text": "Because EF cannot map non-nullable types" },
+        { "id": "d", "text": "To make every field optional in the UI" }
+      ],
+      "correct": ["b"],
+      "explanation": "The nullable distinction lets the engine separate 'absent' from a legitimate default value, which is what reliable change detection needs.",
+      "misconceptions": {
+        "c": "EF maps non-nullable types fine; this is a Synnduit change-detection requirement, not an EF limitation."
+      },
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx.md"
+    },
+    {
+      "id": "L0.E2.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You need a property to stay non-nullable (`int EnrollmentStatus`) for the destination, but satisfy Synnduit's nullable rule. What is the correct pattern?",
+      "options": [
+        { "id": "a", "text": "Mark it [Required] and hope for the best" },
+        { "id": "b", "text": "Add a [NotMapped] nullable proxy property and wire it via [EntityProperty(NullableProxyProperty = nameof(...))]" },
+        { "id": "c", "text": "Change it to a string" },
+        { "id": "d", "text": "Remove the [EntityProperty] attribute" }
+      ],
+      "correct": ["b"],
+      "explanation": "The nullable-proxy pattern keeps the non-nullable property but routes the engine through a [NotMapped] nullable proxy linked by the NullableProxyProperty annotation.",
+      "misconceptions": {
+        "d": "Removing [EntityProperty] would stop tracking the field entirely — the opposite of what you want."
+      },
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx.md"
+    },
+    {
+      "id": "L0.E2.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "When using the nullable-proxy pattern, where does the feed's Map method assign the incoming source value?",
+      "options": [
+        { "id": "a", "text": "To the non-nullable property directly" },
+        { "id": "b", "text": "To the nullable proxy property; Synnduit moves it to the non-nullable one internally via the annotation" },
+        { "id": "c", "text": "To both properties manually" },
+        { "id": "d", "text": "It doesn't — the engine reads the database column directly" }
+      ],
+      "correct": ["b"],
+      "explanation": "You assign to the nullable proxy (e.g. c.NullableEnrollmentStatus = reader.GetInt32(11)); the engine propagates it to the non-nullable property through the NullableProxyProperty link.",
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx.md"
+    },
+    {
+      "id": "L0.E2.q5",
+      "type": "short",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Why is the non-nullable-property bug especially dangerous, and what do you see in the console after applying the fix and re-running in test?",
+      "rubric": [
+        "Dangerous because it is silent: no compile error and no exception — it appears to work, but some changes are never picked up",
+        "After the fix, re-running shows the engine reconciling the affected records, with NoChangesMerged entries counted in the console as it corrects them"
+      ],
+      "sampleAnswer": "It's dangerous because nothing fails loudly — the code compiles and runs, so you assume it works, while certain field changes silently never sync. After switching to nullable (or the proxy pattern) and re-running in test, the console shows the correction progressing, with NoChangesMerged entries as it reconciles the previously-missed records.",
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx.md"
+    }
+  ]
+}

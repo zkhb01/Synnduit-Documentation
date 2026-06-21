@@ -1,0 +1,37 @@
+﻿@inject IConfiguration Config
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="@BaseHref" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..520&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["SynnduitTutor.styles.css"]" />
+    <ImportMap />
+    <link rel="icon" type="image/png" href="brand/ccsd-mark.png" />
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+
+<body>
+    <Routes @rendermode="InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>
+
+@code {
+    // Mirrors Hosting:PathBase (see Program.cs). "/Tutor" → base href "/Tutor/"; empty → "/".
+    private string BaseHref
+    {
+        get
+        {
+            var pathBase = (Config["Hosting:PathBase"] ?? "").Trim().Trim('/');
+            return pathBase.Length == 0 ? "/" : $"/{pathBase}/";
+        }
+    }
+}

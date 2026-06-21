@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SynnduitTutor.Tests/SynnduitTutor.Tests.csproj" />
+  <Project Path="SynnduitTutor/SynnduitTutor.csproj" />
+</Solution>

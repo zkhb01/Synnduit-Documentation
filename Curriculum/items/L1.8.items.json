@@ -1,0 +1,103 @@
+{
+  "poolId": "L1.8.items",
+  "conceptId": "L1.8",
+  "conceptName": "iFeed & iSink (the connectors)",
+  "items": [
+    {
+      "id": "L1.8.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which interface is the source-side connector that produces the snapshot?",
+      "options": [
+        { "id": "a", "text": "ISink<TEntity>" },
+        { "id": "b", "text": "IFeed<TEntity>" },
+        { "id": "c", "text": "IEntityCollection<TEntity>" },
+        { "id": "d", "text": "IRun<TEntity>" }
+      ],
+      "correct": ["b"],
+      "explanation": "IFeed<TEntity> is the source connector; its LoadEntities() returns the snapshot of POCOs.",
+      "misconceptions": {
+        "a": "ISink is the destination connector — it writes, it doesn't read the source.",
+        "c": "IEntityCollection<T> is the return type of the feed, not the connector interface."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.8.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Create, Update, and Delete operations on the destination live on which interface?",
+      "options": [
+        { "id": "a", "text": "IFeed<TEntity>" },
+        { "id": "b", "text": "ISink<TEntity>" },
+        { "id": "c", "text": "Both, equally" },
+        { "id": "d", "text": "Neither — the engine does them with no connector code" }
+      ],
+      "correct": ["b"],
+      "explanation": "ISink<TEntity> defines the destination operations: New / Create / Get / Update / Delete.",
+      "misconceptions": {
+        "a": "The feed only reads the source and returns POCOs; it never writes."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.8.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "In `class StaffFeed : IFeed<Staff>`, what does the method LoadEntities() return?",
+      "options": [
+        { "id": "a", "text": "Only the Staff records that changed since the last run" },
+        { "id": "b", "text": "A collection of Staff POCOs — the full source snapshot" },
+        { "id": "c", "text": "A count of records written to the destination" },
+        { "id": "d", "text": "The mapping rows from StarBridge" }
+      ],
+      "correct": ["b"],
+      "explanation": "LoadEntities() returns the full snapshot as a collection of Staff POCOs; the engine computes the delta from it.",
+      "misconceptions": {
+        "a": "The feed returns everything; change detection is the engine's job (L1.4)."
+      },
+      "source": "README.md#56-anatomy-of-a-feed-the-source-connector"
+    },
+    {
+      "id": "L1.8.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You need to integrate a brand-new source system. Which connector do you write?",
+      "options": [
+        { "id": "a", "text": "A new sink (ISink)" },
+        { "id": "b", "text": "A new feed (IFeed)" },
+        { "id": "c", "text": "Neither — you reconfigure the engine" },
+        { "id": "d", "text": "A new StarBridge database only" }
+      ],
+      "correct": ["b"],
+      "explanation": "A new source means a new feed that reads that system and returns POCOs. A new destination would mean a new sink.",
+      "misconceptions": {
+        "a": "A sink targets a destination; a new source needs a feed."
+      },
+      "source": "README.md#56-anatomy-of-a-feed-the-source-connector"
+    },
+    {
+      "id": "L1.8.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "What is the role of an iCacheFeed (ICacheFeed<TEntity>)?",
+      "options": [
+        { "id": "a", "text": "It caches the source data to make the feed faster" },
+        { "id": "b", "text": "It re-reads the destination's current state so the engine can diff against it; often combined with the sink in one class" },
+        { "id": "c", "text": "It stores the mappings in memory" },
+        { "id": "d", "text": "It schedules the Run" }
+      ],
+      "correct": ["b"],
+      "explanation": "ICacheFeed lets Synnduit re-read the destination's current state for diffing, and is frequently implemented together with the sink (e.g. SinkAndCacheFeed.cs).",
+      "misconceptions": {
+        "a": "Despite the name, it reads the destination state for diffing, not a cache of the source."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    }
+  ]
+}

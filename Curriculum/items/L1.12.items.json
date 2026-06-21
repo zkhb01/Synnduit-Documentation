@@ -1,0 +1,97 @@
+{
+  "poolId": "L1.12.items",
+  "conceptId": "L1.12",
+  "conceptName": "Thresholds & resumability",
+  "items": [
+    {
+      "id": "L1.12.q1",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A feed that should return 65,000 students has a bug and returns 0 records. What feature prevents the destination's entire student set from being garbage-collected (deleted)?",
+      "options": [
+        { "id": "a", "text": "Delta detection" },
+        { "id": "b", "text": "A garbage-collection / deletion percentage abort threshold" },
+        { "id": "c", "text": "The duplication key" },
+        { "id": "d", "text": "Resumability" }
+      ],
+      "correct": ["b"],
+      "explanation": "The GC/deletion percentage threshold compares the would-be deletions (all 65,000) against the destination count; exceeding the configured % aborts the run.",
+      "misconceptions": {
+        "a": "Delta detection would faithfully conclude everything was deleted — the threshold is the guard that stops it.",
+        "d": "Resumability handles crashes, not bad data volumes."
+      },
+      "source": "Documentation/ProposedAbortThresholdOptions.docx.md"
+    },
+    {
+      "id": "L1.12.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does resumability guarantee?",
+      "options": [
+        { "id": "a", "text": "Runs always complete faster on the second attempt" },
+        { "id": "b", "text": "If the server crashes mid-run, no data is lost and the next run picks up where it left off" },
+        { "id": "c", "text": "The destination is backed up before every run" },
+        { "id": "d", "text": "Exceptions are automatically retried forever" }
+      ],
+      "correct": ["b"],
+      "explanation": "Because progress is recorded in StarBridge, a crash mid-run causes no data loss; the next run resumes from where it stopped.",
+      "misconceptions": {
+        "c": "Resumability is about safe continuation, not backups."
+      },
+      "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L1.12.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "If the deletion-percentage threshold parameter is omitted from configuration, what is assumed?",
+      "options": [
+        { "id": "a", "text": "0% — no deletions are ever allowed" },
+        { "id": "b", "text": "100% — full deletion is allowed (no deletion guard)" },
+        { "id": "c", "text": "5% by default" },
+        { "id": "d", "text": "The run will not start" }
+      ],
+      "correct": ["b"],
+      "explanation": "An omitted percentage is assumed to be 100%, meaning the destination entity could be fully deleted — the guard only protects you if you configure it.",
+      "misconceptions": {
+        "a": "It defaults to permissive (100%), not restrictive (0%)."
+      },
+      "source": "Documentation/ProposedAbortThresholdOptions.docx.md"
+    },
+    {
+      "id": "L1.12.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is the difference between the SegmentAbortThreshold and the RunAbortThreshold?",
+      "options": [
+        { "id": "a", "text": "One counts exceptions within a single segment; the other is the limit across the whole run" },
+        { "id": "b", "text": "One is for deletions; the other is for creations" },
+        { "id": "c", "text": "They are the same thing with different names" },
+        { "id": "d", "text": "One applies to the source; the other to the destination" }
+      ],
+      "correct": ["a"],
+      "explanation": "SegmentAbortThreshold aborts a single segment after N exceptions; RunAbortThreshold is the overall exception limit for the entire run.",
+      "source": "README.md#54-how-a-run-is-wired-together-appsettingsjson"
+    },
+    {
+      "id": "L1.12.q5",
+      "type": "mc",
+      "difficulty": "synthesis",
+      "scoring": "auto",
+      "stem": "Thresholds exist because delta detection trusts the snapshot. What is the best one-sentence framing of what thresholds are?",
+      "options": [
+        { "id": "a", "text": "A way to make runs finish faster" },
+        { "id": "b", "text": "Guardrails against a bad snapshot, so a faulty feed can't silently wreck the destination" },
+        { "id": "c", "text": "A logging feature for the dashboard" },
+        { "id": "d", "text": "A replacement for mappings" }
+      ],
+      "correct": ["b"],
+      "explanation": "Because the engine acts on whatever snapshot the feed provides, thresholds are the safety guardrails that abort the run when the snapshot implies dangerous, large-scale change.",
+      "source": "README.md#4-key-features-worth-knowing"
+    }
+  ]
+}

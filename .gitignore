@@ -4,3 +4,15 @@
 
 /.vs
 /DiagnosticScripts/.vs
+
+# .NET build output (SynnduitTutor app + tests)
+[Bb]in/
+[Oo]bj/
+
+# Local mastery store (SQLite) and run logs
+SynnduitTutor/App_Data/
+*.db
+*.db-shm
+*.db-wal
+**/run.
+.idea/*

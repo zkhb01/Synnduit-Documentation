@@ -1,0 +1,56 @@
+@* Presentational donut balance + goal-gradient meter + redeem CTA. *@
+
+<div class="card donut-jar">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>🍩 Donut jar</span>
+        <span class="eyebrow">Earn excellence</span>
+    </div>
+    <div class="card-body">
+        @if (Balance.Available >= Threshold)
+        {
+            <div class="dj-ready">
+                <div class="dj-donuts">
+                    @for (var i = 0; i < Math.Min(Balance.Available, 12); i++)
+                    {
+                        <Donut Size="34" />
+                    }
+                    @if (Balance.Available > 12)
+                    {
+                        <span class="dj-more">+@(Balance.Available - 12)</span>
+                    }
+                </div>
+                <p class="dj-msg"><strong>@Balance.Available donuts</strong> ready to redeem — enough for the box!</p>
+                <button class="btn btn-primary" @onclick="OnRedeem" disabled="@Redeeming">
+                    @(Redeeming ? "Printing…" : $"Redeem {Balance.Available} → print voucher")
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="dj-meter">
+                @for (var i = 0; i < Threshold; i++)
+                {
+                    <Donut Size="30" Muted="@(i >= Balance.Available)" />
+                }
+            </div>
+            <p class="dj-msg">
+                @if (Balance.Available == 0)
+                {
+                    <span>Master your first concept to earn a donut.</span>
+                }
+                else
+                {
+                    <span><strong>@Balance.Available / @Threshold</strong> — @(Threshold - Balance.Available) more to your next voucher.</span>
+                }
+            </p>
+        }
+        <p class="dj-caption">Earned all-time: @Balance.Earned · Redeemed: @Balance.Redeemed</p>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public DonutBalance Balance { get; set; } = new(0, 0, 0);
+    [Parameter] public int Threshold { get; set; } = 6;
+    [Parameter] public EventCallback OnRedeem { get; set; }
+    [Parameter] public bool Redeeming { get; set; }
+}

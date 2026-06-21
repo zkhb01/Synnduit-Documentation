@@ -1,0 +1,105 @@
+{
+  "poolId": "S1.4.items",
+  "conceptId": "S1.4",
+  "conceptName": "The core domain entities",
+  "items": [
+    {
+      "id": "S1.4.q1",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Classify each entity as People, Org structure, or Access: (1) Staff, (2) Wards, (3) Standalone Groups. Which mapping is correct?",
+      "options": [
+        { "id": "a", "text": "Staff = People, Wards = Org structure, Standalone Groups = Access" },
+        { "id": "b", "text": "Staff = Access, Wards = People, Standalone Groups = Org structure" },
+        { "id": "c", "text": "Staff = Org structure, Wards = Access, Standalone Groups = People" },
+        { "id": "d", "text": "All three are Access entities" }
+      ],
+      "correct": ["a"],
+      "explanation": "Staff are people; Wards are an org/geographic structure; Standalone Groups are an access (membership) construct.",
+      "misconceptions": {
+        "b": "Staff are people, not an access role; Wards are geographic structure, not people.",
+        "c": "Staff aren't org structure; Wards aren't access.",
+        "d": "Only Standalone Groups is an access entity here."
+      },
+      "source": "SupplementalDataManagerClient/README.md#routes"
+    },
+    {
+      "id": "S1.4.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What are the three Data-Owner security-group families in SDM?",
+      "options": [
+        { "id": "a", "text": "Department, School, and Functional-Site Data Owners" },
+        { "id": "b", "text": "Admin, Editor, and Viewer" },
+        { "id": "c", "text": "Staff, Vendor, and Trustee" },
+        { "id": "d", "text": "Read, Write, and Delete" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM has Department, School, and Functional-Site Data Owners — AAD-backed groups granting editing rights over their area.",
+      "misconceptions": {
+        "b": "Those are generic role names, not SDM's data-owner families.",
+        "c": "Those are other entities, not the data-owner families.",
+        "d": "Those are permission verbs, not the data-owner groups."
+      },
+      "source": "SupplementalDataManagerClient/README.md#routes"
+    },
+    {
+      "id": "S1.4.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How does a Standalone Group differ from a Data Owner group?",
+      "options": [
+        { "id": "a", "text": "A Standalone Group is a hand-maintained membership list that doesn't sync from upstream; a Data Owner group is an AAD-backed role granting rights" },
+        { "id": "b", "text": "They are the same thing with different names" },
+        { "id": "c", "text": "A Standalone Group grants admin rights; a Data Owner group is just a list" },
+        { "id": "d", "text": "Standalone Groups exist only in PowerSchool" }
+      ],
+      "correct": ["a"],
+      "explanation": "Standalone Groups are static lists maintained directly in SDM (simple or composite); Data Owners are AAD-group-backed roles that grant editing rights.",
+      "misconceptions": {
+        "b": "They're distinct: one is a hand-maintained list, the other a group-backed role.",
+        "c": "It's the reverse — Data Owners grant rights; Standalone Groups are membership lists.",
+        "d": "Standalone Groups are managed in SDM and written to DDH."
+      },
+      "source": "SupplementalDataManagerClient/README.md#routes"
+    },
+    {
+      "id": "S1.4.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "When a user edits an entity in SDM, what records who made the change?",
+      "options": [
+        { "id": "a", "text": "The CreatedBy / UpdatedBy audit fields (with an AuditLog), written to DDH" },
+        { "id": "b", "text": "Nothing — SDM doesn't track who changed data" },
+        { "id": "c", "text": "A comment the user types each time" },
+        { "id": "d", "text": "The browser's history" }
+      ],
+      "correct": ["a"],
+      "explanation": "Domain entities carry CreatedBy/UpdatedBy audit fields and an AuditLog in DDH, so every change records who made it.",
+      "misconceptions": {
+        "b": "Changes are audited via CreatedBy/UpdatedBy.",
+        "c": "Audit is automatic on the entity, not a manual comment.",
+        "d": "Audit lives in DDH, not the browser."
+      },
+      "source": "README.md#solution-structure"
+    },
+    {
+      "id": "S1.4.q5",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "A colleague reports: \"The School Data Owner for School 001 is wrong, and a standalone group's membership is also off.\" Using SDM's entity map, where do these two issues live, and what do they have in common?",
+      "rubric": [
+        "Places both under the Access bucket: School Data Owner is one of the three Data-Owner families; the standalone group is a Standalone Group membership list",
+        "Notes they are different mechanisms (group-backed role vs. hand-maintained list)",
+        "Notes the edits are made in SDM and written to DDH with audit"
+      ],
+      "sampleAnswer": "Both are access concerns. The School Data Owner is one of SDM's three Data-Owner families (an AAD-backed role), while the standalone group's membership is a hand-maintained Standalone Group list — different mechanisms, but both about who can do what. You'd correct each in its SDM area, and the edits write to DDH with CreatedBy/UpdatedBy audit.",
+      "source": "SupplementalDataManagerClient/README.md#routes"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "poolId": "L0.D2.items",
+  "conceptId": "L0.D2",
+  "conceptName": "MEF composition in Synnduit",
+  "items": [
+    {
+      "id": "L0.D2.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How does Synnduit compose its parts (services, sinks, feeds)?",
+      "options": [
+        { "id": "a", "text": "Via Microsoft.Extensions.DependencyInjection registrations in a startup file" },
+        { "id": "b", "text": "Via MEF — attribute-driven discovery of parts, with no central registration list" },
+        { "id": "c", "text": "By reading a JSON list of class names" },
+        { "id": "d", "text": "Every class is new-ed up manually in Main()" }
+      ],
+      "correct": ["b"],
+      "explanation": "Synnduit uses MEF: classes are decorated with attributes and discovered, rather than registered in a container.",
+      "misconceptions": {
+        "a": "This is the trap for experienced DI devs — there is no services.Add... registration to find; MEF discovers attributed parts."
+      },
+      "source": "TeamSiteWebPartService.cs ([Export]); Sync-DDH-SPO sinks"
+    },
+    {
+      "id": "L0.D2.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "What does `[ImportingConstructor]` tell MEF?",
+      "options": [
+        { "id": "a", "text": "To skip this constructor" },
+        { "id": "b", "text": "This is the constructor MEF should use, injecting the imported services into its parameters" },
+        { "id": "c", "text": "To run this constructor on a background thread" },
+        { "id": "d", "text": "This class exports itself as a service" }
+      ],
+      "correct": ["b"],
+      "explanation": "[ImportingConstructor] marks the constructor MEF uses for injection — the MEF counterpart to the container-resolved constructor.",
+      "misconceptions": {
+        "d": "That's [Export]; [ImportingConstructor] is about receiving imports, not publishing one."
+      },
+      "source": "Sync-DDH-SPO sinks ([ImportingConstructor])"
+    },
+    {
+      "id": "L0.D2.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which attribute publishes a class as the implementation of a service contract so other parts can import it?",
+      "options": [
+        { "id": "a", "text": "[Sink(...)]" },
+        { "id": "b", "text": "[Export(typeof(IService))]" },
+        { "id": "c", "text": "[EntityType(...)]" },
+        { "id": "d", "text": "[ImportingConstructor]" }
+      ],
+      "correct": ["b"],
+      "explanation": "[Export(typeof(IService))] declares the class as the export for that contract; importers receive it.",
+      "misconceptions": {
+        "a": "[Sink] marks a connector part for discovery, not a service export."
+      },
+      "source": "TeamSiteWebPartService.cs ([Export])"
+    },
+    {
+      "id": "L0.D2.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "In MEF terms, `[PartCreationPolicy(CreationPolicy.Shared)]` on an [Export]ed service is most like which Microsoft.Extensions.DI concept?",
+      "options": [
+        { "id": "a", "text": "AddTransient (a new instance every time)" },
+        { "id": "b", "text": "AddSingleton (one shared instance)" },
+        { "id": "c", "text": "AddScoped (one per request scope)" },
+        { "id": "d", "text": "It has no equivalent" }
+      ],
+      "correct": ["b"],
+      "explanation": "CreationPolicy.Shared yields a single shared instance — analogous to a singleton registration.",
+      "misconceptions": {
+        "a": "Transient corresponds to CreationPolicy.NonShared, not Shared."
+      },
+      "source": "TeamSiteWebPartService.cs ([Export])"
+    },
+    {
+      "id": "L0.D2.q5",
+      "type": "short",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "A strong DI developer greps the Synnduit codebase for `services.AddSingleton` and finds nothing, then concludes the service isn't wired up. What did they miss, and how does the sink actually reach its service?",
+      "rubric": [
+        "Synnduit uses MEF, not the Microsoft.Extensions.DI container — there is no AddSingleton/AddScoped registration",
+        "The service is published with [Export] (+ [PartCreationPolicy(Shared)]) and discovered by MEF",
+        "The sink receives it through its [ImportingConstructor]"
+      ],
+      "sampleAnswer": "They assumed the standard DI container; Synnduit uses MEF, so there's no services.Add... call. The service is wired up by attributes: it's marked [Export(typeof(ITeamSiteWebPartService))] (and [PartCreationPolicy(CreationPolicy.Shared)] for a single instance), MEF discovers it, and injects it into the sink's [ImportingConstructor].",
+      "source": "TeamSiteWebPartService.cs ([Export]); Sync-DDH-SPO sinks"
+    }
+  ]
+}

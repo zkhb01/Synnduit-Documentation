@@ -1,0 +1,94 @@
+{
+  "poolId": "L1.7.items",
+  "conceptId": "L1.7",
+  "conceptName": "Run & Segment",
+  "items": [
+    {
+      "id": "L1.7.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is a Segment in a Synnduit Run?",
+      "options": [
+        { "id": "a", "text": "One step inside a Run — either a Migration or a GarbageCollection on one entity type" },
+        { "id": "b", "text": "The whole scheduled job" },
+        { "id": "c", "text": "A single source record" },
+        { "id": "d", "text": "A StarBridge database" }
+      ],
+      "correct": ["a"],
+      "explanation": "A Run is an ordered list of Segments; each Segment is one step (Migration or GarbageCollection) on one entity type.",
+      "misconceptions": {
+        "b": "That's the Run; a Segment is one step within it."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.7.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which Segment type removes / cleans up destination records whose source record has disappeared?",
+      "options": [
+        { "id": "a", "text": "Migration" },
+        { "id": "b", "text": "GarbageCollection" },
+        { "id": "c", "text": "Deletion" },
+        { "id": "d", "text": "Cleanup" }
+      ],
+      "correct": ["b"],
+      "explanation": "GarbageCollection handles destination records that no longer have a corresponding source record. Migration pushes creates/updates in.",
+      "misconceptions": {
+        "a": "Migration adds and updates; it does not handle source-disappeared cleanup."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.7.q3",
+      "type": "order",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "For migrating in (School is the parent, Student references School, StudentAddress references Student), put the Migration segments in the correct order.",
+      "options": [
+        { "id": "a", "text": "Migration: Student" },
+        { "id": "b", "text": "Migration: School" },
+        { "id": "c", "text": "Migration: StudentAddress" }
+      ],
+      "correct": ["b", "a", "c"],
+      "explanation": "Migrate parents before children: School, then Student, then StudentAddress — so each child can reference a parent that already exists.",
+      "source": "README.md#54-how-a-run-is-wired-together-appsettingsjson"
+    },
+    {
+      "id": "L1.7.q4",
+      "type": "short",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Why do you migrate School before Student, but garbage-collect Student before School?",
+      "rubric": [
+        "Migration order: parents first so children can reference an existing parent (no missing foreign key)",
+        "GC order: children first (reverse) so you don't delete a parent while children still reference it (no orphaned/violated foreign key)"
+      ],
+      "sampleAnswer": "Migrating adds records, so the parent (School) must exist before a child (Student) can reference it. Garbage collection deletes records, so you must remove the children (Students) first; deleting a School while Students still point to it would violate the foreign key.",
+      "source": "README.md#54-how-a-run-is-wired-together-appsettingsjson"
+    },
+    {
+      "id": "L1.7.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How is a Run launched at CSSD, and what does the GUID in the command do?",
+      "options": [
+        { "id": "b", "text": "Synnduit <RunName> <UserSecretGuid>; the GUID is a UserSecret identifier Synnduit uses to load that run's environment-specific secrets" },
+        { "id": "a", "text": "Synnduit <RunName> <RunGuid>; the GUID identifies the run in StarBridge so history stays consistent across executions" },
+        { "id": "c", "text": "It is started from the dashboard; the GUID is the user's ID" },
+        { "id": "d", "text": "Synnduit <RunGuid>; the GUID is generated fresh each run" }
+      ],
+      "correct": ["b"],
+      "explanation": "Runs are CLI invocations of the form 'Synnduit <RunName> <UserSecretGuid>'. The GUID is a UserSecret identifier that points Synnduit at the environment-specific UserSecret JSON file (connection strings and other secrets) for the run.",
+      "misconceptions": {
+        "a": "The command shape is right, but the GUID is not a StarBridge history key — it locates the run's UserSecret file, which is how the same run targets different environments (Prod, Local, etc.).",
+        "c": "Runs are launched from the CLI (typically via Windows Task Scheduler), not from the dashboard.",
+        "d": "The GUID is stable per run, not generated fresh each execution, and the command includes the Run name before it."
+      },
+      "source": "README.md#53-how-a-run-is-launched"
+    }
+  ]
+}

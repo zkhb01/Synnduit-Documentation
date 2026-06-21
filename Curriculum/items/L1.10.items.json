@@ -1,0 +1,117 @@
+{
+  "poolId": "L1.10.items",
+  "conceptId": "L1.10",
+  "conceptName": "Transaction outcomes",
+  "items": [
+    {
+      "id": "L1.10.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Where are per-record transaction outcomes stored?",
+      "options": [
+        { "id": "a", "text": "In the console output only" },
+        { "id": "b", "text": "In StarBridge's EntityTransaction table" },
+        { "id": "c", "text": "In the destination record itself" },
+        { "id": "d", "text": "In appsettings.json" }
+      ],
+      "correct": ["b"],
+      "explanation": "Each record's outcome is recorded in StarBridge's EntityTransaction table; the console shows summary counts.",
+      "misconceptions": {
+        "a": "The console shows counts, but the per-record outcomes persist in EntityTransaction — that's what you query when triaging."
+      },
+      "source": "README.md#6-where-to-look-first-when-something-goes-wrong"
+    },
+    {
+      "id": "L1.10.q2",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Run 1 creates a Staff record. On run 2 the source data for that staff is byte-for-byte identical. What outcome does run 2 produce for that record?",
+      "options": [
+        { "id": "a", "text": "NewEntityCreated" },
+        { "id": "b", "text": "NoChangesDetected" },
+        { "id": "c", "text": "ChangesDetectedAndMerged" },
+        { "id": "d", "text": "ExceptionThrown" }
+      ],
+      "correct": ["b"],
+      "explanation": "A mapping exists and nothing changed since last run, so the engine takes no action: NoChangesDetected.",
+      "misconceptions": {
+        "a": "NewEntityCreated only happens when there's no mapping and it's not a duplicate; here a mapping already exists."
+      },
+      "source": "Documentation/Synnduit Console.docx.md"
+    },
+    {
+      "id": "L1.10.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Is the 'Rejected' outcome an error?",
+      "options": [
+        { "id": "a", "text": "Yes — it means processing failed and must be investigated" },
+        { "id": "b", "text": "No — a preprocessor deferred the record (e.g. a dependency isn't in the destination yet); it will be retried" },
+        { "id": "c", "text": "Yes — it is the same as ExceptionThrown" },
+        { "id": "d", "text": "No — it means the record was successfully created" }
+      ],
+      "correct": ["b"],
+      "explanation": "Rejected means the record can't be processed *right now* (often a missing dependency) and another attempt should be made later. It is explicitly not an error.",
+      "misconceptions": {
+        "c": "ExceptionThrown is the error outcome; Rejected is a deferral.",
+        "a": "Treating Rejected as a failure leads to chasing non-problems."
+      },
+      "source": "Documentation/Synnduit Console.docx.md"
+    },
+    {
+      "id": "L1.10.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A source record has no existing mapping, and the engine determines it is genuinely not already in the destination. What outcome results?",
+      "options": [
+        { "id": "a", "text": "NewEntityCreated" },
+        { "id": "b", "text": "DuplicateDetectedChangesMerged" },
+        { "id": "c", "text": "NoChangesDetected" },
+        { "id": "d", "text": "Skipped" }
+      ],
+      "correct": ["a"],
+      "explanation": "No mapping + not a duplicate → a new destination record is created: NewEntityCreated.",
+      "misconceptions": {
+        "b": "That outcome applies when dedup finds the record DOES already exist in the destination."
+      },
+      "source": "Documentation/Synnduit Console.docx.md"
+    },
+    {
+      "id": "L1.10.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A daily run that normally reports mostly NoChangesDetected suddenly reports thousands of NewEntityCreated. What is the most likely concern?",
+      "options": [
+        { "id": "a", "text": "Everything is fine — new records are good" },
+        { "id": "b", "text": "Mappings may have been lost/not found, so existing records are being recreated as new (risking duplicates)" },
+        { "id": "c", "text": "The source feed returned zero records" },
+        { "id": "d", "text": "The dashboard is misconfigured" }
+      ],
+      "correct": ["b"],
+      "explanation": "Records that should match existing mappings are instead being created fresh — a sign mappings aren't being found, which can duplicate the destination. Outcomes are how you spot this.",
+      "misconceptions": {
+        "c": "Zero source records would show up as deletions/garbage collection, not a surge of NewEntityCreated."
+      },
+      "source": "README.md#6-where-to-look-first-when-something-goes-wrong"
+    },
+    {
+      "id": "L1.10.q6",
+      "type": "short",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Explain how the transaction outcomes are just delta detection (L1.4) and mapping (L1.6) made visible. Use NoChangesDetected and NewEntityCreated as examples.",
+      "rubric": [
+        "Outcomes reflect the engine's decision tree: is there a mapping? did the delta show a change? is it a duplicate?",
+        "NoChangesDetected = mapping exists (L1.6) AND the delta found no change (L1.4)",
+        "NewEntityCreated = no mapping exists (L1.6) AND not a duplicate, so a record is created"
+      ],
+      "sampleAnswer": "Each outcome is the recorded result of the engine's mapping-then-delta logic. NoChangesDetected means a mapping was found (L1.6) and the snapshot matched last run's state (L1.4), so nothing was done. NewEntityCreated means no mapping was found and the record wasn't a duplicate, so a new destination record was made. Reading outcome counts is reading that logic in aggregate.",
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    }
+  ]
+}

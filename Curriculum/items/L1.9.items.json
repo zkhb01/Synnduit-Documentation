@@ -1,0 +1,99 @@
+{
+  "poolId": "L1.9.items",
+  "conceptId": "L1.9",
+  "conceptName": "POCO & attributes",
+  "items": [
+    {
+      "id": "L1.9.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is a POCO in Synnduit?",
+      "options": [
+        { "id": "a", "text": "The C# class that describes one entity type, decorated with attributes" },
+        { "id": "b", "text": "A stored procedure in StarBridge" },
+        { "id": "c", "text": "The connector that reads the source" },
+        { "id": "d", "text": "A configuration section in appsettings.json" }
+      ],
+      "correct": ["a"],
+      "explanation": "A POCO is a plain C# class for one entity type (Staff, Student, School); its attributes form the contract with the engine.",
+      "misconceptions": {
+        "c": "That's the feed (IFeed); the POCO is the data class the feed returns."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L1.9.q2",
+      "type": "match",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Match each attribute (left) to its job (right): (a) [EntityProperty] (b) [SourceSystemIdentifier] (c) [DuplicationKey] (d) [EntityType]. Jobs: (1) marks the source-side ID for the mapping, (2) globally identifies the entity type via a GUID, (3) marks a field to be tracked for change detection, (4) used to match a new record to an existing one during dedup.",
+      "options": [
+        { "id": "a", "text": "[EntityProperty]" },
+        { "id": "b", "text": "[SourceSystemIdentifier]" },
+        { "id": "c", "text": "[DuplicationKey]" },
+        { "id": "d", "text": "[EntityType]" }
+      ],
+      "correct": ["a:3", "b:1", "c:4", "d:2"],
+      "explanation": "[EntityProperty]=change tracking, [SourceSystemIdentifier]=source-side ID, [DuplicationKey]=dedup matching, [EntityType]=GUID identity.",
+      "source": "README.md#55-anatomy-of-an-entity-poco"
+    },
+    {
+      "id": "L1.9.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You add a property to a POCO but forget to put [EntityProperty] on it. What happens?",
+      "options": [
+        { "id": "a", "text": "The build fails" },
+        { "id": "b", "text": "The field is not tracked for change detection — changes to it won't be picked up" },
+        { "id": "c", "text": "The whole entity stops syncing" },
+        { "id": "d", "text": "It becomes the duplication key automatically" }
+      ],
+      "correct": ["b"],
+      "explanation": "[EntityProperty] is what tells the engine to track a field for change detection; without it, the field's changes are invisible to the diff.",
+      "misconceptions": {
+        "a": "Attributes are runtime metadata; omitting one is not a compile error — which is what makes this bug subtle."
+      },
+      "source": "README.md#55-anatomy-of-an-entity-poco"
+    },
+    {
+      "id": "L1.9.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which attribute marks the property the engine uses to match a 'new' source record to a possible existing destination record during deduplication?",
+      "options": [
+        { "id": "a", "text": "[DestinationSystemIdentifier]" },
+        { "id": "b", "text": "[DuplicationKey]" },
+        { "id": "c", "text": "[EntityType]" },
+        { "id": "d", "text": "[EntityProperty]" }
+      ],
+      "correct": ["b"],
+      "explanation": "[DuplicationKey] designates the field(s) used to detect duplicates (e.g. EmployeeId on Staff).",
+      "misconceptions": {
+        "a": "[DestinationSystemIdentifier] marks the destination-side ID for the mapping, not the dedup key."
+      },
+      "source": "README.md#55-anatomy-of-an-entity-poco"
+    },
+    {
+      "id": "L1.9.q5",
+      "type": "mc",
+      "difficulty": "synthesis",
+      "scoring": "auto",
+      "stem": "Which pair of attributes is what makes a mapping (L1.6) possible for an entity?",
+      "options": [
+        { "id": "a", "text": "[EntityProperty] and [DuplicationKey]" },
+        { "id": "b", "text": "[SourceSystemIdentifier] and [DestinationSystemIdentifier]" },
+        { "id": "c", "text": "[EntityType] and [EntityProperty]" },
+        { "id": "d", "text": "[DuplicationKey] and [DestinationSystemIdentifier]" }
+      ],
+      "correct": ["b"],
+      "explanation": "A mapping links a source ID to a destination ID; the source/destination identifier attributes are what tell the engine which properties those are.",
+      "misconceptions": {
+        "a": "These drive change detection and dedup, not the mapping link itself."
+      },
+      "source": "README.md#55-anatomy-of-an-entity-poco"
+    }
+  ]
+}

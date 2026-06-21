@@ -1,0 +1,114 @@
+{
+  "poolId": "L1.11.items",
+  "conceptId": "L1.11",
+  "conceptName": "Dedup & merge (conceptual)",
+  "items": [
+    {
+      "id": "L1.11.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does deduplication let the engine do?",
+      "options": [
+        { "id": "a", "text": "Delete duplicate rows from the source system" },
+        { "id": "b", "text": "Match a 'new' (unmapped) source record to an existing destination record and merge, instead of creating a duplicate" },
+        { "id": "c", "text": "Skip every record that has a mapping" },
+        { "id": "d", "text": "Compress the StarBridge database" }
+      ],
+      "correct": ["b"],
+      "explanation": "Dedup catches records that have no mapping yet but already exist in the destination, linking and merging rather than duplicating.",
+      "misconceptions": {
+        "a": "Dedup acts on the destination side via the duplication key; it doesn't edit the source."
+      },
+      "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L1.11.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "When does deduplication run for a record?",
+      "options": [
+        { "id": "a", "text": "On every record, every run" },
+        { "id": "b", "text": "Only when the record has no existing mapping (an insert)" },
+        { "id": "c", "text": "Only during GarbageCollection segments" },
+        { "id": "d", "text": "Only when an exception is thrown" }
+      ],
+      "correct": ["b"],
+      "explanation": "Dedup only applies to unmapped records. If a mapping already exists, the engine uses the fast mapping lookup instead.",
+      "misconceptions": {
+        "a": "Mapped records skip dedup — they're matched by their stored link."
+      },
+      "source": "Documentation/Synnduit Deduplication sequence.docx.md"
+    },
+    {
+      "id": "L1.11.q3",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "An unmapped source record is checked against the destination using its [DuplicationKey]. A match is found, and the source and destination field values are identical. What outcome results?",
+      "options": [
+        { "id": "a", "text": "NewEntityCreated" },
+        { "id": "b", "text": "DuplicateDetectedNoChangesMerged" },
+        { "id": "c", "text": "DuplicateDetectedChangesMerged" },
+        { "id": "d", "text": "Rejected" }
+      ],
+      "correct": ["b"],
+      "explanation": "A duplicate was found and a mapping created, but since the values already matched, nothing needed merging: DuplicateDetectedNoChangesMerged.",
+      "misconceptions": {
+        "c": "That outcome is when the matched values differ and a delta is merged.",
+        "a": "A match was found, so it is not created as new."
+      },
+      "source": "Documentation/Synnduit Deduplication sequence.docx.md"
+    },
+    {
+      "id": "L1.11.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What happens when dedup finds the record only *might* match an existing one (multiple candidate duplicates)?",
+      "options": [
+        { "id": "a", "text": "It picks the first candidate automatically" },
+        { "id": "b", "text": "It is referred for manual deduplication (a human decides)" },
+        { "id": "c", "text": "It throws an exception" },
+        { "id": "d", "text": "It creates a new record and ignores the candidates" }
+      ],
+      "correct": ["b"],
+      "explanation": "Ambiguous matches are routed to ReferredForManualDeduplication so a person can resolve them, rather than guessing.",
+      "misconceptions": {
+        "a": "Auto-picking could merge the wrong records; the engine defers to a human instead."
+      },
+      "source": "Documentation/Synnduit Console.docx.md"
+    },
+    {
+      "id": "L1.11.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Why is deduplication important when one destination entity (e.g. Staff) is fed by multiple source systems?",
+      "options": [
+        { "id": "a", "text": "It isn't relevant to multi-source entities" },
+        { "id": "b", "text": "Without it, the second source would re-create records the first source already made, duplicating them" },
+        { "id": "c", "text": "It lets each source have its own destination table" },
+        { "id": "d", "text": "It disables change detection for shared entities" }
+      ],
+      "correct": ["b"],
+      "explanation": "Multiple sources (via [SharedSourceSystemIdentifiers]) converge on the same destination records; dedup matches them to existing records instead of multiplying them.",
+      "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L1.11.q6",
+      "type": "short",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Deduplication sits between the [DuplicationKey] attribute (L1.9) and mapping (L1.6). Explain how a successful dedup connects those two concepts.",
+      "rubric": [
+        "Starts from L1.9: the [DuplicationKey] property is what the engine matches on (since no mapping exists yet)",
+        "Ends at L1.6: a successful match creates a new mapping linking the source ID to the matched destination record",
+        "Consequence: subsequent runs use the mapping lookup, not dedup"
+      ],
+      "sampleAnswer": "Because the record has no mapping, the engine matches on the field marked [DuplicationKey] (L1.9). When it finds the existing destination record, it creates a mapping (L1.6) to it and merges. From then on the record is mapped, so future runs use the direct mapping lookup and skip dedup entirely.",
+      "source": "Documentation/Synnduit Deduplication sequence.docx.md"
+    }
+  ]
+}

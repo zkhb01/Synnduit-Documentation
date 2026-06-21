@@ -1,0 +1,87 @@
+{
+  "poolId": "L2.6.items",
+  "conceptId": "L2.6",
+  "conceptName": "Add it to a Run",
+  "items": [
+    {
+      "id": "L2.6.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which Segment type removes destination records whose source has disappeared?",
+      "options": [
+        { "id": "a", "text": "Migration" },
+        { "id": "b", "text": "GarbageCollection" },
+        { "id": "c", "text": "Cleanup" },
+        { "id": "d", "text": "Delete" }
+      ],
+      "correct": ["b"],
+      "explanation": "A GarbageCollection segment handles destination records the source no longer has.",
+      "misconceptions": {
+        "a": "Migration pushes the delta in (create/update); GarbageCollection removes orphans."
+      },
+      "source": "README.md#5.4"
+    },
+    {
+      "id": "L2.6.q2",
+      "type": "order",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Put these Migration segments in a valid order (1 = first migrated). Student references School; StudentAddress references Student.",
+      "options": [
+        { "id": "a", "text": "Migration: School" },
+        { "id": "b", "text": "Migration: Student" },
+        { "id": "c", "text": "Migration: StudentAddress" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "Migrate parents before children: School, then Student, then StudentAddress.",
+      "source": "README.md#5.4"
+    },
+    {
+      "id": "L2.6.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You add `StudentAddress` (a child of `Student`). Where does its Migration segment go relative to Student's Migration?",
+      "options": [
+        { "id": "a", "text": "Before Student's Migration" },
+        { "id": "b", "text": "After Student's Migration" },
+        { "id": "c", "text": "Order doesn't matter for Migration" },
+        { "id": "d", "text": "It replaces Student's Migration" }
+      ],
+      "correct": ["b"],
+      "explanation": "Migrate parents before children — a StudentAddress can't reference a Student that isn't there yet, so it migrates after Student.",
+      "misconceptions": {
+        "c": "Order matters: wrong order causes foreign-key/reference errors."
+      },
+      "source": "README.md#5.4"
+    },
+    {
+      "id": "L2.6.q4",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "Given a Segments list that migrates School then Student (and GCs Student then School), add the two segments for a new `StudentAddress` (child of Student) in the correct positions. Show the segment lines and where they go.",
+      "rubric": [
+        "Adds a Migration segment for StudentAddress AFTER the Student migration",
+        "Adds a GarbageCollection segment for StudentAddress BEFORE the Student GC (reverse order)",
+        "Uses the correct JSON shape: { \"Type\": \"Migration\"|\"GarbageCollection\", \"EntityType\": \"StudentAddress\" }"
+      ],
+      "sampleAnswer": "Migration order (parents first): School, Student, then add { \"Type\": \"Migration\", \"EntityType\": \"StudentAddress\" } after Student.\nGarbageCollection order (children first): add { \"Type\": \"GarbageCollection\", \"EntityType\": \"StudentAddress\" } before the Student GC, giving GC order StudentAddress, Student, School.",
+      "source": "README.md#5.4"
+    },
+    {
+      "id": "L2.6.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "Why do you migrate parents before children, but garbage-collect children before parents?",
+      "rubric": [
+        "Migration: a child references a parent, so the parent must exist first (parents before children)",
+        "GarbageCollection: deleting a parent while children still reference it breaks integrity, so remove children first (reverse order)"
+      ],
+      "sampleAnswer": "Migrating in, a child (StudentAddress) references a parent (Student), so the parent must be created first. Garbage-collecting out, you must remove the children first — deleting a Student while addresses still point at it would break referential integrity. It's the same logic as inserting into and deleting from foreign-keyed tables.",
+      "source": "README.md#5.4"
+    }
+  ]
+}

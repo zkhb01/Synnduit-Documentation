@@ -1,0 +1,95 @@
+{
+  "poolId": "L1.4.items",
+  "conceptId": "L1.4",
+  "conceptName": "Delta detection (snapshot to delta)",
+  "items": [
+    {
+      "id": "L1.4.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does a Synnduit feed return on each run?",
+      "options": [
+        { "id": "a", "text": "Only the records that changed since the last run" },
+        { "id": "b", "text": "A full snapshot of the source's current state" },
+        { "id": "c", "text": "A list of delete instructions" },
+        { "id": "d", "text": "Nothing — the engine reads the source directly" }
+      ],
+      "correct": ["b"],
+      "explanation": "The feed always emits a complete snapshot; the engine is responsible for working out what changed.",
+      "misconceptions": {
+        "a": "You never write change-detection in the feed — that's the engine's job. The feed returns everything.",
+        "d": "The engine does not access the source itself; your feed supplies the snapshot."
+      },
+      "source": "README.md#2-the-mental-model"
+    },
+    {
+      "id": "L1.4.q2",
+      "type": "scenario",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "A feed returns all 5,000 staff on every run, but only 3 staff records actually changed yesterday. How many updates does the destination receive, and why?",
+      "rubric": [
+        "Answer: 3 (only the changed records)",
+        "Reason: the engine diffs the full snapshot against last run's recorded state and applies only the delta; unchanged records produce no write"
+      ],
+      "sampleAnswer": "Three. The feed hands over the full snapshot of 5,000, but the engine compares it to the state recorded last run and applies only the delta — the 3 changes. The other 4,997 are identical, so they get NoChangesDetected and no write.",
+      "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L1.4.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Where does Synnduit get the \"previous state\" it compares the new snapshot against?",
+      "options": [
+        { "id": "a", "text": "From StarBridge — the recorded state from the last run" },
+        { "id": "b", "text": "From a second query against the source" },
+        { "id": "c", "text": "The developer passes it into the feed" },
+        { "id": "d", "text": "It re-reads the entire destination every run" }
+      ],
+      "correct": ["a"],
+      "explanation": "Synnduit keeps the last-run recorded state in StarBridge and diffs the new snapshot against it to compute the delta.",
+      "misconceptions": {
+        "b": "Only the current snapshot comes from the source; the prior state is Synnduit's own record in StarBridge."
+      },
+      "source": "README.md#2-the-mental-model"
+    },
+    {
+      "id": "L1.4.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Complete the slogan that captures delta detection:",
+      "options": [
+        { "id": "a", "text": "Snapshot in, delta out" },
+        { "id": "b", "text": "Delta in, snapshot out" },
+        { "id": "c", "text": "Full reload every run" },
+        { "id": "d", "text": "Read once, write once" }
+      ],
+      "correct": ["a"],
+      "explanation": "The feed provides a full snapshot; the engine emits only the delta to the destination.",
+      "source": "README.md#2-the-mental-model"
+    },
+    {
+      "id": "L1.4.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Why is delta detection a benefit to the developer writing a feed?",
+      "options": [
+        { "id": "a", "text": "It forces the developer to write change-tracking logic carefully" },
+        { "id": "b", "text": "The developer writes the simple part (return everything) and the engine handles the hard part (what changed)" },
+        { "id": "c", "text": "It lets the feed skip records to run faster" },
+        { "id": "d", "text": "It means the destination is wiped and reloaded, which is simpler" }
+      ],
+      "correct": ["b"],
+      "explanation": "Because the engine computes the delta, the feed stays simple — query the source and return all of it — with no change-tracking code.",
+      "misconceptions": {
+        "a": "The opposite — the developer writes no change-tracking at all.",
+        "d": "Delta detection avoids full reloads; it does not perform them."
+      },
+      "source": "README.md#4-key-features-worth-knowing"
+    }
+  ]
+}
