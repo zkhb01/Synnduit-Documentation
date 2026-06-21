@@ -50,19 +50,21 @@
       "type": "multi",
       "difficulty": "apply",
       "scoring": "auto",
-      "stem": "Which of these are things a human would do in SDM (rather than something the Sync-* fleet does automatically)? Select all that apply.",
+      "stem": "Which of these does a person actually do in SDM? (Select all that apply.)",
       "options": [
-        { "id": "a", "text": "Add a newly opened school" },
-        { "id": "b", "text": "Correct a security group's membership" },
-        { "id": "c", "text": "Mechanically reconcile HR records into DDH every night" },
-        { "id": "d", "text": "Fix a staff member's job assignment" }
+        { "id": "a", "text": "Augment or correct the supplemental data on an existing school" },
+        { "id": "b", "text": "Create a brand-new school or delete one" },
+        { "id": "c", "text": "Fix a standalone group's membership" },
+        { "id": "d", "text": "Add a temporary job or contractor that HR doesn't manage" },
+        { "id": "e", "text": "Run the nightly mechanical reconciliation of HR into DDH" }
       ],
-      "correct": ["a", "b", "d"],
-      "explanation": "Adding a school, correcting a membership, and fixing a job assignment are editorial judgement calls — SDM's purpose. Nightly mechanical reconciliation is the Sync-* fleet.",
+      "correct": ["a", "c", "d"],
+      "explanation": "SDM augments/corrects the supplemental data on records the syncs source (like schools) and maintains the things it owns (standalone group membership, HR-gap staffing such as temp jobs and contractors). It does NOT create or delete system-of-record entities like schools — those come from the source system via the syncs — and it doesn't run the syncs.",
       "misconceptions": {
-        "c": "That bulk, rule-based reconciliation is exactly what the syncs do — not a human editorial action in SDM."
+        "b": "Schools are sourced from a system of record; SDM augments a school's data but cannot create or remove the school itself.",
+        "e": "That bulk, scheduled reconciliation is the Sync-* fleet's job, not a human action in SDM."
       },
-      "source": "README.md#purpose"
+      "source": "README.md#purpose--business-context"
     },
     {
       "id": "S1.1.q4",
