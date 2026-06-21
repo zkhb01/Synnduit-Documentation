@@ -23,12 +23,12 @@
         {
           "id": "S1.1",
           "name": "What SDM is",
-          "objective": "State that SDM is the human-editorial portal above the Sync-* family: people make the authoritative edits to district data (DDH) that the syncs then propagate.",
+          "objective": "Explain that SDM manages supplemental data (system-of-record sources augmented with data downstream apps need but DDH doesn't hold) and is the human, RACI self-serve editor for the CSSD-curated portion of DDH, where people make the authoritative edits the Sync-* fleet then propagates.",
           "prereqs": [],
-          "sources": ["README.md#purpose", "SYSTEMS.md#purpose-in-the-enterprise"],
+          "sources": ["README.md#purpose--business-context", "SYSTEMS.md#purpose-in-the-enterprise"],
           "itemPoolId": "S1.1.items",
           "masteryThreshold": 0.8,
-          "remediationAngle": "Contrast the mechanical Sync-* fleet (reconciles HR/PowerSchool/Entra/AD/SPO) with SDM as the place humans make the editorial calls those syncs carry out."
+          "remediationAngle": "Two anchors: (1) 'supplemental' — SDM holds/manages data DDH doesn't, plus the sync config; (2) RACI self-serve — the data owners edit their own data. Contrast with the mechanical Sync-* fleet that just propagates the result."
         },
         {
           "id": "S1.2",

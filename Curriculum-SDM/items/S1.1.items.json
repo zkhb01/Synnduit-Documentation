@@ -77,6 +77,68 @@
       ],
       "sampleAnswer": "Not quite — the mechanical, scheduled movement between HR, Entra, AD, and SharePoint is the Sync-* fleet's job. SDM is the opposite: it's the admin portal where authorized people make the authoritative editorial changes to the district's data in DDH, and the syncs then carry those changes out to the other systems.",
       "source": "SYSTEMS.md#purpose-in-the-enterprise"
+    },
+    {
+      "id": "S1.1.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "The name \"Supplemental Data Manager\" points at its core job. What does SDM primarily manage?",
+      "options": [
+        { "id": "a", "text": "A backup copy of everything already in DDH" },
+        { "id": "b", "text": "System-of-record sources, augmented with supplemental data that downstream apps need but DDH itself doesn't hold" },
+        { "id": "c", "text": "Only the look-and-feel settings of the sync tools" },
+        { "id": "d", "text": "The HR system's master staff records" }
+      ],
+      "correct": ["b"],
+      "explanation": "SDM's core role is to manage system-of-record sources and augment them with the extra data downstream consumers require that DDH doesn't carry — the \"supplemental\" in the name.",
+      "misconceptions": {
+        "a": "SDM isn't a backup — it manages data DDH doesn't hold, not a copy of what DDH already has.",
+        "c": "It manages real district data (and the sync config), not just UI settings.",
+        "d": "HR remains the system of record for the staff it manages; SDM fills the gaps HR doesn't cover."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S1.1.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "SDM is designed around a RACI self-serve model. What does that mean in practice?",
+      "options": [
+        { "id": "a", "text": "A central IT team keys in every change on users' behalf" },
+        { "id": "b", "text": "Editorial responsibility sits with the people who own the data, who maintain it themselves" },
+        { "id": "c", "text": "Every change needs manager sign-off before it can be saved" },
+        { "id": "d", "text": "The syncs decide who is allowed to edit each record" }
+      ],
+      "correct": ["b"],
+      "explanation": "The RACI self-serve model puts editing in the hands of the data owners (the data-owners team and delegated school staff) rather than a central team.",
+      "misconceptions": {
+        "a": "That's the opposite of self-serve — the point is the owners do their own edits.",
+        "c": "There's no universal sign-off gate; ownership is distributed to the data owners.",
+        "d": "Authorization is AAD-group-driven, but the self-serve model is about who does the editing, not the syncs."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S1.1.q7",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "As SDM evolved, its scope widened beyond editing DDH entities. Which of the following did it take on? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "The volatile template/configuration JSON files that drive the syncs" },
+        { "id": "b", "text": "Staffing categories HR doesn't manage — temporary jobs under six weeks, contractors, and vendors" },
+        { "id": "c", "text": "Running the mechanical nightly sync reconciliations itself" },
+        { "id": "d", "text": "Becoming the system of record for all HR staff data" }
+      ],
+      "correct": ["a", "b"],
+      "explanation": "Over time SDM absorbed the sync template/config JSON and the HR-gap staffing categories (temp jobs under six weeks, contractors, vendors). It still doesn't run the syncs, nor does it replace HR as the staff system of record.",
+      "misconceptions": {
+        "c": "The Sync-* fleet runs the reconciliations; SDM manages the data and config, not the sync execution.",
+        "d": "HR remains the system of record for the staff it manages; SDM only covers the gaps."
+      },
+      "source": "README.md#purpose--business-context"
     }
   ]
 }
