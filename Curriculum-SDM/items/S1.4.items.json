@@ -100,6 +100,27 @@
       ],
       "sampleAnswer": "Both are access concerns. The School Data Owner is one of SDM's three Data-Owner families (an AAD-backed role), while the standalone group's membership is a hand-maintained Standalone Group list — different mechanisms, but both about who can do what. You'd correct each in its SDM area, and the edits write to DDH with CreatedBy/UpdatedBy audit.",
       "source": "SupplementalDataManagerClient/README.md#routes"
+    },
+    {
+      "id": "S1.4.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Beyond being static membership lists, what are Standalone Groups also used for in SDM?",
+      "options": [
+        { "id": "a", "text": "Role-based access — the Help Desk grants temporary access via Entra (AAD) group memberships through the Standalone Group menu" },
+        { "id": "b", "text": "Storing each user's password" },
+        { "id": "c", "text": "Running the nightly sync jobs" },
+        { "id": "d", "text": "Defining school attendance areas" }
+      ],
+      "correct": ["a"],
+      "explanation": "Role-based access was lifted into SDM from the old config JSON; Standalone Groups are how the Help Desk grants temporary access via Entra group memberships.",
+      "misconceptions": {
+        "b": "SDM stores no credentials; access is via Entra group membership, not passwords.",
+        "c": "The Sync-* fleet runs the syncs, not Standalone Groups.",
+        "d": "Attendance areas belong to Schools, not Standalone Groups."
+      },
+      "source": "README.md#purpose--business-context"
     }
   ]
 }
