@@ -121,6 +121,27 @@
         "d": "Attendance areas belong to Schools, not Standalone Groups."
       },
       "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S1.4.q7",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How should you characterize contractors versus vendors in SDM?",
+      "options": [
+        { "id": "a", "text": "Contractors are HR-gap staffing (the group also covers student teachers and volunteers); vendors are 3rd-party suppliers, whose representatives are tracked as Vendor Reps" },
+        { "id": "b", "text": "They're the same thing — both tracked as Vendor Reps" },
+        { "id": "c", "text": "Both are permanent staff managed by HR" },
+        { "id": "d", "text": "Vendors are a type of school and contractors are a type of ward" }
+      ],
+      "correct": ["a"],
+      "explanation": "Contractors are staffing HR doesn't manage (the group also includes student teachers and volunteers); vendors are 3rd-party suppliers, and Vendor Reps are those suppliers' representatives — the two are distinct.",
+      "misconceptions": {
+        "b": "They're distinct: contractors are HR-gap staffing; vendors are 3rd-party suppliers (Vendor Reps = their representatives).",
+        "c": "Permanent staff are HR's system of record; contractors and vendors are the HR-gap categories SDM covers.",
+        "d": "Vendors are suppliers and contractors are staffing — neither is an org-structure entity."
+      },
+      "source": "README.md#purpose--business-context"
     }
   ]
 }
