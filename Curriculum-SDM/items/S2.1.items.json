@@ -1,0 +1,89 @@
+{
+  "poolId": "S2.1.items",
+  "conceptId": "S2.1",
+  "conceptName": "Two front ends: the legacy shell and the Iapetus app",
+  "items": [
+    {
+      "id": "S2.1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How is SDM's user interface structured?",
+      "options": [
+        { "id": "a", "text": "A single modern Angular app" },
+        { "id": "b", "text": "Two front ends — a legacy AngularJS shell and a newer Angular SPA at /Iapetus — both served by one backend" },
+        { "id": "c", "text": "A desktop app plus a web app" },
+        { "id": "d", "text": "Only server-rendered Razor pages, no JavaScript framework" }
+      ],
+      "correct": ["b"],
+      "explanation": "SDM is mid-migration: the legacy AngularJS shell renders the outer page/menu, and newer screens are the Angular SPA mounted at /Iapetus — the same backend serves both.",
+      "misconceptions": {
+        "a": "There are two front ends, not one — older AngularJS and newer Angular 12.",
+        "c": "Both front ends are web; there's no desktop client.",
+        "d": "It uses Angular front ends; the Razor/MVC side is just the thin shell + SPA host."
+      },
+      "source": "README.md#architecture-overview"
+    },
+    {
+      "id": "S2.1.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A menu link is marked \"upgraded.\" What happens when you click it?",
+      "options": [
+        { "id": "a", "text": "It loads the modern Angular SPA at /Iapetus/<feature>" },
+        { "id": "b", "text": "It stays in the legacy AngularJS shell" },
+        { "id": "c", "text": "It downloads a file" },
+        { "id": "d", "text": "It signs the user out" }
+      ],
+      "correct": ["a"],
+      "explanation": "An 'upgraded' link points at the new Angular app under /Iapetus; a non-upgraded (legacy) link renders in the old AngularJS shell.",
+      "misconceptions": {
+        "b": "That's a legacy (non-upgraded) link; upgraded links go to /Iapetus.",
+        "c": "Upgraded links navigate to an app route, not a download.",
+        "d": "Navigation doesn't sign the user out."
+      },
+      "source": "README.md#solution-structure"
+    },
+    {
+      "id": "S2.1.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Why does `/Iapetus` appear in the URL of the newer screens?",
+      "options": [
+        { "id": "a", "text": "It's the SPA's mount path — the Angular app is built with base-href Iapetus and served there" },
+        { "id": "b", "text": "It's the name of the database" },
+        { "id": "c", "text": "It's the authentication provider" },
+        { "id": "d", "text": "It's a separate server" }
+      ],
+      "correct": ["a"],
+      "explanation": "The Angular SPA is mounted under /Iapetus (base-href Iapetus + the backend's IapetusController), so its routes live under that path.",
+      "misconceptions": {
+        "b": "The database is SchoolObjectModel (DDH).",
+        "c": "Authentication is Entra ID.",
+        "d": "The same backend serves it — not a separate server."
+      },
+      "source": "README.md#solution-structure"
+    },
+    {
+      "id": "S2.1.q4",
+      "type": "multi",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which statements about SDM's two front ends are true? Select all that apply.",
+      "options": [
+        { "id": "a", "text": "One backend serves both the legacy shell and the Angular SPA" },
+        { "id": "b", "text": "Features migrate from the legacy shell to the Angular app gradually" },
+        { "id": "c", "text": "The legacy shell renders the outer page and the navigation menu" },
+        { "id": "d", "text": "The two front ends run on two completely separate servers" }
+      ],
+      "correct": ["a", "b", "c"],
+      "explanation": "A single backend hosts both; the legacy shell draws the page + menu; and features move to /Iapetus one at a time. They are not separately hosted.",
+      "misconceptions": {
+        "d": "Both are served by the same backend/origin, not separate servers."
+      },
+      "source": "README.md#architecture-overview"
+    }
+  ]
+}
