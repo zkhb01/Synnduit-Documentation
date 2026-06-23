@@ -18,7 +18,7 @@
       "correct": ["a"],
       "explanation": "Authorization reads the DA-* group claims Entra puts on the sign-in token; SDM doesn't keep its own permissions store.",
       "misconceptions": {
-        "b": "SDM only reads the AAD group claims — permissions aren't configured in SDM itself.",
+        "b": "An authorization decision reads the AAD group claims, not a permissions table in SDM — though SDM can manage who's in those groups (the Standalone Group menu).",
         "c": "Access is driven by AAD group membership, not a PowerSchool title.",
         "d": "Different groups grant different access, so menus and rights differ per user."
       },
@@ -53,16 +53,16 @@
       "stem": "Which statements about SDM's authorization are true? Select all that apply.",
       "options": [
         { "id": "a", "text": "Sign-in is via Entra ID using OpenID Connect (OIDC)" },
-        { "id": "b", "text": "The DA-* groups are maintained upstream (by Sync-DDH-AAD), not inside SDM" },
+        { "id": "b", "text": "An authorization decision is made by reading the DA-* group claims on the token, not from a permissions table inside SDM" },
         { "id": "c", "text": "Two users can see different menus depending on their groups" },
-        { "id": "d", "text": "To grant someone access, you edit a permissions setting in SDM" }
+        { "id": "d", "text": "DA-* group membership can never be changed from within SDM" }
       ],
       "correct": ["a", "b", "c"],
-      "explanation": "SDM signs in via OIDC, reads DA-* group claims (maintained upstream), and tailors the menu per user. Granting access means changing group membership upstream — not a setting in SDM.",
+      "explanation": "SDM signs in via OIDC and authorizes by reading the DA-* claims on the token, tailoring the menu per user. Those memberships CAN be managed in SDM — the Standalone Group menu (e.g. Help-Desk temporary access) — so d is false.",
       "misconceptions": {
-        "d": "SDM only reads the group claims; you change access by changing AAD group membership upstream."
+        "d": "You can change DA-* membership in SDM via the Standalone Group menu; the change reaches the user at their next sign-in (once reflected in Entra via Sync-DDH-AAD)."
       },
-      "source": "README.md#authentication"
+      "source": "README.md#purpose--business-context"
     },
     {
       "id": "S1.3.q4",

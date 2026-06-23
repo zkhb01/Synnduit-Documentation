@@ -43,12 +43,12 @@
         {
           "id": "S1.3",
           "name": "Authorization via AAD groups",
-          "objective": "Explain that SDM authorizes by Entra (AAD) group claims: DA-* groups (maintained by Sync-DDH-AAD) arrive on the OIDC token and decide which menu items and data a user gets; a 403 means a missing DA-* group.",
+          "objective": "Explain that SDM authorizes by reading Entra (AAD) DA-* group claims on the OIDC token (a 403 = a missing group), and that those group memberships can be managed in SDM via the Standalone Group menu (e.g. Help-Desk temporary access), taking effect at the user's next sign-in.",
           "prereqs": ["S1.2"],
-          "sources": ["README.md#authentication", "README.md#configuration"],
+          "sources": ["README.md#authentication", "README.md#configuration", "README.md#purpose--business-context"],
           "itemPoolId": "S1.3.items",
           "masteryThreshold": 0.8,
-          "remediationAngle": "Trace one sign-in: Entra OIDC -> group claims -> the menu (management tasks) filtered by the user's DA-* groups -> an API check that returns 200 or 403."
+          "remediationAngle": "Trace one sign-in (Entra OIDC -> DA-* claims -> menu + API check -> 200/403); then the other direction: those DA-* memberships are managed in SDM via Standalone Groups (Help-Desk temp access), reaching the user at next sign-in."
         },
         {
           "id": "S1.4",
