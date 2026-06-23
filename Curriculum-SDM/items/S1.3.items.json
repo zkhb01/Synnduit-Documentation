@@ -60,7 +60,7 @@
       "correct": ["a", "b", "c"],
       "explanation": "SDM signs in via OIDC and authorizes by reading the DA-* claims on the token, tailoring the menu per user. Those memberships CAN be managed in SDM — the Standalone Group menu (e.g. Help-Desk temporary access) — so d is false.",
       "misconceptions": {
-        "d": "You can change DA-* membership in SDM via the Standalone Group menu; the change reaches the user at their next sign-in (once reflected in Entra via Sync-DDH-AAD)."
+        "d": "You can change DA-* membership in SDM via the Standalone Group menu; the edit persists to DDH, Sync-DDH-AAD syncs it to the Azure DA-* groups, and it reaches the user at their next sign-in."
       },
       "source": "README.md#purpose--business-context"
     },
