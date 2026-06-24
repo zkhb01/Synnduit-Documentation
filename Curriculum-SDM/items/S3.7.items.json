@@ -1,0 +1,128 @@
+{
+  "poolId": "S3.7.items",
+  "conceptId": "S3.7",
+  "conceptName": "Vendor Representatives",
+  "items": [
+    {
+      "id": "S3.7.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is a Vendor Rep in SDM?",
+      "options": [
+        { "id": "a", "text": "A representative of a 3rd-party supplier that SDM creates and maintains because HR doesn't manage them" },
+        { "id": "b", "text": "A school-board trustee seat imported from HRAD" },
+        { "id": "c", "text": "A CSSD staff member with a temporary job under six weeks" },
+        { "id": "d", "text": "An AAD security group that grants editing rights over an area" }
+      ],
+      "correct": ["a"],
+      "explanation": "Vendor Reps are representatives of 3rd-party suppliers. They're one of the staffing categories HR doesn't manage, so SDM creates and maintains them directly.",
+      "misconceptions": {
+        "b": "That describes Trustee Positions, not Vendor Reps.",
+        "c": "Temporary jobs are HR-gap staffing on the Staff side, not vendor representatives.",
+        "d": "That describes Data Owners, an access construct — not a vendor representative."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/VendorReps"
+    },
+    {
+      "id": "S3.7.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does SDM provision for a Vendor Rep?",
+      "options": [
+        { "id": "a", "text": "A login account and a matching CSSD email, but no other access to CSSD assets" },
+        { "id": "b", "text": "Full access to CSSD systems, files, and sites" },
+        { "id": "c", "text": "Only a row in DDH with no account or email" },
+        { "id": "d", "text": "A school assignment and District Program links" }
+      ],
+      "correct": ["a"],
+      "explanation": "A Vendor Rep gets a login account and a matching CSSD email — and deliberately nothing more; no other access to CSSD assets.",
+      "misconceptions": {
+        "a": "",
+        "b": "The access is narrow by design — a login and CSSD email only, not broad system access.",
+        "c": "They do get an account and a CSSD email; it isn't a data-only record.",
+        "d": "Schools and District Program links belong to the Schools page, not to a Vendor Rep."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/VendorReps"
+    },
+    {
+      "id": "S3.7.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Why does SDM maintain Vendor Reps directly instead of receiving them from a system of record?",
+      "options": [
+        { "id": "a", "text": "Because vendors are one of the staffing categories HR doesn't manage" },
+        { "id": "b", "text": "Because HRAD exports vendors but the sync is disabled in dev" },
+        { "id": "c", "text": "Because Vendor Reps are created and deleted only in SharePoint" },
+        { "id": "d", "text": "Because the AuditLog generates vendor records automatically" }
+      ],
+      "correct": ["a"],
+      "explanation": "Vendors are an HR-gap category — HR doesn't manage them — so SDM creates and maintains them itself rather than importing them.",
+      "misconceptions": {
+        "b": "There is no HRAD vendor feed; vendors are an HR gap SDM fills directly.",
+        "c": "Vendor Reps are created and maintained in SDM, not in SharePoint.",
+        "d": "The AuditLog records changes; it doesn't generate vendor records."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.7.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A 3rd-party supplier sends a technician who needs to sign in and be reachable on a CSSD address for one engagement. How should this be handled?",
+      "options": [
+        { "id": "a", "text": "Create a Vendor Rep in SDM, which provisions a login account and matching CSSD email and nothing more" },
+        { "id": "b", "text": "Wait for HR to onboard the technician through the HR system of record" },
+        { "id": "c", "text": "Grant the technician the same access a CSSD staff member receives" },
+        { "id": "d", "text": "Add the technician as a contractor on the Staff page" }
+      ],
+      "correct": ["a"],
+      "explanation": "This is exactly the Vendor Rep case: a 3rd-party supplier's representative gets a login and a matching CSSD email, with no other access to CSSD assets.",
+      "misconceptions": {
+        "a": "",
+        "b": "HR doesn't manage vendors — that's why SDM owns them; waiting on HR means the rep never gets provisioned.",
+        "c": "A Vendor Rep is an external supplier, not staff; granting staff-level access over-provisions them.",
+        "d": "Contractors are HR-gap staffing (S3.5); a supplier's representative is a Vendor Rep, a distinct category."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/VendorReps"
+    },
+    {
+      "id": "S3.7.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Both Vendor Reps and contractors are HR-gap categories SDM owns. What distinguishes a Vendor Rep from a contractor?",
+      "options": [
+        { "id": "a", "text": "A Vendor Rep represents a 3rd-party supplier and is provisioned with only a login and CSSD email; a contractor is HR-gap staffing on the Staff side" },
+        { "id": "b", "text": "A Vendor Rep comes from HRAD while a contractor is created in SDM" },
+        { "id": "c", "text": "There is no difference — the terms are interchangeable" },
+        { "id": "d", "text": "A contractor gets no account, while a Vendor Rep gets full CSSD access" }
+      ],
+      "correct": ["a"],
+      "explanation": "Both fill an HR gap, but they're distinct: a contractor (which also covers student teachers and volunteers) is HR-gap staffing handled on the Staff side, while a Vendor Rep represents a 3rd-party supplier and gets only a login and a matching CSSD email.",
+      "misconceptions": {
+        "a": "",
+        "b": "Both are created in SDM precisely because HR doesn't manage them; neither comes from HRAD.",
+        "c": "They are distinct categories — a supplier's representative is not a contractor.",
+        "d": "A Vendor Rep's access is narrow (login + CSSD email, no other access), not full CSSD access."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.7.q6",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain why SDM owns Vendor Reps and what access a Vendor Rep is given.",
+      "rubric": [
+        "States Vendor Reps are representatives of 3rd-party suppliers that SDM creates/maintains because HR doesn't manage them",
+        "States the access scope: a login account and a matching CSSD email, with no other access to CSSD assets"
+      ],
+      "sampleAnswer": "Vendor Reps are representatives of 3rd-party suppliers, and since HR doesn't manage them SDM creates and maintains them itself. Each rep gets a login account and a matching CSSD email, but no other access to CSSD assets.",
+      "source": "SupplementalDataManager/menu-catalog.json#/VendorReps"
+    }
+  ]
+}

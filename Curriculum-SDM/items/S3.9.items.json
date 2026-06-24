@@ -1,0 +1,125 @@
+{
+  "poolId": "S3.9.items",
+  "conceptId": "S3.9",
+  "conceptName": "Temporary Job Assignment",
+  "items": [
+    {
+      "id": "S3.9.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the Temporary Job Assignment page handle?",
+      "options": [
+        { "id": "a", "text": "Temporary jobs under six weeks that HR doesn't manage, plus Contractor job changes" },
+        { "id": "b", "text": "Permanent FTE positions loaded from the HR system of record" },
+        { "id": "c", "text": "The school-board trustee seats and their boundary maps" },
+        { "id": "d", "text": "Attendance Area maps linked to a school" }
+      ],
+      "correct": ["a"],
+      "explanation": "The page covers the HR-gap temporary jobs under six weeks that SDM owns and creates directly, and it's also where Contractor job changes are maintained.",
+      "misconceptions": {
+        "b": "Permanent FTE roles come from the HR system of record; this page is for the HR-gap jobs HR doesn't manage.",
+        "c": "Trustee positions are a separate org-structure entity, not temporary jobs.",
+        "d": "Attendance Area links are maintained on the Schools page (S3.1)."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/TemporaryJobAssignment"
+    },
+    {
+      "id": "S3.9.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "For the temporary jobs on this page, where do they originate?",
+      "options": [
+        { "id": "a", "text": "SDM owns and creates them directly — there is no HR system of record for them" },
+        { "id": "b", "text": "They are imported from HRAD and SDM only augments them" },
+        { "id": "c", "text": "They are created by principals in their own school's self-serve page" },
+        { "id": "d", "text": "They are generated automatically by the Sync-* fleet" }
+      ],
+      "correct": ["a"],
+      "explanation": "These under-six-week temporary jobs are part of the HR-gap staffing SDM owns and creates directly, because HR doesn't manage them.",
+      "misconceptions": {
+        "b": "There's no upstream feed for these jobs; SDM creates them rather than augmenting an imported record.",
+        "c": "Principal self-serve at a single school is School Job Assignment (S3.8), a different page.",
+        "d": "The syncs keep imported data current; they don't create these HR-gap temporary jobs."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.9.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A contractor's job assignment needs to change. Where do you maintain that change?",
+      "options": [
+        { "id": "a", "text": "On the Temporary Job Assignment page, which also covers Contractor job changes" },
+        { "id": "b", "text": "Upstream in the HR system of record" },
+        { "id": "c", "text": "On the Trustee Positions page" },
+        { "id": "d", "text": "Nowhere — contractor jobs can't change once set" }
+      ],
+      "correct": ["a"],
+      "explanation": "The Temporary Job Assignment page explicitly maintains Contractor job changes alongside the under-six-week temporary jobs.",
+      "misconceptions": {
+        "b": "Contractors are part of the HR-gap staffing SDM maintains; HR doesn't manage them.",
+        "c": "Trustee Positions are unrelated to contractor job assignments.",
+        "d": "Contractor job changes are exactly what this page maintains."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/TemporaryJobAssignment"
+    },
+    {
+      "id": "S3.9.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How does the district-wide Temporary Job Assignment page (S3.9) differ from the School Job Assignment page (S3.8)?",
+      "options": [
+        { "id": "a", "text": "S3.9 covers the HR-gap temporary jobs SDM owns and Contractor job changes across the district; S3.8 is a principal/delegate self-serve page scoped to one school" },
+        { "id": "b", "text": "S3.9 is scoped to one school and S3.8 is district-wide" },
+        { "id": "c", "text": "They are the same page under two names" },
+        { "id": "d", "text": "S3.9 augments HR-fed jobs while S3.8 creates new ones" }
+      ],
+      "correct": ["a"],
+      "explanation": "S3.8 is school-scoped and principal-self-serve (their school's staff, a canned job list); S3.9 handles the under-six-week HR-gap jobs SDM owns and Contractor job changes across the district.",
+      "misconceptions": {
+        "b": "It's the reverse: S3.8 is school-scoped, S3.9 is district-wide.",
+        "c": "They're distinct pages with different scope and purpose.",
+        "d": "Neither page augments HR-fed jobs; these are jobs SDM owns because HR doesn't manage them."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/TemporaryJobAssignment"
+    },
+    {
+      "id": "S3.9.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "When you create a temporary job here, what happens to the change, and what can the temp-job workflow trigger?",
+      "options": [
+        { "id": "a", "text": "It writes to DDH with CreatedBy/UpdatedBy audit, and the workflow can fire an email notification" },
+        { "id": "b", "text": "It is stored only in SDM and never reaches DDH" },
+        { "id": "c", "text": "It is emailed to HR for manual keying and nothing is recorded" },
+        { "id": "d", "text": "It silently overwrites the record with no audit and never notifies anyone" }
+      ],
+      "correct": ["a"],
+      "explanation": "Like all SDM edits the change lands in DDH with CreatedBy/UpdatedBy audit, and the temp-job workflow can fire an email notification (S2.4) so the right people are informed.",
+      "misconceptions": {
+        "b": "SDM holds no separate source of truth; the result lives in DDH.",
+        "c": "Edits write to DDH directly and are audited; they aren't relayed to HR by email.",
+        "d": "SDM edits are always audited, and the temp-job workflow can notify."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.9.q6",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "A district-office task needs a worker for three weeks and HR will never create a position for it. In one or two sentences, say why this belongs on the Temporary Job Assignment page and not on School Job Assignment (S3.8).",
+      "rubric": [
+        "Identifies it as a temporary job under six weeks that HR doesn't manage / part of HR-gap staffing SDM owns and creates",
+        "Notes S3.9 is district-wide (or not tied to a single principal's school) whereas S3.8 is school-scoped principal/delegate self-serve"
+      ],
+      "sampleAnswer": "A three-week task with no HR position is exactly the under-six-week HR-gap job SDM owns and creates directly, so it belongs on the district-wide Temporary Job Assignment page. School Job Assignment (S3.8) is for a principal or delegate assigning their own school's staff, which isn't the scope here.",
+      "source": "README.md#purpose--business-context"
+    }
+  ]
+}

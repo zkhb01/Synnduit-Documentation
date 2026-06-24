@@ -1,0 +1,126 @@
+{
+  "poolId": "S3.2.items",
+  "conceptId": "S3.2",
+  "conceptName": "Data Owners and delegates",
+  "items": [
+    {
+      "id": "S3.2.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "On the School Data Owners page, who can assign a delegate for a school?",
+      "options": [
+        { "id": "a", "text": "The principal, who owns the school's data" },
+        { "id": "b", "text": "A central administration team that processes requests" },
+        { "id": "c", "text": "Any signed-in SDM user" },
+        { "id": "d", "text": "The HRAD system of record, automatically" }
+      ],
+      "correct": ["a"],
+      "explanation": "In SDM's RACI self-serve model the owner assigns the delegate. For a school that owner is the principal.",
+      "misconceptions": {
+        "b": "The self-serve model deliberately removes a central team from the loop — the owner decides.",
+        "c": "Assignment is the owner's right, not any user's.",
+        "d": "HRAD is the system of record for school records; it doesn't assign delegates."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolDataOwners"
+    },
+    {
+      "id": "S3.2.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What two responsibilities can a delegate be assigned for their area?",
+      "options": [
+        { "id": "a", "text": "Maintaining the area's supplemental data and managing its SPO (SharePoint Online) site" },
+        { "id": "b", "text": "Creating new schools and deleting closed ones" },
+        { "id": "c", "text": "Editing the HRAD system of record and the AuditLog" },
+        { "id": "d", "text": "Approving budgets and signing contracts" }
+      ],
+      "correct": ["a"],
+      "explanation": "A delegate is assigned to maintain the area's supplemental data and to manage its SharePoint Online site in the owner's capacity.",
+      "misconceptions": {
+        "b": "Creating/deleting schools happens upstream in HRAD, not via a Data-Owner delegate.",
+        "c": "The system of record and AuditLog aren't edit surfaces a delegate manages.",
+        "d": "Those are organizational duties, not the data/SPO responsibilities SDM delegates."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/DepartmentDataOwners"
+    },
+    {
+      "id": "S3.2.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "The three Data-Owner pages — Department, School, and Functional Site — differ primarily in what?",
+      "options": [
+        { "id": "a", "text": "Their scope and owning role (manager / principal / owner); the mechanism is the same" },
+        { "id": "b", "text": "Whether edits are audited in DDH" },
+        { "id": "c", "text": "Whether they use Entra (AAD) at all" },
+        { "id": "d", "text": "Whether a delegate can be assigned at all" }
+      ],
+      "correct": ["a"],
+      "explanation": "All three work the same way; only the scope (Department/School/Functional Site) and owning role (manager/principal/owner) change.",
+      "misconceptions": {
+        "b": "All SDM edits write to DDH with audit — that doesn't distinguish the pages.",
+        "c": "Authorization across SDM rests on Entra DA-* groups regardless of the page.",
+        "d": "Delegate assignment is the shared mechanism on all three pages."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/FunctionalSiteDataOwners"
+    },
+    {
+      "id": "S3.2.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A department manager is overloaded and wants someone else to keep the department's supplemental data current and run its SharePoint site. Under SDM's model, what should happen?",
+      "options": [
+        { "id": "a", "text": "The manager assigns a delegate on Department Data Owners; the delegate then maintains the data and the SPO site" },
+        { "id": "b", "text": "The manager files a ticket so a central team takes over the department's data" },
+        { "id": "c", "text": "The data goes unmaintained until HRAD pushes an update" },
+        { "id": "d", "text": "Ownership transfers permanently to whoever edits the record next" }
+      ],
+      "correct": ["a"],
+      "explanation": "The RACI self-serve model lets the owner assign a delegate to carry the data-maintenance and SPO responsibility, rather than handing it to a central team.",
+      "misconceptions": {
+        "b": "The self-serve model exists precisely so this isn't routed to a central team.",
+        "c": "HRAD supplies system-of-record fields, not the supplemental data a delegate maintains.",
+        "d": "Delegation is an explicit assignment by the owner, not an accident of who edits last."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/DepartmentDataOwners"
+    },
+    {
+      "id": "S3.2.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A teacher complains they were never made a delegate for their functional site, even though the owner intended it. Where would you confirm who was actually assigned?",
+      "options": [
+        { "id": "a", "text": "In DDH, where the assignment is recorded with CreatedBy/UpdatedBy audit (reversible via soft delete)" },
+        { "id": "b", "text": "Only by asking the central access team, since SDM keeps no record" },
+        { "id": "c", "text": "In SDM's own separate source of truth, which is independent of DDH" },
+        { "id": "d", "text": "Nowhere — delegate assignments are not tracked" }
+      ],
+      "correct": ["a"],
+      "explanation": "Delegate assignments are edits like any other, so they write to DDH with CreatedBy/UpdatedBy audit and a soft-delete flag, making them attributable and reversible.",
+      "misconceptions": {
+        "b": "The self-serve model has no central team owning this, and SDM does record the change in DDH.",
+        "c": "SDM holds no separate source of truth; authoritative data lives in DDH.",
+        "d": "All SDM edits, including delegation, carry an audit trail."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/FunctionalSiteDataOwners"
+    },
+    {
+      "id": "S3.2.q6",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, describe SDM's RACI self-serve model for Data Owners, and give a concrete example of an owner assigning a delegate.",
+      "rubric": [
+        "States responsibility sits with the owner (manager/principal/owner) or their delegate, not a central team",
+        "States the delegate maintains the area's supplemental data and manages its SPO (SharePoint Online) site",
+        "Gives a valid example, e.g. a principal assigning an office administrator as a delegate for the school"
+      ],
+      "sampleAnswer": "Responsibility for an area's supplemental data sits with its owner — the manager, principal, or functional-site owner — or with a delegate the owner assigns, not a central team. For example, a principal can assign an office administrator as a delegate so that person maintains the school's supplemental data and manages its SharePoint Online site.",
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolDataOwners"
+    }
+  ]
+}

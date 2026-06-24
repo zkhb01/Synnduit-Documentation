@@ -1,0 +1,105 @@
+{
+  "poolId": "S3.8.items",
+  "conceptId": "S3.8",
+  "conceptName": "School Job Assignment",
+  "items": [
+    {
+      "id": "S3.8.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "On the School Job Assignment page, who assigns staff to temporary jobs?",
+      "options": [
+        { "id": "a", "text": "The school's principal or their delegate" },
+        { "id": "b", "text": "Central IT / the Help Desk" },
+        { "id": "c", "text": "Any staff member at any school" },
+        { "id": "d", "text": "The HRAD system of record, automatically" }
+      ],
+      "correct": ["a"],
+      "explanation": "It's a self-serve page: the principal — or someone they have delegated — makes the assignments for their own school.",
+      "misconceptions": {
+        "b": "This is principal-self-serve, not an IT/Help Desk function.",
+        "c": "Only the principal or their delegate can assign, and only for their own school's staff.",
+        "d": "These temporary-job assignments are made by people on the page, not imported automatically."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffJobAssignment"
+    },
+    {
+      "id": "S3.8.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Where do the jobs available on the School Job Assignment page come from?",
+      "options": [
+        { "id": "a", "text": "A canned (predefined) list of jobs" },
+        { "id": "b", "text": "Free text typed in by the principal" },
+        { "id": "c", "text": "Whatever jobs HRAD pushes that day" },
+        { "id": "d", "text": "A list the staff member chooses for themselves" }
+      ],
+      "correct": ["a"],
+      "explanation": "Temporary jobs are selected from a canned, predefined list — they aren't entered as free text.",
+      "misconceptions": {
+        "b": "Jobs are chosen from a predefined list, not typed freely.",
+        "c": "The list is a fixed canned set, not a daily import.",
+        "d": "The principal or delegate makes the assignment; the staff member doesn't pick their own job here."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffJobAssignment"
+    },
+    {
+      "id": "S3.8.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Whose staff can a principal assign on the School Job Assignment page?",
+      "options": [
+        { "id": "a", "text": "Staff at their own school" },
+        { "id": "b", "text": "Staff anywhere in the district" },
+        { "id": "c", "text": "Staff at any school in their municipal division" },
+        { "id": "d", "text": "Only contractors and volunteers" }
+      ],
+      "correct": ["a"],
+      "explanation": "The page is school-scoped: a principal assigns staff at their own school. District-wide assignment is a separate page (S3.9).",
+      "misconceptions": {
+        "b": "District-wide assignment is the separate Temporary Job Assignment page (S3.9), not this one.",
+        "c": "The scope is the principal's own school, not a wider geographic grouping.",
+        "d": "It covers the school's staff, not a specific worker category only."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffJobAssignment"
+    },
+    {
+      "id": "S3.8.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A principal needs a short-term role filled by a teacher at their own school. Which page is the right self-serve tool, and why?",
+      "options": [
+        { "id": "a", "text": "School Job Assignment — it's school-scoped and the principal (or delegate) assigns their own staff to a temporary job from the canned list" },
+        { "id": "b", "text": "The district-wide Temporary Job Assignment page (S3.9), because all temporary jobs are assigned district-wide" },
+        { "id": "c", "text": "The Schools page, by adding a new job field to the school record" },
+        { "id": "d", "text": "A Help Desk ticket, since principals can't assign jobs themselves" }
+      ],
+      "correct": ["a"],
+      "explanation": "For a temporary job at the principal's own school, School Job Assignment is the school-scoped, principal-self-serve page; the job is picked from the canned list.",
+      "misconceptions": {
+        "b": "S3.9 is district-wide; a single-school need is handled on the school-scoped page.",
+        "c": "Job assignments aren't done by editing the school record on the Schools page.",
+        "d": "Principals (or delegates) self-serve here — no Help Desk ticket is required."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffJobAssignment"
+    },
+    {
+      "id": "S3.8.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, describe what the School Job Assignment page does and how it differs from the district-wide Temporary Job Assignment page (S3.9).",
+      "rubric": [
+        "States principals or their delegates assign staff at their own school to temporary jobs",
+        "Notes the jobs come from a canned/predefined list",
+        "Contrasts the school scope here with the district-wide scope of S3.9"
+      ],
+      "sampleAnswer": "On the School Job Assignment page a principal (or their delegate) assigns staff at their own school to temporary jobs chosen from a canned list. It's school-scoped, unlike the district-wide Temporary Job Assignment page (S3.9), which assigns across the whole district.",
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffJobAssignment"
+    }
+  ]
+}

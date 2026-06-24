@@ -1,0 +1,147 @@
+{
+  "poolId": "S3.3.items",
+  "conceptId": "S3.3",
+  "conceptName": "Standalone Groups (rules, staff, DA-* linkage)",
+  "items": [
+    {
+      "id": "S3.3.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What are the two ways to add staff to a Standalone Group?",
+      "options": [
+        { "id": "a", "text": "By an HR-attribute rule, or by adding a staff member directly with a start/end date" },
+        { "id": "b", "text": "By importing from HRAD, or by emailing the Help Desk" },
+        { "id": "c", "text": "By composing other groups, or by deriving membership from a parent group" },
+        { "id": "d", "text": "By editing the AuditLog, or by typing into appsettings.json" }
+      ],
+      "correct": ["a"],
+      "explanation": "Standalone Group membership is curated directly: either Rule-based (driven by HR attributes) or Staff-based (a named staff member added with a start and end date).",
+      "misconceptions": {
+        "b": "Standalone groups aren't imported from a system of record, and the Help Desk uses the menu itself, not email, to manage them.",
+        "c": "Composing/deriving is how other group types work; a standalone group is curated by hand.",
+        "d": "Editing logs/config isn't how membership is set; the old JSON config is being replaced by this SDM functionality."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StandaloneGroups"
+    },
+    {
+      "id": "S3.3.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How is a Standalone Group's membership maintained, compared with composed/derived groups?",
+      "options": [
+        { "id": "a", "text": "It is curated directly in SDM, rather than rolling up from other groups" },
+        { "id": "b", "text": "It is computed automatically by rolling up other groups, just like composed groups" },
+        { "id": "c", "text": "It is maintained upstream in HRAD and only viewed in SDM" },
+        { "id": "d", "text": "It cannot be viewed at all once the group is created" }
+      ],
+      "correct": ["a"],
+      "explanation": "Unlike composed/derived groups whose membership rolls up from other groups, a standalone group's membership is curated by hand directly in SDM. View options let you see that membership.",
+      "misconceptions": {
+        "b": "That describes composed/derived groups; standalone groups are curated directly.",
+        "c": "Standalone groups are owned by SDM, not maintained in a system of record.",
+        "d": "View options exist specifically to see a group's membership."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StandaloneGroups"
+    },
+    {
+      "id": "S3.3.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How does a Standalone Group connect to SDM's authorization (the DA-* groups from S1.3)?",
+      "options": [
+        { "id": "a", "text": "A standalone group can be set up with linkage to a DA-* AAD group" },
+        { "id": "b", "text": "A standalone group replaces the OIDC token entirely" },
+        { "id": "c", "text": "A standalone group is the same thing as a Data Owner group" },
+        { "id": "d", "text": "Standalone groups have no relationship to DA-* groups" }
+      ],
+      "correct": ["a"],
+      "explanation": "A standalone group can be created with ultimate linkage to a DA-* group, so its curated membership feeds the DA-* group claims SDM reads to make authorization decisions.",
+      "misconceptions": {
+        "b": "SDM still reads DA-* claims off the OIDC token; the group feeds those claims, it doesn't replace the token.",
+        "c": "Data Owners are a distinct AAD-backed role family (S1.4); a standalone group is a hand-curated list that can be linked to a DA-* group.",
+        "d": "Linkage to DA-* groups is a defining feature of standalone groups."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StandaloneGroups"
+    },
+    {
+      "id": "S3.3.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "The Help Desk needs to give a staff member access to an area for exactly two weeks. Using Standalone Groups, what's the right approach?",
+      "options": [
+        { "id": "a", "text": "Add the staff member directly to a DA-*-linked group with a start and end date" },
+        { "id": "b", "text": "Define an HR-attribute rule so all staff get the access permanently" },
+        { "id": "c", "text": "Edit the school record to grant the access" },
+        { "id": "d", "text": "Delete the staff member's account and recreate it after two weeks" }
+      ],
+      "correct": ["a"],
+      "explanation": "Staff-based membership with start/end dates is what enables temporary access. Adding the person to a group linked to the right DA-* group, with an end date, grants the access and lets it expire automatically.",
+      "misconceptions": {
+        "b": "A rule applies broadly and permanently — wrong tool for one person's two-week need.",
+        "c": "Schools (S3.1) are an augment-only surface, unrelated to granting access.",
+        "d": "Account deletion has nothing to do with timed group membership."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.3.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which action is legitimate for Standalone Groups but NOT for Schools (S3.1)?",
+      "options": [
+        { "id": "a", "text": "Creating and deleting the entity in SDM" },
+        { "id": "b", "text": "Writing the change to DDH with an audit trail" },
+        { "id": "c", "text": "Viewing the record in SDM" },
+        { "id": "d", "text": "Editing it without anyone knowing who changed it" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM owns standalone groups outright and can create and delete them. Schools come from a system of record (HRAD) and are augment-only — SDM never creates or deletes them.",
+      "misconceptions": {
+        "b": "Writing to DDH with audit is true of both — it isn't the distinguishing action.",
+        "c": "Both can be viewed; that isn't unique to standalone groups.",
+        "d": "All SDM edits carry CreatedBy/UpdatedBy audit; silent edits never happen."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.3.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Where is the role-based access in Standalone Groups being ported from?",
+      "options": [
+        { "id": "a", "text": "An old JSON config file" },
+        { "id": "b", "text": "The HRAD system of record" },
+        { "id": "c", "text": "The AuditLog table" },
+        { "id": "d", "text": "A SharePoint list that SDM still depends on" }
+      ],
+      "correct": ["a"],
+      "explanation": "This functionality is transitioning from a JSON config file into SDM; the role-based access that used to live there is now managed as Standalone Groups.",
+      "misconceptions": {
+        "b": "HRAD is the source of record for schools/staff, not the origin of this config.",
+        "c": "The AuditLog records changes; it isn't the source being ported in.",
+        "d": "The data is being ported into SDM from a JSON file, not retained in SharePoint."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StandaloneGroups"
+    },
+    {
+      "id": "S3.3.q7",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain how Standalone Groups let the Help Desk grant temporary access, and name the two ways a group's membership can be filled.",
+      "rubric": [
+        "Names the two membership methods: rule-based (HR attributes) and staff-based (direct add with start/end dates)",
+        "Connects temporary access to staff-based membership with an end date and/or linkage to a DA-* group",
+        "Notes the access reflects through DA-* group claims (effective at next sign-in) — or that SDM owns/curates these groups directly"
+      ],
+      "sampleAnswer": "A standalone group is filled either by an HR-attribute rule or by adding a staff member directly with a start and end date. For temporary access, the Help Desk adds the person to a DA-*-linked group with an end date; the membership feeds the DA-* group claims SDM reads, taking effect at the user's next sign-in and expiring on the end date.",
+      "source": "README.md#purpose--business-context"
+    }
+  ]
+}

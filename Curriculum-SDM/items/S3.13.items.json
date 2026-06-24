@@ -1,0 +1,105 @@
+{
+  "poolId": "S3.13.items",
+  "conceptId": "S3.13",
+  "conceptName": "Team Site Security",
+  "items": [
+    {
+      "id": "S3.13.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the Team Site Security area let you do?",
+      "options": [
+        { "id": "a", "text": "Review and maintain who can access which team sites" },
+        { "id": "b", "text": "Create new team sites from scratch" },
+        { "id": "c", "text": "Configure email notifications for site owners" },
+        { "id": "d", "text": "Import staff records from the system of record" }
+      ],
+      "correct": ["a"],
+      "explanation": "Team Site Security is the review-and-maintain surface for team site access — who can access which sites/assets.",
+      "misconceptions": {
+        "b": "It maintains access to sites, not the creation of sites.",
+        "c": "Notifications are configured elsewhere, not in Site Security.",
+        "d": "Staff imports are a separate concern; Site Security is about access."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SiteSecurityByAsset"
+    },
+    {
+      "id": "S3.13.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What are the two ways the same team site access can be viewed?",
+      "options": [
+        { "id": "a", "text": "By asset (a site and its users) and by user (a person and their sites)" },
+        { "id": "b", "text": "By department and by school" },
+        { "id": "c", "text": "By created date and by updated date" },
+        { "id": "d", "text": "By active records and by soft-deleted records" }
+      ],
+      "correct": ["a"],
+      "explanation": "The same per-site access can be viewed by asset (start from a site, see who can access it) or by user (start from a person, see which sites they can access).",
+      "misconceptions": {
+        "b": "Department/School are Data-Owner families, not the two Site Security lenses.",
+        "c": "Those are audit fields, not the by-asset/by-user views.",
+        "d": "Soft-delete is the editing model (S2.3), not a Site Security lens."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SiteSecurityByUser"
+    },
+    {
+      "id": "S3.13.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You want to answer \"which sites can this particular person access?\" Which view do you start from?",
+      "options": [
+        { "id": "a", "text": "The by-user view" },
+        { "id": "b", "text": "The by-asset view" },
+        { "id": "c", "text": "The AuditLog" },
+        { "id": "d", "text": "The Standalone Groups menu" }
+      ],
+      "correct": ["a"],
+      "explanation": "Starting from a person to see the sites they can reach is the by-user lens; starting from a site to see its users is the by-asset lens.",
+      "misconceptions": {
+        "b": "By-asset starts from a site, not a person.",
+        "c": "The AuditLog records changes; it isn't a Site Security view.",
+        "d": "Standalone Groups are hand-maintained membership lists, a different area (S1.4)."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SiteSecurityByUser"
+    },
+    {
+      "id": "S3.13.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A teammate says the by-asset view and the by-user view are two separate access lists you have to keep in sync. Are they right?",
+      "options": [
+        { "id": "a", "text": "No — they are two presentations of the same per-site access" },
+        { "id": "b", "text": "Yes — they are independent lists that can disagree" },
+        { "id": "c", "text": "Yes — by-asset is the real one and by-user is a copy" },
+        { "id": "d", "text": "No — only one of the two views actually shows access" }
+      ],
+      "correct": ["a"],
+      "explanation": "Both views describe the same underlying access from different entry points; a change seen one way is the same change seen the other way.",
+      "misconceptions": {
+        "b": "They can't disagree — they read the same access.",
+        "c": "Neither is a copy of the other; it's one matrix, two lenses.",
+        "d": "Both views show the same access, just organized differently."
+      },
+      "source": "SupplementalDataManagerClient/README.md#routes"
+    },
+    {
+      "id": "S3.13.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain the difference between the by-asset and by-user views of Team Site Security, and why both exist.",
+      "rubric": [
+        "By asset starts from a site/asset and shows which users can access it",
+        "By user starts from a person and shows which sites they can access",
+        "States both are the same underlying per-site access, just different entry points for different questions"
+      ],
+      "sampleAnswer": "By asset starts from a site and shows who can access it; by user starts from a person and shows which sites they can reach. They're the same access viewed two ways, so you can answer either \"who can get into this site?\" or \"what can this person access?\" without re-deriving it.",
+      "source": "SupplementalDataManager/menu-catalog.json#/SiteSecurityByAsset"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "poolId": "S3.10.items",
+  "conceptId": "S3.10",
+  "conceptName": "Municipal Divisions and hierarchy",
+  "items": [
+    {
+      "id": "S3.10.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the Municipal Divisions page maintain?",
+      "options": [
+        { "id": "a", "text": "The city-provided set of communities, quadrants, and cities (and their supplemental data) that schools service" },
+        { "id": "b", "text": "The parent/child roll-up of communities into quadrants and cities" },
+        { "id": "c", "text": "The list of staff job assignments for each division" },
+        { "id": "d", "text": "The Attendance Area maps for each school" }
+      ],
+      "correct": ["a"],
+      "explanation": "Municipal Divisions maintains the municipal division records — the city-provided communities/quadrants/cities and their supplemental data — that schools will be servicing.",
+      "misconceptions": {
+        "b": "That's the Municipal Division Hierarchy page; the records page holds the divisions themselves.",
+        "c": "Job assignments belong to Staff, not Municipal Divisions.",
+        "d": "Attendance Area maps are a separate entity, not municipal divisions."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/MunicipalDivisions"
+    },
+    {
+      "id": "S3.10.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the Municipal Division Hierarchy page maintain?",
+      "options": [
+        { "id": "a", "text": "The parent/child relationships — how communities roll up into quadrants and cities" },
+        { "id": "b", "text": "The city-provided list of community records and their supplemental data" },
+        { "id": "c", "text": "The AAD security groups that grant editing rights" },
+        { "id": "d", "text": "The SMTP settings used for on-hold job notifications" }
+      ],
+      "correct": ["a"],
+      "explanation": "The hierarchy page maintains the parent/child relationships between municipal divisions: communities rolling up into quadrants and cities. It also provides the link to associate the communities a school services.",
+      "misconceptions": {
+        "b": "Maintaining the records themselves is the Municipal Divisions page's job.",
+        "c": "Editing rights are governed by Data Owners, not the hierarchy page.",
+        "d": "Notification settings are unrelated to the municipal division hierarchy."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/MunicipalDivisionHierarchy"
+    },
+    {
+      "id": "S3.10.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You need to record that several communities roll up into a particular quadrant. Which page do you use?",
+      "options": [
+        { "id": "a", "text": "Municipal Division Hierarchy" },
+        { "id": "b", "text": "Municipal Divisions" },
+        { "id": "c", "text": "Schools" },
+        { "id": "d", "text": "Standalone Groups" }
+      ],
+      "correct": ["a"],
+      "explanation": "Roll-up (parent/child) relationships — communities into quadrants and cities — are maintained on the Municipal Division Hierarchy page.",
+      "misconceptions": {
+        "b": "The Municipal Divisions page maintains the division records, not the roll-up between them.",
+        "c": "The Schools page augments schools; it isn't where the division roll-up is set.",
+        "d": "Standalone Groups are hand-maintained membership lists, unrelated to division roll-up."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/MunicipalDivisionHierarchy"
+    },
+    {
+      "id": "S3.10.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Where do you associate the specific communities that a given school services?",
+      "options": [
+        { "id": "a", "text": "Via the link provided on the Municipal Division Hierarchy page" },
+        { "id": "b", "text": "By creating a new municipal division record for the school" },
+        { "id": "c", "text": "In the AuditLog entry for the school" },
+        { "id": "d", "text": "By editing the school's name field in HRAD" }
+      ],
+      "correct": ["a"],
+      "explanation": "The Municipal Division Hierarchy page provides a link to associate the communities a school services.",
+      "misconceptions": {
+        "b": "You associate existing communities; you don't create a division per school.",
+        "c": "The AuditLog records changes; it isn't an association surface.",
+        "d": "The school's HRAD fields are unrelated to which communities it services."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/MunicipalDivisionHierarchy"
+    },
+    {
+      "id": "S3.10.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "In the municipal division hierarchy, what is the roll-up order?",
+      "options": [
+        { "id": "a", "text": "Communities roll up into quadrants and cities" },
+        { "id": "b", "text": "Cities roll up into quadrants and communities" },
+        { "id": "c", "text": "Quadrants roll up into communities" },
+        { "id": "d", "text": "Schools roll up into communities" }
+      ],
+      "correct": ["a"],
+      "explanation": "The hierarchy maintains communities rolling up into quadrants and cities — communities are the children, quadrants and cities the parents.",
+      "misconceptions": {
+        "b": "The direction is reversed: communities are the smallest unit rolling up, not cities.",
+        "c": "Quadrants don't roll up into communities; communities roll up into quadrants.",
+        "d": "Schools service communities; they aren't a level of the division hierarchy."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/MunicipalDivisionHierarchy"
+    },
+    {
+      "id": "S3.10.q6",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain how the Municipal Divisions page and the Municipal Division Hierarchy page differ, and name one thing the hierarchy page lets you do beyond setting roll-up.",
+      "rubric": [
+        "States Municipal Divisions maintains the city-provided division records (communities/quadrants/cities) and their supplemental data",
+        "States Municipal Division Hierarchy maintains the parent/child roll-up — communities into quadrants and cities",
+        "Names the extra capability: a link to associate the communities a school services"
+      ],
+      "sampleAnswer": "Municipal Divisions maintains the city-provided community/quadrant/city records and their supplemental data, while Municipal Division Hierarchy maintains how those communities roll up into quadrants and cities. The hierarchy page also provides a link to associate the communities a school services.",
+      "source": "SupplementalDataManager/menu-catalog.json#/MunicipalDivisionHierarchy"
+    }
+  ]
+}

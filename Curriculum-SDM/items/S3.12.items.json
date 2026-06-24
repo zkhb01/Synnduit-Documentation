@@ -1,0 +1,126 @@
+{
+  "poolId": "S3.12.items",
+  "conceptId": "S3.12",
+  "conceptName": "Trustees and Wards",
+  "items": [
+    {
+      "id": "S3.12.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the Trustee Positions page maintain?",
+      "options": [
+        { "id": "a", "text": "The 7 elected trustees, each with their position and boundary map" },
+        { "id": "b", "text": "Every staff member's job assignment and proxy address" },
+        { "id": "c", "text": "The list of vendors and their representatives" },
+        { "id": "d", "text": "The AAD security groups that grant editing rights" }
+      ],
+      "correct": ["a"],
+      "explanation": "Trustee Positions maintains the 7 elected trustees with their position and boundary maps.",
+      "misconceptions": {
+        "b": "Staff and job assignments are people-and-roles data, not trustee positions.",
+        "c": "Vendor Reps are a separate entity from elected trustees.",
+        "d": "Data Owners are the access constructs; trustee positions are org-structure governance data."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/TrusteePositions"
+    },
+    {
+      "id": "S3.12.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "On the Wards page, what is maintained for each ward?",
+      "options": [
+        { "id": "a", "text": "The set of wards and each ward's relationship to its elected trustee" },
+        { "id": "b", "text": "The municipal-division hierarchy and parish assignments" },
+        { "id": "c", "text": "The attendance-area map for each school" },
+        { "id": "d", "text": "The standalone-group membership for each resident" }
+      ],
+      "correct": ["a"],
+      "explanation": "The Wards page maintains the set of wards and the relationship of each ward to the elected trustee who represents it.",
+      "misconceptions": {
+        "b": "Municipal Divisions are a separate org-structure entity; wards carry the trustee relationship.",
+        "c": "Attendance areas link to schools, not to wards-and-trustees.",
+        "d": "Standalone Groups are hand-maintained access lists, unrelated to wards."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/Wards"
+    },
+    {
+      "id": "S3.12.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "The trustee-and-ward data maintained in SDM is primarily used by which consumer?",
+      "options": [
+        { "id": "a", "text": "The external district site, which shows residents their elected representatives" },
+        { "id": "b", "text": "The HRAD system of record" },
+        { "id": "c", "text": "The SMTP / email-notification configuration" },
+        { "id": "d", "text": "The Selenium UI test harness" }
+      ],
+      "correct": ["a"],
+      "explanation": "Both Trustee Positions and Wards describe data used for the external (public-facing) district site.",
+      "misconceptions": {
+        "b": "HRAD is the system of record for schools/staff, not the consumer of trustee data.",
+        "c": "Email configuration is unrelated to publishing trustee-and-ward data.",
+        "d": "The test harness is not a data consumer."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/TrusteePositions"
+    },
+    {
+      "id": "S3.12.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "The district redraws its electoral boundaries, moving a ward into a different trustee's area. Which actions keep SDM correct?",
+      "options": [
+        { "id": "a", "text": "Update the affected trustee positions' boundary maps, then re-point the moved ward to its new trustee on the Wards page" },
+        { "id": "b", "text": "Delete the ward and recreate the trustee in HRAD" },
+        { "id": "c", "text": "Only edit the Wards page; trustee positions never change" },
+        { "id": "d", "text": "Edit the ward's attendance-area map on the Schools page" }
+      ],
+      "correct": ["a"],
+      "explanation": "Trustee Positions and Wards are siblings: a boundary change on a position usually means re-pointing the affected ward's trustee relationship so the two stay in step.",
+      "misconceptions": {
+        "b": "Trustees are elected seats maintained in SDM, not records created in HRAD.",
+        "c": "Boundary maps live on the trustee positions; ignoring them leaves the governance map stale.",
+        "d": "Attendance areas link schools, not wards to trustees."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/Wards"
+    },
+    {
+      "id": "S3.12.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Why are Trustee Positions and Wards classified as org-structure data rather than people-and-roles (Staff) data?",
+      "options": [
+        { "id": "a", "text": "They describe elected seats and the geography they cover, not HR staffing" },
+        { "id": "b", "text": "They store each trustee's payroll and benefits" },
+        { "id": "c", "text": "They are managed by the Help Desk for temporary access" },
+        { "id": "d", "text": "They are AAD security groups that grant editing rights" }
+      ],
+      "correct": ["a"],
+      "explanation": "There are exactly 7 elected trustee seats, each tied to a boundary and its wards — this is org-structure/governance data, distinct from the Staff/HR people-and-roles area.",
+      "misconceptions": {
+        "b": "SDM does not hold payroll/benefits; trustees are elected seats, not HR records.",
+        "c": "Temporary access via Entra groups is the Standalone Group / Help Desk flow, unrelated here.",
+        "d": "Security groups are Data Owners; trustee positions are governance org structure."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/TrusteePositions"
+    },
+    {
+      "id": "S3.12.q6",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain how Trustee Positions and Wards relate to each other and why keeping them in sync matters.",
+      "rubric": [
+        "States Trustee Positions maintains the 7 elected trustees with position/boundary maps",
+        "States Wards maintains wards and each ward's relationship to its elected trustee",
+        "Notes the data feeds the external district site, so an out-of-sync ward-to-trustee link is publicly visible / points residents at the wrong representative"
+      ],
+      "sampleAnswer": "Trustee Positions holds the 7 elected trustees with their boundary maps, and Wards ties each ward to the trustee who represents it; because this data drives the external district site, a stale boundary or wrong ward link would publicly point residents at the wrong representative.",
+      "source": "SupplementalDataManager/menu-catalog.json#/Wards"
+    }
+  ]
+}
