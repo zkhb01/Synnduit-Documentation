@@ -1,0 +1,105 @@
+{
+  "poolId": "S3.11.items",
+  "conceptId": "S3.11",
+  "conceptName": "District Programs",
+  "items": [
+    {
+      "id": "S3.11.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the District Programs page let you do?",
+      "options": [
+        { "id": "a", "text": "Maintain the district programs the district offers and link them to the schools that provide them" },
+        { "id": "b", "text": "Create and delete the schools that run each program" },
+        { "id": "c", "text": "Define attendance-area boundaries for each program" },
+        { "id": "d", "text": "Manage staff job assignments for program teachers" }
+      ],
+      "correct": ["a"],
+      "explanation": "The page maintains the district programs offered by the district (and their supplemental data) and provides a link to associate programs with the schools providing them.",
+      "misconceptions": {
+        "b": "Schools come from HRAD; SDM can't create or delete them (S3.1).",
+        "c": "Attendance areas are a separate entity, not part of maintaining a program.",
+        "d": "Staff job assignments are managed under Staff, not on District Programs."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/DistrictPrograms"
+    },
+    {
+      "id": "S3.11.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "On the District Programs page, what does the link associate?",
+      "options": [
+        { "id": "a", "text": "Programs to the schools that provide them" },
+        { "id": "b", "text": "Programs to the municipal divisions they serve" },
+        { "id": "c", "text": "Schools to their data owners" },
+        { "id": "d", "text": "Programs to the trustee positions that fund them" }
+      ],
+      "correct": ["a"],
+      "explanation": "The link associates programs to the schools providing them — the same school-program association seen from the Schools page (S3.1).",
+      "misconceptions": {
+        "b": "The catalog entry describes a program-to-school link, not program-to-division.",
+        "c": "Data-owner assignment is a separate access concern, not this link.",
+        "d": "Trustee positions are unrelated to the program-school link."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/DistrictPrograms"
+    },
+    {
+      "id": "S3.11.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "The district is introducing a new French immersion program and wants three schools to run it. Where do you maintain the program record itself?",
+      "options": [
+        { "id": "a", "text": "On the District Programs page, then link it to the three schools" },
+        { "id": "b", "text": "On the Schools page, which is where programs are created" },
+        { "id": "c", "text": "Upstream in HRAD, since programs are imported like schools" },
+        { "id": "d", "text": "In the AuditLog, which is the edit surface for new records" }
+      ],
+      "correct": ["a"],
+      "explanation": "The program record is maintained on the District Programs page; you then use the link to associate it with the schools that provide it.",
+      "misconceptions": {
+        "b": "The Schools page only links to programs that already exist; it doesn't define the program record.",
+        "c": "The catalog entry gives no indication programs are imported from HRAD; that fact would be invented.",
+        "d": "The AuditLog records changes; it isn't an edit surface."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/DistrictPrograms"
+    },
+    {
+      "id": "S3.11.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A colleague says \"I added the immersion program from the Schools page.\" What's the accurate correction?",
+      "options": [
+        { "id": "a", "text": "The Schools page links a school to existing programs; the program itself is maintained on District Programs" },
+        { "id": "b", "text": "Both pages create program records, so either is fine" },
+        { "id": "c", "text": "Programs can only be linked, never maintained anywhere in SDM" },
+        { "id": "d", "text": "The Schools page deletes programs; District Programs creates them" }
+      ],
+      "correct": ["a"],
+      "explanation": "From the Schools page you associate a school with District Programs it offers (S3.1); the program record is maintained on the District Programs page and then linked to its providing schools.",
+      "misconceptions": {
+        "b": "Only the District Programs page maintains the program record; the Schools page just links.",
+        "c": "Programs are maintained on the District Programs page — they aren't link-only.",
+        "d": "Nothing in the source describes the Schools page deleting programs."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/DistrictPrograms"
+    },
+    {
+      "id": "S3.11.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain what the District Programs page is for and how it relates to the Schools page (S3.1). Use the immersion program as your example.",
+      "rubric": [
+        "States the District Programs page maintains the programs the district offers (and their supplemental data)",
+        "States a program is linked/associated to the schools that provide it",
+        "Connects to S3.1: the same school-program association is seen from the Schools page, and uses immersion as the example"
+      ],
+      "sampleAnswer": "The District Programs page is where you maintain the programs the district offers — say a French immersion program — along with their supplemental data, and link each program to the schools that provide it. It's the program's-eye view of the same association you make on the Schools page (S3.1), where a school is connected to the programs it offers.",
+      "source": "SupplementalDataManager/menu-catalog.json#/DistrictPrograms"
+    }
+  ]
+}

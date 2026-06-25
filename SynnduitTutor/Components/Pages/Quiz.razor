@@ -18,6 +18,15 @@ else if (!Session.IsSignedIn)
 {
     <RedirectToHome />
 }
+else if (Session.IsAuditor)
+{
+    <div class="alert alert-secondary">
+        <h4 class="mb-1">Audit mode</h4>
+        <p class="mb-2">Quizzes are disabled for audit-only accounts. You can read every lesson, but you
+        can't take checks or earn donuts.</p>
+        <a class="btn btn-outline-secondary btn-sm" href="@($"{Course}/lesson/{ConceptId}")">← Back to the lesson</a>
+    </div>
+}
 else if (_concept is null)
 {
     <p class="text-danger">Concept <code>@ConceptId</code> not found.</p>
@@ -260,7 +269,7 @@ else
     protected override async Task OnParametersSetAsync()
     {
         _store = Catalog.GetStore(Course);
-        if (_store is null || !Session.IsSignedIn) return;   // markup handles unknown course / redirect
+        if (_store is null || !Session.IsSignedIn || Session.IsAuditor) return;   // markup handles unknown course / redirect / audit block
         _concept = _store.Graph.FindConcept(ConceptId);
         if (_concept is null) return;
         await LoadItemsAsync();

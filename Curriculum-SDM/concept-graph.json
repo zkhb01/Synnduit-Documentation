@@ -10,7 +10,7 @@
     "escalationTarget": "human-mentor",
     "contentStrategy": "reviewed canonical lesson + quiz bank backbone; Claude supplies adaptive diagnosis, re-teaching, fresh items, and Q&A"
   },
-  "pathOrder": ["S1", "S2"],
+  "pathOrder": ["S1", "S2", "S3"],
   "levels": [
     {
       "id": "S1",
@@ -68,7 +68,7 @@
       "order": 2,
       "type": "conceptual",
       "gate": "all-concepts-mastered",
-      "gatesLevel": null,
+      "gatesLevel": "S3",
       "concepts": [
         {
           "id": "S2.1",
@@ -109,6 +109,146 @@
           "itemPoolId": "S2.4.items",
           "masteryThreshold": 0.8,
           "remediationAngle": "Tie it to purpose: SDM owns the HR-gap staffing (temp jobs under six weeks, contractors, vendors); creating/merging those can fire a config-driven email that is off in dev via DisableEmailNotifications."
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "name": "Using SDM (per-feature)",
+      "order": 3,
+      "type": "operational",
+      "gate": "all-concepts-mastered",
+      "gatesLevel": null,
+      "concepts": [
+        {
+          "id": "S3.1",
+          "name": "Managing Schools",
+          "objective": "Use the Schools page to augment school records imported from the HRAD system of record (SDM never creates or deletes schools) — maintaining the supplemental attributes downstream systems need and linking Attendance Area maps, District Programs, and Municipal Divisions to the school.",
+          "prereqs": ["S1.4", "S2.3"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/Schools", "README.md#purpose--business-context"],
+          "itemPoolId": "S3.1.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Schools come from HRAD via the syncs; SDM only augments them. The page's job is supplemental attributes plus linking the school to Attendance Areas, District Programs, and Municipal Divisions."
+        },
+        {
+          "id": "S3.2",
+          "name": "Data Owners and delegates",
+          "objective": "Explain how a manager (Department), principal (School), or owner (Functional Site) assigns a delegate to maintain that area's supplemental data and to manage its SharePoint Online site — SDM's RACI self-serve model, where responsibility sits with the owner or their delegate, not a central team.",
+          "prereqs": ["S1.3", "S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/DepartmentDataOwners", "SupplementalDataManager/menu-catalog.json#/SchoolDataOwners", "SupplementalDataManager/menu-catalog.json#/FunctionalSiteDataOwners"],
+          "itemPoolId": "S3.2.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Same feature, three scopes (Department/School/Functional Site): the owner delegates editorial + SPO-site management. It's the RACI self-serve model in action."
+        },
+        {
+          "id": "S3.3",
+          "name": "Standalone Groups (rules, staff, DA-* linkage)",
+          "objective": "Use Standalone Groups to add staff by HR-attribute rules or directly with start/end dates, view a group's membership, and link a group to a DA-* AAD group — functionality being ported from the old config JSON; SDM owns these groups (it can create and delete them).",
+          "prereqs": ["S1.3", "S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/StandaloneGroups", "README.md#purpose--business-context"],
+          "itemPoolId": "S3.3.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Two ways to populate a standalone group — HR-attribute rules or direct staff add (with start/end) — plus optional linkage to a DA-* group; this was lifted out of the config JSON and SDM owns the groups outright."
+        },
+        {
+          "id": "S3.4",
+          "name": "Requesting a Subsite",
+          "objective": "Explain that SDM offers a subsite request (because the highest SPO permission delegated is 'Contribute', which can't create a subsite) and that the requested subsite is created the next time the SharePoint Online sync runs.",
+          "prereqs": ["S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/#/Subsites"],
+          "itemPoolId": "S3.4.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "You can't create a subsite directly (Contribute is the ceiling), so SDM records a request that the SPO sync fulfils on its next run."
+        },
+        {
+          "id": "S3.5",
+          "name": "Managing Staff (FTE vs Contractor)",
+          "objective": "Distinguish augmenting FTE staff (loaded from the HR system of record) from fully maintaining Contractors (paid or volunteer — security account/email, initial jobs linked to the manager); use Staff augmentation (Service Area, Support Languages, Proxy Addresses), user-account changes, FTE↔Contractor conversion, and the On-Hold name-conflict resolution for new FTEs.",
+          "prereqs": ["S1.4", "S2.3", "S2.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/StaffManagement", "README.md#purpose--business-context"],
+          "itemPoolId": "S3.5.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "FTEs are augmented (they come from HR); Contractors are fully maintained in SDM (account/email, initial job, manager). Both get the same access relative to their manager. Know the extras: account changes, FTE↔Contractor conversion, and On-Hold for name conflicts."
+        },
+        {
+          "id": "S3.6",
+          "name": "School Staff on external sites",
+          "objective": "Use School Staff to manage the HR-sourced staff information shown on external school sites — applying school-friendly job labels and privacy values, with bulk features to reset values at the start of each school year.",
+          "prereqs": ["S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/SchoolStaffList"],
+          "itemPoolId": "S3.6.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "This page governs what the public school site shows about HR-sourced staff: friendly job labels + privacy values, with a start-of-year bulk reset."
+        },
+        {
+          "id": "S3.7",
+          "name": "Vendor Representatives",
+          "objective": "Explain that Vendor Reps are representatives of 3rd-party suppliers SDM owns because HR doesn't manage them — they receive a login account and a matching CSSD email but no other access to CSSD assets.",
+          "prereqs": ["S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/VendorReps", "README.md#purpose--business-context"],
+          "itemPoolId": "S3.7.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Vendor Reps are an HR-gap category SDM creates and maintains; give them a login + CSSD email, but nothing beyond that — no broader CSSD access."
+        },
+        {
+          "id": "S3.8",
+          "name": "School Job Assignment",
+          "objective": "Explain that principals or their delegates assign staff at their school to temporary jobs chosen from a canned list of jobs.",
+          "prereqs": ["S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/SchoolStaffJobAssignment"],
+          "itemPoolId": "S3.8.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Scoped to a school: the principal (or delegate) assigns staff to temporary jobs picked from a predefined list — distinct from the district-wide Temporary Job Assignment page."
+        },
+        {
+          "id": "S3.9",
+          "name": "Temporary Job Assignment",
+          "objective": "Use Temporary Job Assignment for the HR-gap temporary jobs (under six weeks) SDM owns and creates directly, and for maintaining Contractor job changes.",
+          "prereqs": ["S1.4", "S2.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/TemporaryJobAssignment", "README.md#purpose--business-context"],
+          "itemPoolId": "S3.9.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Temp jobs under six weeks are HR-gap staffing SDM creates; this page also handles Contractor job changes. Tie back to S2.4's notifications."
+        },
+        {
+          "id": "S3.10",
+          "name": "Municipal Divisions and hierarchy",
+          "objective": "Maintain the city-provided set of communities/quadrants/cities that schools service, and the parent/child hierarchy (communities rolling up into quadrants and cities), including the link associating the communities a school services.",
+          "prereqs": ["S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/MunicipalDivisions", "SupplementalDataManager/menu-catalog.json#/MunicipalDivisionHierarchy"],
+          "itemPoolId": "S3.10.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Two related pages: the divisions themselves (city-provided communities/quadrants/cities) and their hierarchy (what rolls up into what), with a link to the communities a school services."
+        },
+        {
+          "id": "S3.11",
+          "name": "District Programs",
+          "objective": "Maintain the district programs offered by the district and link programs to the schools that provide them.",
+          "prereqs": ["S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/DistrictPrograms"],
+          "itemPoolId": "S3.11.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Maintain the catalog of district programs and associate each with the schools offering it."
+        },
+        {
+          "id": "S3.12",
+          "name": "Trustees and Wards",
+          "objective": "Maintain the 7 elected trustees with their position and boundary maps, and the wards related to each trustee — data used for the external district site.",
+          "prereqs": ["S1.4"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/TrusteePositions", "SupplementalDataManager/menu-catalog.json#/Wards"],
+          "itemPoolId": "S3.12.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Seven elected trustees, each with a position + boundary map; wards relate to a trustee. This data feeds the external district site."
+        },
+        {
+          "id": "S3.13",
+          "name": "Team Site Security",
+          "objective": "Review and maintain team site security, viewing the per-site access matrix either by asset (which users can access a site) or by user (which sites a user can access).",
+          "prereqs": ["S1.4", "S2.3"],
+          "sources": ["SupplementalDataManager/menu-catalog.json#/SiteSecurityByAsset", "SupplementalDataManager/menu-catalog.json#/SiteSecurityByUser", "SupplementalDataManagerClient/README.md#routes"],
+          "itemPoolId": "S3.13.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Same underlying access matrix, two lenses: by asset (start from a site, see its users) or by user (start from a person, see their sites)."
         }
       ]
     }

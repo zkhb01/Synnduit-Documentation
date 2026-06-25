@@ -57,6 +57,29 @@ public class GatingEngineTests
     }
 
     [Fact]
+    public void Audit_mode_makes_a_locked_concept_available()
+    {
+        var gating = new GatingEngine();
+        var l16 = _store.Graph.FindConcept("L1.6")!;   // prereqs L1.4, L1.5 — normally locked
+        var none = new Dictionary<string, ConceptMastery>();
+
+        Assert.Equal(ConceptStatus.Locked, gating.StatusFor(l16, none));                  // gated
+        Assert.Equal(ConceptStatus.Available, gating.StatusFor(l16, none, auditMode: true)); // unlocked for auditors
+    }
+
+    [Fact]
+    public void Audit_mode_unlocks_every_level_and_no_concept_is_locked()
+    {
+        var gating = new GatingEngine();
+        var none = new Dictionary<string, ConceptMastery>();
+
+        var overview = gating.BuildOverview(_store.Graph, none, auditMode: true);
+
+        Assert.All(overview, lv => Assert.True(lv.Unlocked));
+        Assert.All(overview, lv => Assert.DoesNotContain(lv.Concepts, c => c.Status == ConceptStatus.Locked));
+    }
+
+    [Fact]
     public void Overview_reports_level_completion_and_gating()
     {
         var gating = new GatingEngine();

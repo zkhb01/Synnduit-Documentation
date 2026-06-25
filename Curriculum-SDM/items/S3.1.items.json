@@ -1,0 +1,126 @@
+{
+  "poolId": "S3.1.items",
+  "conceptId": "S3.1",
+  "conceptName": "Managing Schools",
+  "items": [
+    {
+      "id": "S3.1.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Where do school records originate, relative to SDM?",
+      "options": [
+        { "id": "a", "text": "They are imported into DDH from the HRAD system of record; SDM augments them" },
+        { "id": "b", "text": "They are created from scratch on the SDM Schools page" },
+        { "id": "c", "text": "They are typed into the AuditLog and synced out" },
+        { "id": "d", "text": "They live only in SharePoint and are never in DDH" }
+      ],
+      "correct": ["a"],
+      "explanation": "Schools come from the HRAD system of record into DDH; SDM augments those imported records and never creates or deletes a school.",
+      "misconceptions": {
+        "b": "SDM can't create schools — they originate in HRAD and arrive via the syncs.",
+        "c": "The AuditLog records changes; it isn't the source of school records.",
+        "d": "School data lives in DDH; SDM edits the supplemental layer on it."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/Schools"
+    },
+    {
+      "id": "S3.1.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which related domain data can be linked to a school on the Schools page?",
+      "options": [
+        { "id": "a", "text": "Attendance Area maps, District Programs, and Municipal Divisions" },
+        { "id": "b", "text": "Vendor Reps, Trustee Positions, and Wards" },
+        { "id": "c", "text": "Standalone Groups and Data Owners" },
+        { "id": "d", "text": "SMTP settings and email templates" }
+      ],
+      "correct": ["a"],
+      "explanation": "The Schools page links a school to its Attendance Area maps, the District Programs it offers, and the Municipal Divisions it services.",
+      "misconceptions": {
+        "b": "Those are separate entities not linked from the Schools page.",
+        "c": "Access constructs are managed elsewhere, not linked on the school here.",
+        "d": "Those are notification configuration, unrelated to a school record."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/Schools"
+    },
+    {
+      "id": "S3.1.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A school's name (a field that comes from HRAD) is spelled wrong. Where is the right place to fix it?",
+      "options": [
+        { "id": "a", "text": "Upstream in the system of record (HRAD); the sync will carry it into DDH" },
+        { "id": "b", "text": "On the SDM Schools page, since SDM owns all school fields" },
+        { "id": "c", "text": "By deleting the school in SDM and re-adding it" },
+        { "id": "d", "text": "In the AuditLog entry for the school" }
+      ],
+      "correct": ["a"],
+      "explanation": "System-of-record fields are fixed upstream in HRAD; SDM only augments. SDM can't create or delete the school, and the supplemental layer isn't where an imported field is corrected.",
+      "misconceptions": {
+        "b": "SDM augments the school; it doesn't own the imported system-of-record fields.",
+        "c": "SDM can't delete a school, and that wouldn't fix the upstream source anyway.",
+        "d": "The AuditLog records changes; it isn't an edit surface."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/Schools"
+    },
+    {
+      "id": "S3.1.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which task genuinely belongs on the Schools page?",
+      "options": [
+        { "id": "a", "text": "Linking a school to the District Programs it offers" },
+        { "id": "b", "text": "Creating a brand-new school for a new building" },
+        { "id": "c", "text": "Deleting a closed school from the district" },
+        { "id": "d", "text": "Defining a new District Program from scratch" }
+      ],
+      "correct": ["a"],
+      "explanation": "Augment-and-link is the page's job: you associate the school with existing District Programs (and Attendance Areas, Municipal Divisions). Creating/deleting schools and defining the programs themselves happen elsewhere.",
+      "misconceptions": {
+        "b": "Schools are created upstream in HRAD, not in SDM.",
+        "c": "SDM can't delete schools.",
+        "d": "District Programs are defined on their own page (S3.11); here you only link them."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.1.q5",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain what it means that SDM \"augments\" a school rather than owning it, and give one example of something you'd do on the Schools page.",
+      "rubric": [
+        "States schools come from HRAD (system of record) and SDM cannot create/delete them",
+        "States SDM adds supplemental attributes / links the school to related data (DDH holds the result)",
+        "Gives a valid example: a supplemental attribute, or linking Attendance Areas / District Programs / Municipal Divisions"
+      ],
+      "sampleAnswer": "The school already exists — it's imported from HRAD — so SDM doesn't create or delete it; it layers on the supplemental data the source doesn't provide. For example, on the Schools page you'd link the school to the District Programs it offers or the Municipal Divisions it serves.",
+      "source": "SupplementalDataManager/menu-catalog.json#/Schools"
+    },
+    {
+      "id": "S3.1.q6",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "When you edit a school's supplemental data in SDM, what happens to that change?",
+      "options": [
+        { "id": "a", "text": "It writes to DDH with CreatedBy/UpdatedBy audit and is reversible via soft delete" },
+        { "id": "b", "text": "It overwrites the record silently with no record of who changed it" },
+        { "id": "c", "text": "It is stored only in SDM, separate from DDH" },
+        { "id": "d", "text": "It is emailed to HRAD for manual entry" }
+      ],
+      "correct": ["a"],
+      "explanation": "Like all SDM edits (S2.3), a school edit writes to DDH with CreatedBy/UpdatedBy audit and a soft-delete flag, so it's attributable and reversible.",
+      "misconceptions": {
+        "b": "SDM edits are audited, never silent.",
+        "c": "SDM holds no data of its own; the result lives in DDH.",
+        "d": "Edits write to DDH directly; they aren't relayed to HRAD by email."
+      },
+      "source": "README.md#purpose--business-context"
+    }
+  ]
+}

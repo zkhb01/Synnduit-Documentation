@@ -1,0 +1,147 @@
+{
+  "poolId": "S3.5.items",
+  "conceptId": "S3.5",
+  "conceptName": "Managing Staff (FTE vs Contractor)",
+  "items": [
+    {
+      "id": "S3.5.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How does SDM treat permanent FTE staff versus Contractors?",
+      "options": [
+        { "id": "a", "text": "FTE staff are augmented from the HR system of record; Contractors are fully maintained in SDM (account, email, initial job)" },
+        { "id": "b", "text": "Both are created from scratch in SDM" },
+        { "id": "c", "text": "Both are loaded from the HR system of record and only augmented" },
+        { "id": "d", "text": "FTE staff are fully maintained in SDM; Contractors come from the HR feed" }
+      ],
+      "correct": ["a"],
+      "explanation": "Permanent staff come from a system of record into DDH and SDM augments them; Contractors have no HR feed, so SDM fully maintains them — provisioning the security account and email and creating an initial job linked to the manager.",
+      "misconceptions": {
+        "b": "FTE staff already exist in the system of record — SDM augments rather than creates them.",
+        "c": "Contractors are not in the HR system of record; SDM maintains them end to end.",
+        "d": "It's the reverse: FTE = augment, Contractor = full maintenance."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StaffManagement"
+    },
+    {
+      "id": "S3.5.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which supplemental attributes does SDM augment onto staff records?",
+      "options": [
+        { "id": "a", "text": "Service Area, Support Languages, and Proxy Addresses" },
+        { "id": "b", "text": "Salary, tax code, and bank account" },
+        { "id": "c", "text": "Attendance Areas, District Programs, and Municipal Divisions" },
+        { "id": "d", "text": "SMTP host, sender address, and job codes" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM augments staff with Service Area, Support Languages, and Proxy Addresses — the supplemental data the source doesn't provide.",
+      "misconceptions": {
+        "b": "Payroll fields belong to the HR system of record, not SDM's augmentation layer.",
+        "c": "Those are links made on the Schools page (S3.1), not staff augmentation fields.",
+        "d": "Those are email-notification settings (S2.4), not staff attributes."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StaffManagement"
+    },
+    {
+      "id": "S3.5.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What is true about the access rights FTEs and Contractors receive?",
+      "options": [
+        { "id": "a", "text": "Both get the same access rights relative to their assigned manager" },
+        { "id": "b", "text": "Contractors always get fewer rights than FTEs" },
+        { "id": "c", "text": "Access depends on whether the person is paid or a volunteer" },
+        { "id": "d", "text": "Only FTEs receive access; Contractors get none" }
+      ],
+      "correct": ["a"],
+      "explanation": "Access is keyed to the assigned manager, not the staff type — FTEs and Contractors get the same access rights relative to their manager.",
+      "misconceptions": {
+        "b": "Staff type doesn't reduce access; the manager determines it.",
+        "c": "Paid-vs-volunteer affects nothing about access; the manager does.",
+        "d": "Contractors do receive access — the same as FTEs, relative to their manager."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StaffManagement"
+    },
+    {
+      "id": "S3.5.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A volunteer classroom tutor is starting and has no record anywhere yet. What does SDM do for them on the Staff page?",
+      "options": [
+        { "id": "a", "text": "Fully maintains them — provisions a security account and email and creates an initial job linked to their manager" },
+        { "id": "b", "text": "Waits for the HR system of record to load them, then augments the record" },
+        { "id": "c", "text": "Refuses them because volunteers aren't staff" },
+        { "id": "d", "text": "Creates the school they will work at" }
+      ],
+      "correct": ["a"],
+      "explanation": "A volunteer is a Contractor — part of the HR-gap staffing SDM owns. With no HR feed, SDM fully maintains them: security account, email, and an initial job linked to the assigned manager.",
+      "misconceptions": {
+        "b": "There is no HR feed for contractors/volunteers; SDM maintains them directly.",
+        "c": "Contractors explicitly include volunteers and student teachers.",
+        "d": "Schools come from HRAD (S3.1); creating one is not part of staffing a contractor."
+      },
+      "source": "README.md#purpose--business-context"
+    },
+    {
+      "id": "S3.5.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A new permanent FTE is being loaded and their name conflicts with an existing record. How is this handled in SDM?",
+      "options": [
+        { "id": "a", "text": "Resolve it on the Staff page using the On-Hold feature" },
+        { "id": "b", "text": "Delete the existing staff record so the new one can load" },
+        { "id": "c", "text": "Convert the new FTE to a Contractor to dodge the conflict" },
+        { "id": "d", "text": "Create a brand-new school to hold the duplicate name" }
+      ],
+      "correct": ["a"],
+      "explanation": "New FTEs coming onboard with a name conflict are resolved with the On-Hold feature; on-hold/merge events can also fire notifications (S2.4).",
+      "misconceptions": {
+        "b": "Deleting a real record to clear a name clash is destructive and not the workflow.",
+        "c": "Conversion changes the staff type; it isn't a tool for resolving name conflicts.",
+        "d": "Schools are unrelated to a staff name conflict."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StaffManagement"
+    },
+    {
+      "id": "S3.5.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A contractor who has worked for months is hired as permanent staff. What is the appropriate action in SDM?",
+      "options": [
+        { "id": "a", "text": "Use FTE↔Contractor conversion to convert the existing record" },
+        { "id": "b", "text": "Delete the contractor and wait for the HR system of record, since FTEs can't be edited in SDM" },
+        { "id": "c", "text": "Nothing — staff type can never change in SDM" },
+        { "id": "d", "text": "Move the record to the Vendor Reps page" }
+      ],
+      "correct": ["a"],
+      "explanation": "SDM supports conversion both ways (FTE↔Contractor), so you convert the existing record rather than re-keying it.",
+      "misconceptions": {
+        "b": "There's no need to delete and wait — conversion is supported in SDM.",
+        "c": "Conversion in both directions is explicitly supported.",
+        "d": "Vendor Reps are 3rd-party vendor representatives, distinct from contractors and FTEs (S1.4)."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/StaffManagement"
+    },
+    {
+      "id": "S3.5.q7",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain the difference between how SDM handles an FTE versus a Contractor, and name one thing SDM does for a Contractor that it does not do for an FTE.",
+      "rubric": [
+        "States FTEs come from the HR system of record and SDM augments them (e.g. Service Area / Support Languages / Proxy Addresses)",
+        "States Contractors are fully maintained in SDM because there is no HR feed",
+        "Names a full-maintenance action SDM does for a Contractor: provision the security account/email, or create an initial job linked to the manager"
+      ],
+      "sampleAnswer": "An FTE already exists in the HR system of record, so SDM only augments the record (Service Area, Support Languages, Proxy Addresses). A Contractor has no HR feed, so SDM fully maintains them — for example provisioning their security account and email and creating an initial job linked to their manager.",
+      "source": "SupplementalDataManager/menu-catalog.json#/StaffManagement"
+    }
+  ]
+}

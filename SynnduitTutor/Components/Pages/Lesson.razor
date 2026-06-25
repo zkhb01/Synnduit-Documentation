@@ -42,7 +42,14 @@ else
         <small class="text-muted">
             @if (_lesson?.Get("sources") is { Length: > 0 } src) { <span>Sources: @src</span> }
         </small>
-        <a class="btn btn-primary" href="@($"{Course}/quiz/{_concept.Id}")">Check my understanding →</a>
+        @if (Session.IsAuditor)
+        {
+            <span class="text-muted small">Audit mode — quiz disabled</span>
+        }
+        else
+        {
+            <a class="btn btn-primary" href="@($"{Course}/quiz/{_concept.Id}")">Check my understanding →</a>
+        }
     </div>
 }
 

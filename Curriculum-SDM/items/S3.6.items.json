@@ -1,0 +1,126 @@
+{
+  "poolId": "S3.6.items",
+  "conceptId": "S3.6",
+  "conceptName": "School Staff on external sites",
+  "items": [
+    {
+      "id": "S3.6.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does the School Staff page govern?",
+      "options": [
+        { "id": "a", "text": "The HR-sourced staff information that is displayed on external school sites" },
+        { "id": "b", "text": "The creation of brand-new staff records from scratch" },
+        { "id": "c", "text": "The payroll system of record for staff" },
+        { "id": "d", "text": "Internal-only HR notes never shown anywhere public" }
+      ],
+      "correct": ["a"],
+      "explanation": "School Staff manages the HR-sourced staff info that appears on the external (public-facing) school sites; SDM augments that data, it doesn't own it.",
+      "misconceptions": {
+        "b": "Staff originate in HR; SDM augments them rather than creating them here.",
+        "c": "HR is the system of record; this page only shapes what's shown externally.",
+        "d": "The point of this page is the externally visible info, not hidden internal notes."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffList"
+    },
+    {
+      "id": "S3.6.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which two kinds of augment data do you maintain on the School Staff page?",
+      "options": [
+        { "id": "a", "text": "School-friendly job labels and privacy values" },
+        { "id": "b", "text": "Salary bands and benefit elections" },
+        { "id": "c", "text": "Attendance Area maps and District Programs" },
+        { "id": "d", "text": "AAD security groups and Data-Owner roles" }
+      ],
+      "correct": ["a"],
+      "explanation": "The augment layer provides school-friendly job labels and privacy values for what shows on external school sites.",
+      "misconceptions": {
+        "b": "Compensation data is HR's, not part of the external-site augment.",
+        "c": "Those are linked on the Schools page (S3.1), not here.",
+        "d": "Access constructs are managed elsewhere (S1.4), not on School Staff."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffList"
+    },
+    {
+      "id": "S3.6.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What are the School Staff bulk features for?",
+      "options": [
+        { "id": "a", "text": "Resetting values across the roster at the start of each new school year" },
+        { "id": "b", "text": "Importing the staff records themselves into DDH" },
+        { "id": "c", "text": "Deleting staff who have left the district" },
+        { "id": "d", "text": "Emailing all staff their public profile link" }
+      ],
+      "correct": ["a"],
+      "explanation": "There are bulk features for resetting the augment values (labels/privacy) at the start of each new school year, instead of editing staff one at a time.",
+      "misconceptions": {
+        "b": "Staff data is HR-sourced and arrives via sync, not imported by this page's bulk tools.",
+        "c": "The page augments HR-sourced staff; it isn't a delete-staff tool.",
+        "d": "No emailing behavior is described for this page."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffList"
+    },
+    {
+      "id": "S3.6.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "It's early September and the external school site is still showing a teacher's job title from last year, in HR's payroll wording. What do you do on School Staff?",
+      "options": [
+        { "id": "a", "text": "Use the start-of-year bulk reset to clear stale values, then apply the correct school-friendly job label" },
+        { "id": "b", "text": "Edit the teacher's title directly in the HR system of record from this page" },
+        { "id": "c", "text": "Create a new staff record so the old title disappears" },
+        { "id": "d", "text": "Change the Attendance Area map for the school" }
+      ],
+      "correct": ["a"],
+      "explanation": "The yearly bulk reset clears last year's augment values, and the school-friendly job label is exactly the augment field you set here so the public site reads correctly.",
+      "misconceptions": {
+        "b": "HR owns the source title; this page sets the school-friendly label shown externally, it doesn't edit HR.",
+        "c": "Staff aren't created here, and a new record wouldn't fix the displayed label.",
+        "d": "Attendance Areas are unrelated to a staff member's displayed job label."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffList"
+    },
+    {
+      "id": "S3.6.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A staff member's home phone number is appearing on the public school site and shouldn't be. Where does this belong?",
+      "options": [
+        { "id": "a", "text": "It's a privacy value on School Staff — set it so the field isn't shown externally" },
+        { "id": "b", "text": "It's a Data-Owner permission change in the access area" },
+        { "id": "c", "text": "It's a Standalone Group membership edit" },
+        { "id": "d", "text": "It's a Schools-page supplemental attribute" }
+      ],
+      "correct": ["a"],
+      "explanation": "Privacy values on School Staff control what staff detail is exposed on external school sites — exactly the lever for hiding a field.",
+      "misconceptions": {
+        "b": "Data Owners grant editing rights; they don't control external-site field visibility.",
+        "c": "Standalone Groups are membership lists, not external-display privacy.",
+        "d": "The Schools page augments school records, not a staff member's displayed privacy."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffList"
+    },
+    {
+      "id": "S3.6.q6",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain what the School Staff page is for and why its data is an 'augment' rather than a source of truth. Give one concrete thing you'd do there.",
+      "rubric": [
+        "States the page governs the HR-sourced staff info shown on external school sites",
+        "States staff come from HR / SDM augments rather than owns the data (edits write to DDH with audit)",
+        "Gives a valid example: apply a school-friendly job label, set a privacy value, or run the start-of-year bulk reset"
+      ],
+      "sampleAnswer": "School Staff controls how HR-sourced staff appear on the external school websites — the data is an augment because HR remains the source of truth and SDM only adds school-friendly labels and privacy values on top (written to DDH with audit). For example, at the start of the year you'd run the bulk reset and then apply each teacher's school-friendly job label.",
+      "source": "SupplementalDataManager/menu-catalog.json#/SchoolStaffList"
+    }
+  ]
+}

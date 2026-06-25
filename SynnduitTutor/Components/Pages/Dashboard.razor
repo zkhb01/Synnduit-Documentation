@@ -1,4 +1,5 @@
 @page "/{Course}/dashboard"
+@implements IDisposable
 @inject LearnerSession Session
 @inject MasteryService Mastery
 @inject GatingEngine Gating
@@ -27,7 +28,15 @@ else
     <h1>@Session.DisplayName's path</h1>
     <p class="lead">Master every concept in a level to clear its gate. Locked concepts open once their prerequisites are done.</p>
 
-    @if (_balance is not null)
+    @if (Session.IsAuditor)
+    {
+        <div class="alert alert-secondary py-2">
+            <strong>Audit mode.</strong> Every lesson is open for you to read, but quizzes are disabled —
+            you won't earn mastery or donuts.
+        </div>
+    }
+
+    @if (!Session.IsAuditor && _balance is not null)
     {
         <DonutJar Balance="_balance" Threshold="Donuts.Threshold" OnRedeem="RedeemAsync" Redeeming="_redeeming" />
         @if (_redeemError is not null)
@@ -113,7 +122,17 @@ else
     private string? _redeemError;
     private readonly HashSet<string> _collapsed = new();   // level ids whose lessons are hidden
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnInitialized() => Session.Changed += OnSessionChanged;
+
+    public void Dispose() => Session.Changed -= OnSessionChanged;
+
+    // Toggling audit mode from the nav changes what the gating overview should show, so rebuild it.
+    private async void OnSessionChanged() =>
+        await InvokeAsync(async () => { await LoadAsync(); StateHasChanged(); });
+
+    protected override Task OnParametersSetAsync() => LoadAsync();
+
+    private async Task LoadAsync()
     {
         _course = Catalog.GetCourse(Course);
         var store = Catalog.GetStore(Course);
@@ -121,8 +140,8 @@ else
 
         _collapsed.Clear();
         var map = await Mastery.GetMasteryMapAsync(Session.LearnerId!.Value, Course);
-        _levels = Gating.BuildOverview(store.Graph, map);
-        _balance = await Donuts.GetBalanceAsync(Session.LearnerId!.Value, Course);
+        _levels = Gating.BuildOverview(store.Graph, map, Session.IsAuditor);
+        _balance = Session.IsAuditor ? null : await Donuts.GetBalanceAsync(Session.LearnerId!.Value, Course);
 
         // Default: hide completed and locked levels; leave the level(s) you're working on open.
         foreach (var lv in _levels)

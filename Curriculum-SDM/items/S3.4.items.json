@@ -1,0 +1,125 @@
+{
+  "poolId": "S3.4.items",
+  "conceptId": "S3.4",
+  "conceptName": "Requesting a Subsite",
+  "items": [
+    {
+      "id": "S3.4.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Why does SDM let you *request* a subsite rather than create one directly?",
+      "options": [
+        { "id": "a", "text": "The highest SPO permission delegated to SDM is 'Contribute', which can't create a subsite" },
+        { "id": "b", "text": "Subsites are deprecated in SharePoint Online" },
+        { "id": "c", "text": "SDM has no connection to SharePoint at all" },
+        { "id": "d", "text": "Team Site owners are not allowed to have subsites" }
+      ],
+      "correct": ["a"],
+      "explanation": "Creating a subsite needs elevated SPO privileges; SDM tops out at 'Contribute', which can't create one — so it offers a request instead.",
+      "misconceptions": {
+        "b": "The reason is a permission ceiling, not deprecation.",
+        "c": "SDM does connect to SharePoint via the SPO sync; it just lacks creation rights.",
+        "d": "Team Site owners can have subsites — they just request them here."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/#/Subsites"
+    },
+    {
+      "id": "S3.4.q2",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "After you submit a subsite request, when is the subsite actually created?",
+      "options": [
+        { "id": "a", "text": "The next time the SPO sync runs" },
+        { "id": "b", "text": "Immediately, as soon as you click submit" },
+        { "id": "c", "text": "Only after an HRAD import completes" },
+        { "id": "d", "text": "Never — SDM just stores the request for reporting" }
+      ],
+      "correct": ["a"],
+      "explanation": "The request is fulfilled the next time the SharePoint Online sync runs, which has the elevated permissions SDM lacks.",
+      "misconceptions": {
+        "b": "It isn't instant — the page records a request that the sync later fulfills.",
+        "c": "The SPO sync provisions the subsite, not an HRAD import.",
+        "d": "The request is acted on: the SPO sync creates the subsite."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/#/Subsites"
+    },
+    {
+      "id": "S3.4.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A Team Site owner submits a subsite request and the subsite hasn't appeared a few minutes later. What is the most likely explanation?",
+      "options": [
+        { "id": "a", "text": "The SPO sync hasn't run yet; the subsite is created on its next run" },
+        { "id": "b", "text": "The request failed and must be re-submitted immediately" },
+        { "id": "c", "text": "SDM created it but is hiding it until approval" },
+        { "id": "d", "text": "Their account lost the 'Contribute' permission" }
+      ],
+      "correct": ["a"],
+      "explanation": "This is a request-and-wait flow: the subsite is provisioned the next time the SPO sync runs, so a delay is expected, not a failure.",
+      "misconceptions": {
+        "b": "A delay is normal — re-submitting isn't the fix; the sync simply hasn't run.",
+        "c": "SDM can't create the subsite at all; the sync does, when it runs.",
+        "d": "The permission ceiling is exactly why a request is used; it's not the cause of the delay."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/#/Subsites"
+    },
+    {
+      "id": "S3.4.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which statement best describes what the Subsites page actually does?",
+      "options": [
+        { "id": "a", "text": "It queues a request that the SPO sync later turns into a real subsite" },
+        { "id": "b", "text": "It creates the subsite live in SharePoint using SDM's admin rights" },
+        { "id": "c", "text": "It deletes existing subsites from the Team Site" },
+        { "id": "d", "text": "It edits HRAD school records that feed SharePoint" }
+      ],
+      "correct": ["a"],
+      "explanation": "The page records a subsite request; the SharePoint Online sync, which has the elevated rights SDM lacks, creates the subsite on its next run.",
+      "misconceptions": {
+        "b": "SDM has no admin/creation rights in SPO — only 'Contribute'.",
+        "c": "The page is about requesting creation, not deletion.",
+        "d": "It concerns SharePoint subsites, not HRAD school records."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/#/Subsites"
+    },
+    {
+      "id": "S3.4.q5",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Who is described as maintaining subsite creation and the related supplemental data?",
+      "options": [
+        { "id": "a", "text": "Team Site owners" },
+        { "id": "b", "text": "The HRAD system of record" },
+        { "id": "c", "text": "The Help Desk only" },
+        { "id": "d", "text": "Anyone with read-only SPO access" }
+      ],
+      "correct": ["a"],
+      "explanation": "The tooltip states Team Site owners maintain subsite creation and their supplemental data — they submit the request and own the result.",
+      "misconceptions": {
+        "b": "HRAD is the source for staff/schools, not subsite requests.",
+        "c": "This page is for Team Site owners, not a Help-Desk-only function.",
+        "d": "Read-only access can't request a subsite; owners do."
+      },
+      "source": "SupplementalDataManager/menu-catalog.json#/#/Subsites"
+    },
+    {
+      "id": "S3.4.q6",
+      "type": "short",
+      "difficulty": "apply",
+      "scoring": "model",
+      "stem": "In one or two sentences, explain why SDM offers a subsite *request* instead of creating the subsite outright, and when the subsite finally gets created.",
+      "rubric": [
+        "States SDM's highest delegated SPO permission is 'Contribute', which can't create a subsite",
+        "States the subsite is created the next time the SPO sync runs (request-and-wait, not instant)"
+      ],
+      "sampleAnswer": "Creating a subsite needs elevated SPO rights, but SDM only has 'Contribute', which can't create one — so it records a request instead. The subsite is actually provisioned the next time the SharePoint Online sync runs.",
+      "source": "SupplementalDataManager/menu-catalog.json#/#/Subsites"
+    }
+  ]
+}

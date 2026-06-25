@@ -41,6 +41,6 @@ public sealed class EntraLearnerProvisioner : CircuitHandler
                    ?? "Learner";
 
         var learner = await _mastery.GetOrCreateLearnerAsync(name, "entra:" + oid);
-        _session.SignIn(learner.Id, learner.DisplayName);
+        _session.SignIn(learner.Id, learner.DisplayName, learner.IsAuditor);
     }
 }

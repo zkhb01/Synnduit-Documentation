@@ -10,6 +10,13 @@ public sealed class Learner
     public string DisplayName { get; set; } = "";
     public string ExternalId { get; set; } = "";   // stub now; Entra oid/UPN later
     public DateTime CreatedUtc { get; set; }
+
+    /// <summary>
+    /// Audit-only learner: every lesson in every course is viewable, but quizzes are disabled — so
+    /// an auditor can read all content without earning mastery, donuts, or vouchers.
+    /// </summary>
+    public bool IsAuditor { get; set; }
+
     public List<ConceptMastery> Mastery { get; set; } = new();
 }
 
