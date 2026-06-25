@@ -28,13 +28,13 @@ public sealed class MasteryService(
         return await db.Learners.OrderBy(l => l.DisplayName).ToListAsync();
     }
 
-    public async Task<Learner> GetOrCreateLearnerAsync(string displayName, string externalId)
+    public async Task<Learner> GetOrCreateLearnerAsync(string displayName, string externalId, bool isAuditor = false)
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         var learner = await db.Learners.FirstOrDefaultAsync(l => l.ExternalId == externalId);
         if (learner is null)
         {
-            learner = new Learner { DisplayName = displayName, ExternalId = externalId, CreatedUtc = DateTime.UtcNow };
+            learner = new Learner { DisplayName = displayName, ExternalId = externalId, IsAuditor = isAuditor, CreatedUtc = DateTime.UtcNow };
             db.Learners.Add(learner);
             await db.SaveChangesAsync();
         }
@@ -45,6 +45,16 @@ public sealed class MasteryService(
     {
         await using var db = await dbFactory.CreateDbContextAsync();
         return await db.Learners.FindAsync(learnerId);
+    }
+
+    /// <summary>Persists the audit-only flag for a learner (toggled by reviewers from the nav).</summary>
+    public async Task SetAuditorAsync(int learnerId, bool isAuditor)
+    {
+        await using var db = await dbFactory.CreateDbContextAsync();
+        var learner = await db.Learners.FindAsync(learnerId);
+        if (learner is null || learner.IsAuditor == isAuditor) return;
+        learner.IsAuditor = isAuditor;
+        await db.SaveChangesAsync();
     }
 
     public async Task<Dictionary<string, ConceptMastery>> GetMasteryMapAsync(int learnerId, string courseId)

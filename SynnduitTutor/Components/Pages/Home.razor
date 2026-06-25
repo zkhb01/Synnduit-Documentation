@@ -69,7 +69,13 @@ else
                     {
                         <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                                 @onclick="() => SignIn(l)">
-                            <span>@l.DisplayName</span>
+                            <span>
+                                @l.DisplayName
+                                @if (l.IsAuditor)
+                                {
+                                    <span class="badge bg-secondary ms-2" title="Audit only — views lessons, no quizzes">audit</span>
+                                }
+                            </span>
                             <small class="text-muted">@l.ExternalId</small>
                         </button>
                     }
@@ -111,7 +117,7 @@ else
 
     private void SignIn(Learner l)
     {
-        Session.SignIn(l.Id, l.DisplayName);
+        Session.SignIn(l.Id, l.DisplayName, l.IsAuditor);
         // Return to the page the learner originally requested, else show the course catalog (re-render).
         if (!string.IsNullOrWhiteSpace(ReturnUrl))
             Nav.NavigateTo(ReturnUrl);
@@ -121,7 +127,7 @@ else
     {
         if (string.IsNullOrWhiteSpace(_newName)) return;
         var ext = "stub:" + _newName.Trim().ToLowerInvariant().Replace(' ', '.');
-        var learner = await Mastery.GetOrCreateLearnerAsync(_newName.Trim(), ext);
+        var learner = await Mastery.GetOrCreateLearnerAsync(_newName.Trim(), ext);   // audit mode defaults off; toggled later from the nav
         SignIn(learner);
     }
 }

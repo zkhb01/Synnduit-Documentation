@@ -61,6 +61,6 @@
             : id.ToString();
 
         var learner = await Mastery.GetOrCreateLearnerAsync(name, "sdm:" + id);
-        Session.SignIn(learner.Id, learner.DisplayName);
+        Session.SignIn(learner.Id, learner.DisplayName, learner.IsAuditor);
     }
 }

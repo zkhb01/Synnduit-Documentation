@@ -1,5 +1,7 @@
+@implements IDisposable
 @inject LearnerSession Session
 @inject IConfiguration Config
+@inject MasteryService Mastery
 
 <div class="brand">
     <a class="brand-lockup" href="">
@@ -25,8 +27,25 @@
     {
         <div class="learner-chip">
             <span class="lc-label">Signed in</span>
-            <span class="lc-name">@Session.DisplayName</span>
+            <span class="lc-name">
+                @Session.DisplayName
+                @if (Session.IsAuditor)
+                {
+                    <span class="badge bg-secondary ms-1" title="Audit mode — viewing all lessons, quizzes disabled">audit</span>
+                }
+            </span>
         </div>
+
+        <div class="nav-item audit-toggle">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="auditSwitch"
+                       checked="@Session.IsAuditor" @onchange="ToggleAuditAsync" />
+                <label class="form-check-label" for="auditSwitch" title="View all lessons without taking quizzes">
+                    Audit mode
+                </label>
+            </div>
+        </div>
+
         @if (Config.IsEntraConfigured())
         {
             <div class="nav-item">
@@ -35,3 +54,22 @@
         }
     }
 </div>
+
+@code {
+    // The sidebar must re-render when the session changes (sign-in happens after the nav first renders,
+    // and the audit toggle flips state), otherwise the learner chip and toggle never appear.
+    protected override void OnInitialized() => Session.Changed += OnSessionChanged;
+
+    public void Dispose() => Session.Changed -= OnSessionChanged;
+
+    private async void OnSessionChanged() => await InvokeAsync(StateHasChanged);
+
+    private async Task ToggleAuditAsync(ChangeEventArgs e)
+    {
+        if (!Session.IsSignedIn) return;
+        var on = (bool)e.Value!;
+        await Mastery.SetAuditorAsync(Session.LearnerId!.Value, on);
+        // Raises LearnerSession.Changed → the dashboard reloads its gating overview with the new mode.
+        Session.SetAuditor(on);
+    }
+}

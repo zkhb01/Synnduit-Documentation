@@ -59,6 +59,14 @@ using (var scope = app.Services.CreateScope())
     using var db = factory.CreateDbContext();
     db.Database.EnsureCreated();
 
+    // EnsureCreated() never alters an existing table, so additive columns must be patched in by hand
+    // (we have no migrations in this slice). Idempotently add Learner.IsAuditor to pre-existing DBs.
+    var hasAuditor = db.Database
+        .SqlQueryRaw<int>("SELECT COUNT(*) AS Value FROM pragma_table_info('Learners') WHERE name = 'IsAuditor'")
+        .AsEnumerable().First() > 0;
+    if (!hasAuditor)
+        db.Database.ExecuteSqlRaw("ALTER TABLE Learners ADD COLUMN IsAuditor INTEGER NOT NULL DEFAULT 0");
+
     // Fail fast if any configured course's curriculum can't be located/parsed.
     var catalog = scope.ServiceProvider.GetRequiredService<CourseCatalog>();
     foreach (var course in catalog.Courses)

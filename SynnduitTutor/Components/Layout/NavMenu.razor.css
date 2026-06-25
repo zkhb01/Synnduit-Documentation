@@ -75,6 +75,30 @@
 }
 .nav-item ::deep a.active::before { color: #caab6c; }
 
+/* ---------- Audit-mode toggle ---------- */
+.audit-toggle {
+    margin-top: .6rem;
+    padding: .35rem .9rem .35rem 1.4rem;
+}
+.audit-toggle .form-check-label {
+    color: rgba(246,241,231,0.78);
+    font-size: .9rem; font-weight: 500;
+    cursor: pointer;
+}
+.audit-toggle .form-check-input {
+    cursor: pointer;
+    background-color: rgba(246,241,231,0.12);
+    border-color: rgba(177,141,77,0.55);
+}
+.audit-toggle .form-check-input:checked {
+    background-color: #caab6c;
+    border-color: #caab6c;
+}
+.audit-toggle .form-check-input:focus {
+    border-color: #caab6c;
+    box-shadow: 0 0 0 .2rem rgba(202,171,108,0.25);
+}
+
 /* ---------- Signed-in chip ---------- */
 .learner-chip {
     margin: 1.25rem .9rem 0; padding: .7rem .9rem;
