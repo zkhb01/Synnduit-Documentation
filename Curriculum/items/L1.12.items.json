@@ -5,7 +5,7 @@
   "items": [
     {
       "id": "L1.12.q1",
-      "type": "scenario",
+      "type": "mc",
       "difficulty": "apply",
       "scoring": "auto",
       "stem": "A feed that should return 65,000 students has a bug and returns 0 records. What feature prevents the destination's entire student set from being garbage-collected (deleted)?",
@@ -92,6 +92,48 @@
       "correct": ["b"],
       "explanation": "Because the engine acts on whatever snapshot the feed provides, thresholds are the safety guardrails that abort the run when the snapshot implies dangerous, large-scale change.",
       "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L1.12.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How does the orphan-mapping abort threshold differ from the garbage-collection (deletion) abort threshold?",
+      "options": [
+        { "id": "a", "text": "The orphan-mapping threshold is checked preemptively during the Migration segment — before any GC runs; the GC/deletion threshold is checked during the GarbageCollection segments" },
+        { "id": "b", "text": "They are the same threshold with two names" },
+        { "id": "c", "text": "The orphan-mapping threshold only counts exceptions, not removals" },
+        { "id": "d", "text": "The GC threshold is checked first, then the orphan-mapping threshold" }
+      ],
+      "correct": ["a"],
+      "explanation": "Both guard against a bad feed causing mass removal, but the orphan-mapping check is preemptive: as the Migration identifies mappings whose source record is gone (slated for deactivation/removal), it aborts before GC deletes anything. The GC/deletion percentage threshold fires during the GarbageCollection segments themselves.",
+      "misconceptions": {
+        "b": "They fire at different points — orphan-mapping during the migration (preemptive), GC during the GC segments.",
+        "c": "The orphan-mapping threshold is about mappings identified for removal, not exception counts (those are the Segment/Run abort thresholds).",
+        "d": "The orphan-mapping check comes first — it's preemptive, before GC removes anything."
+      },
+      "source": "lessons/L1.12.md - orphan-mapping preemptive abort example"
+    },
+    {
+      "id": "L1.12.q7",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "How should you set the orphan-mapping and garbage-collection abort percentages, and which is the more valuable guard?",
+      "options": [
+        { "id": "a", "text": "Set both to the same percentage; the orphan-mapping threshold is more valuable because it fires preemptively during migration, aborting before any deletion so you can just re-run" },
+        { "id": "b", "text": "Set the GC percentage far lower than the orphan one; the GC threshold is the only real guard" },
+        { "id": "c", "text": "Set the orphan percentage to 100% and rely on the GC threshold" },
+        { "id": "d", "text": "They must never be equal or the run won't start" }
+      ],
+      "correct": ["a"],
+      "explanation": "Both guard the same failure (a bad feed causing mass removal), so a single consistent limit is what you want. The orphan-mapping check is preemptive — it trips first, during migration, before any deletion — so it's the more beneficial to rely on and it leaves a clean re-run; the matching GC value is the backstop.",
+      "misconceptions": {
+        "b": "The orphan-mapping threshold is the front-line preemptive guard; the GC threshold is the later backstop.",
+        "c": "Setting orphan to 100% disables the preemptive guard, forcing reliance on the later GC abort — after deletion has begun.",
+        "d": "Equal values are exactly what's recommended, so the removal limit is consistent across both checks."
+      },
+      "source": "lessons/L1.12.md - orphan vs GC threshold config"
     }
   ]
 }

@@ -27,19 +27,20 @@
       "type": "mc",
       "difficulty": "apply",
       "scoring": "auto",
-      "stem": "A user reports a record showing up twice in the destination. Which script finds the cause?",
+      "stem": "A run fails with 'Synnduit.SynnduitException - An item with the same key has already been added.' Which script finds the cause, and what's the usual root cause?",
       "options": [
-        { "id": "a", "text": "Starbridge-SeeMappingIssues.sql (records with more than one active mapping)" },
-        { "id": "b", "text": "Starbridge-ValueChange.sql" },
-        { "id": "c", "text": "Starbridge-Transactions.sql" },
-        { "id": "d", "text": "Starbridge-Table-LastEventNotification.sql" }
+        { "id": "a", "text": "Starbridge-CorruptionCheck.sql — it finds source IDs with more than one active mapping; the usual cause is two processes running against the same StarBridge database at once" },
+        { "id": "b", "text": "Starbridge-ValueChange.sql — a field changed" },
+        { "id": "c", "text": "Starbridge-Deletions.sql — records were deleted" },
+        { "id": "d", "text": "Starbridge-Transactions.sql — just re-read the outcome counts" }
       ],
       "correct": ["a"],
-      "explanation": "SeeMappingIssues groups mappings and flags those with COUNT(*) > 1 — duplicate active mappings are the usual cause of a doubled record.",
+      "explanation": "CorruptionCheck groups mappings and flags COUNT(*) > 1 (State <> 3) — duplicate active mappings, which throw the 'same key' exception. They typically come from concurrent processes against one StarBridge DB (the one-process rule, L1.5/L3.7); fix by restoring the most recent backup.",
       "misconceptions": {
-        "b": "ValueChange shows field diffs, not duplicate mappings."
+        "b": "ValueChange shows field diffs, not duplicate mappings.",
+        "d": "Transactions shows outcome counts; it won't surface the duplicate mappings behind the exception."
       },
-      "source": "DiagnosticScripts/Starbridge-SeeMappingIssues.sql"
+      "source": "DiagnosticScripts/Starbridge-CorruptionCheck.sql"
     },
     {
       "id": "L3.3.q3",
@@ -86,6 +87,46 @@
       ],
       "sampleAnswer": "The message text is in the Message table, tied to an Operation through OperationMessage. ExceptionRejections does those joins (Operation -> OperationMessage -> Message, plus EntityType/SourceSystemEntityId) so you can read the exception/rejection text by Type.",
       "source": "DiagnosticScripts/Starbridge-ExceptionRejections.sql"
+    },
+    {
+      "id": "L3.3.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A transaction shows Outcome 6 (NotFoundInDestinationSystem): the source and its StarBridge mapping exist, but the destination record is gone, and you confirm the deletion was a mistake. How do you get the record back into the destination?",
+      "options": [
+        { "id": "a", "text": "Set the mapping's State to 3 (Removed) — for the record and its child mappings, via [dbo].[SetMappingState] — so the next run treats it as brand new and re-inserts it" },
+        { "id": "b", "text": "Just re-run the sync; it will automatically recreate the destination record" },
+        { "id": "c", "text": "Delete the source record so both sides agree" },
+        { "id": "d", "text": "Raise the garbage-collection threshold and re-run" }
+      ],
+      "correct": ["a"],
+      "explanation": "Outcome 6 needs manual intervention. If the destination removal was a mistake, set State = 3 on the mapping and its children through [dbo].[SetMappingState] (not a raw UPDATE); with no active mapping, the record feeds through as an insert. (If the removal had been legitimate, you'd instead remove the source record.)",
+      "misconceptions": {
+        "b": "The engine takes no action on Outcome 6 — the mapping still points at a missing record, so a plain re-run just repeats the same outcome.",
+        "c": "Removing the source is the fix when the removal was legitimate; here it was a mistake, so you restore the record instead.",
+        "d": "Thresholds are unrelated to this manual fix."
+      },
+      "source": "DiagnosticScripts/Starbridge-NotFoundInDestination.sql; Starbridge-Cleanup.sql (SetMappingState)"
+    },
+    {
+      "id": "L3.3.q7",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How does the support team learn about NotFoundInDestinationSystem and ReferredForManualDeduplication transactions across the CSSD syncs without running scripts by hand?",
+      "options": [
+        { "id": "a", "text": "SynnduitEmailNotification queries each StarBridge DB for exceptions/rejections and the two manual-intervention outcomes, then emails the team a report" },
+        { "id": "b", "text": "The Synnduit console prints them to a shared screen" },
+        { "id": "c", "text": "They show up in the Windows Event Log automatically" },
+        { "id": "d", "text": "There's no automation — someone runs the scripts on a schedule manually" }
+      ],
+      "correct": ["a"],
+      "explanation": "SynnduitEmailNotification is a scheduled tool that monitors every sync's StarBridge DB for Exceptions/Rejections plus the two outcomes needing manual intervention (NotFoundInDestinationSystem and ReferredForManualDeduplication) and emails a report so support can work them.",
+      "misconceptions": {
+        "d": "That manual polling is exactly what SynnduitEmailNotification automates."
+      },
+      "source": "SynnduitEmailNotification (support monitor)"
     }
   ]
 }

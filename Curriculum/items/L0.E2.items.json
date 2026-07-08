@@ -5,7 +5,7 @@
   "items": [
     {
       "id": "L0.E2.q1",
-      "type": "scenario",
+      "type": "mc",
       "difficulty": "apply",
       "scoring": "auto",
       "stem": "You add `public int Grade { get; set; }` to a POCO. It compiles and runs, but some Grade changes never sync to the destination. What rule did you break?",
@@ -89,6 +89,68 @@
       ],
       "sampleAnswer": "It's dangerous because nothing fails loudly — the code compiles and runs, so you assume it works, while certain field changes silently never sync. After switching to nullable (or the proxy pattern) and re-running in test, the console shows the correction progressing, with NoChangesMerged entries as it reconciles the previously-missed records.",
       "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx.md"
+    },
+    {
+      "id": "L0.E2.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Your `SourceSystemEntityId` is composed from non-nullable value-typed source fields (e.g. `int StudentNumber`, `int PersonId`). What is the recommended way to satisfy the nullable rule for the identifier?",
+      "options": [
+        { "id": "a", "text": "Give SourceSystemEntityId a plain getter/setter and build the string directly in the feed's Map (e.g. string.Format(\"{0}_{1}\", ...)) from the source fields" },
+        { "id": "b", "text": "Add a [NotMapped] nullable proxy for the string SourceSystemEntityId itself" },
+        { "id": "c", "text": "Make SourceSystemEntityId an int? so it can represent 'no value'" },
+        { "id": "d", "text": "Nothing is needed — identifier fields are exempt from all nullable handling, including their source fields" }
+      ],
+      "correct": ["a"],
+      "explanation": "The SourceSystemEntityId property is itself a string (a nullable reference type), so it needs no proxy. Because it's assigned explicitly by composing the source fields in Map, the value is set directly rather than diffed through the engine, so the nullable-proxy plumbing isn't required on it.",
+      "misconceptions": {
+        "b": "The string property is already a nullable reference type; a proxy is for non-nullable value types, not for the identifier string.",
+        "c": "SourceSystemEntityId is a string identifier, not an integer — it isn't retyped to int?.",
+        "d": "The identifier string is exempt, but its underlying non-nullable value-typed source fields still follow the nullable rule; the direct-assignment approach is what lets you avoid a proxy per field."
+      },
+      "source": "Documentation/Synnduit Requirement Poco Properties are Nullable.docx.md"
+    },
+    {
+      "id": "L0.E2.q7",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A POCO is fed by two sources (PowerSchool and a JSON feed), each providing only a subset of its properties. By default, when the JSON feed doesn't supply a property and it arrives as null, what does the engine do with that null?",
+      "options": [
+        { "id": "a", "text": "Treats it as 'not part of this sync' and leaves the existing value unchanged" },
+        { "id": "b", "text": "Overwrites the existing value with null" },
+        { "id": "c", "text": "Throws an exception because the property is required" },
+        { "id": "d", "text": "Deletes the destination record" }
+      ],
+      "correct": ["a"],
+      "explanation": "By default a source's null on a property it doesn't provide is ignored — it isn't a change. This is a core reason properties are nullable: it lets the engine tell 'this source didn't supply a value' apart from a real change, so one source doesn't blank out fields owned by another.",
+      "misconceptions": {
+        "b": "That's what [ForceNullPropagation] makes it do for a specific named source; the default is to ignore the null.",
+        "c": "A subset feed legitimately leaves other properties null; that isn't an error."
+      },
+      "source": "Sync-SRC-DDH SchoolObjectModel POCOs + Json/Feeds/SchoolSiteFeed.cs"
+    },
+    {
+      "id": "L0.E2.q8",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You want a null coming from PowerSchool to actually overwrite the previous value (set it to null), while a JSON feed that provides only a subset should keep having its nulls ignored for that same property. What do you put on the property?",
+      "options": [
+        { "id": "a", "text": "[ForceNullPropagation(typeof(PowerSchool.PowerSchool))] — propagates PowerSchool's null as a change, and applies only to PowerSchool" },
+        { "id": "b", "text": "[ForceNullPropagation] on the property with no source type, so every source's null propagates" },
+        { "id": "c", "text": "[Required] on the property" },
+        { "id": "d", "text": "Remove [EntityProperty] so nulls are always written" }
+      ],
+      "correct": ["a"],
+      "explanation": "ForceNullPropagation names one source system: a null from that source is applied as a change (value → null) instead of ignored. Because it's scoped to PowerSchool, the JSON feed's nulls for that property keep the default 'ignore' behavior.",
+      "misconceptions": {
+        "b": "The point is source-specific propagation; naming PowerSchool is what leaves the JSON feed's nulls ignored.",
+        "c": "[Required] is about validation, not null-change semantics.",
+        "d": "Removing [EntityProperty] stops tracking the field for change detection entirely — the opposite of what you want."
+      },
+      "source": "Sync-SRC-DDH SchoolObjectModel POCOs (e.g. stdnt/Course.cs)"
     }
   ]
 }

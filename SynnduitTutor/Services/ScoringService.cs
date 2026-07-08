@@ -34,7 +34,7 @@ public sealed class ScoringService
             return response.SelfAssessedCorrect ?? false;
 
         var correct = item.Correct ?? new List<string>();
-        return item.Type switch
+        return item.EffectiveType switch
         {
             "mc" => response.SelectedOptionIds.Count == 1
                     && correct.Contains(response.SelectedOptionIds[0]),

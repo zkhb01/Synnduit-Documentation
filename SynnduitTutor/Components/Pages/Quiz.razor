@@ -51,7 +51,7 @@ else
                         @if (!item.IsAutoScored) { <span class="badge bg-info text-dark">practice · @(Grader.IsLive ? "Claude feedback" : "self-check")</span> }
                     </p>
 
-                    @switch (item.Type)
+                    @switch (item.EffectiveType)
                     {
                         case "mc":
                             @foreach (var o in item.Options!)
@@ -313,7 +313,7 @@ else
         foreach (var item in _items)
         {
             var resp = new ItemResponse();
-            switch (item.Type)
+            switch (item.EffectiveType)
             {
                 case "mc":
                     if (_single.TryGetValue(item.Id, out var one)) resp.SelectedOptionIds.Add(one);

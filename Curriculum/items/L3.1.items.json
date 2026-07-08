@@ -54,9 +54,9 @@
         { "id": "d", "text": "Yes — it means the destination is down" }
       ],
       "correct": ["b"],
-      "explanation": "Rejected is a preprocessor 'try again later' outcome (often a parent not yet present); it isn't an error by itself. ExceptionThrown is the one to chase.",
+      "explanation": "Rejected is a 'try again later' outcome, not an error by itself — ExceptionThrown is the one to chase. With correct parent-before-child segment ordering, records generally shouldn't reject at all. But timing can still cause it on a long-running segment against a volatile source: a new Student can arrive just after the Student migrator finished, so when the StudentContact segment runs, that student isn't mapped yet and the contact is rejected. It clears on the next run once the parent has been migrated.",
       "misconceptions": {
-        "a": "Rejections are expected during ordered migrations; they often clear on a later pass."
+        "a": "Rejections aren't failures. With correct ordering they're usually a timing artifact — a parent created between the parent and child segments — that clears on the next run."
       },
       "source": "Documentation/Synnduit Console.docx"
     },
@@ -86,6 +86,46 @@
       ],
       "sampleAnswer": "The scheduler runs the command headless, so there's no console to watch. To see live progress you re-run the Run's .cmd yourself from a command prompt.",
       "source": "Documentation/Synnduit Console.docx"
+    },
+    {
+      "id": "L3.1.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You didn't watch a scheduled run live. Where can you still find a record of what it did?",
+      "options": [
+        { "id": "a", "text": "The Serilog log file — a FileLogger writes a one-line-per-event record (segment tallies, exceptions, aborts) to the File sink path configured in appsettings.json" },
+        { "id": "b", "text": "Nowhere — if you didn't watch the console, the run's activity is lost" },
+        { "id": "c", "text": "Only by re-running the entire sync again" },
+        { "id": "d", "text": "In the POCO source files" }
+      ],
+      "correct": ["a"],
+      "explanation": "A FileLogger ([EventReceiver]) runs on every execution alongside the console logger, writing to the Serilog File sink configured in appsettings.json — so even an unwatched scheduled run leaves a greppable log of its final state.",
+      "misconceptions": {
+        "b": "Every run writes to the Serilog log file, watched or not.",
+        "c": "Re-running is for watching live; the log file already holds the record."
+      },
+      "source": "Synnduit.ConsoleLogger/FileLogger.cs"
+    },
+    {
+      "id": "L3.1.q7",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "When you re-run a sync on Windows, the live console tally looks jumbled and misaligned. What's the fix?",
+      "options": [
+        { "id": "a", "text": "Set the default terminal to Windows Console Host — the new Windows Terminal misrenders the console logger's in-place updates" },
+        { "id": "b", "text": "Reinstall Synnduit" },
+        { "id": "c", "text": "Lower the abort thresholds" },
+        { "id": "d", "text": "Nothing — the run is corrupted and must be restored" }
+      ],
+      "correct": ["a"],
+      "explanation": "The console logger updates the tally in place; the modern Windows Terminal mishandles those cursor updates and misaligns them. Switching the default terminal application to Windows Console Host restores the intended display. The Serilog log file is plain text and unaffected.",
+      "misconceptions": {
+        "c": "Thresholds govern deletion/errors, not console rendering.",
+        "d": "It's purely a display issue — the run itself and its log file are fine."
+      },
+      "source": "Synnduit.ConsoleLogger ConsoleLogger.cs (in-place console updates)"
     }
   ]
 }

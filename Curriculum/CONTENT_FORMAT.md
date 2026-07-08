@@ -154,12 +154,31 @@ pulls *fresh* items (so author more than the gate samples — aim 5–8 per conc
 ```
 
 ### Item-type notes
+The app renders exactly three **interactive, auto-scored** shapes: `mc` (radio), `multi` (checkbox),
+and `order` (ranking). **Every other `type` renders as a free-text box** and must be `scoring: "model"`.
 - **mc** — exactly one correct option. **multi** — one or more; `correct` lists all.
-- **classify** — `stem` lists things to bucket; model items work best, or encode as several `mc`.
 - **order** — `correct` is the option ids in the required order.
-- **match** — `options` are left items; encode right items + the answer key in `correct`
-  as `["a:2","b:1",...]` (left id : right id).
+- **classify** — there's no bucket UI; it renders as free-text. Make it `scoring: "model"` with
+  `rubric` + `sampleAnswer`, **or** encode the buckets as one/several auto `mc`.
+- **match** — there's **no interactive match renderer**; a bare `match` with only a `correct` key
+  renders as an empty text box (no way to answer, empty self-check panel). Encode a matching question
+  as an auto `mc` ("which set of pairings is correct?"), or as a `scoring: "model"` short with
+  `rubric` + `sampleAnswer`.
 - **short / scenario** — `scoring: "model"`; always supply `rubric` + `sampleAnswer`.
+
+**Tag `type` to match the mechanics, not the narrative.** A question the engine scores objectively
+is `mc` (one correct) or `multi` (several) — *even if its stem reads like a scenario*. `scenario` and
+`short` are **model-scored free-text** kinds: use them only with `scoring: "model"` (+ `rubric` +
+`sampleAnswer`), never with `scoring: "auto"`. A scenario-flavoured multiple-choice is still `type: "mc"`.
+
+The loader defends against a mismatch two ways, but don't rely on either — author it right:
+- **Inference** — an `auto` item that carries `options` is treated as a choice question regardless of
+  its `type` label (one `correct` → `mc`, several → `multi`), so a mislabeled-but-well-formed item
+  still renders and scores correctly.
+- **Fail-loud validation** — curriculum load aborts (naming the pool + item id) on either: (a) an
+  `auto` item that *can't* be resolved to a scoreable choice (no `options`, or no `correct`) — almost
+  always a `scoring: "model"` item tagged `auto` by mistake; or (b) a `scoring: "model"` item with
+  **neither** a `rubric` nor a `sampleAnswer`, whose self-check panel would render empty.
 
 **Gating vs. practice.** `scoring: "auto"` items (mc/multi/order) are the only ones that count toward
 the mastery score and the pass/fail gate. `scoring: "model"` items (short/scenario, and free-text

@@ -92,6 +92,68 @@
         "b": "The GC percentage threshold bounds deletion, not error count."
       },
       "source": "README.md#5.4"
+    },
+    {
+      "id": "L3.4.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "An orphan-mapping abort halted a run because a feed glitch returned too few rows. After you fix the feed, what is the correct recovery?",
+      "options": [
+        { "id": "a", "text": "Just re-run — no StarBridge restore is needed, because the abort fires before any orphan mapping is deactivated or removed" },
+        { "id": "b", "text": "Restore the StarBridge database from backup, then re-run" },
+        { "id": "c", "text": "Manually delete the orphaned destination records first, then re-run" },
+        { "id": "d", "text": "Lower the orphan threshold so the run completes, then re-run" }
+      ],
+      "correct": ["a"],
+      "explanation": "The orphan-mapping check aborts before the step that changes any mapping state, so the mappings and destination records are untouched. Fix the feed and re-run — there's nothing to restore.",
+      "misconceptions": {
+        "b": "There's nothing to undo — the abort is preemptive, so the StarBridge state is intact.",
+        "c": "The destination records were never removed; deleting them by hand would cause the very data loss the threshold prevented.",
+        "d": "Forcing the run to complete would let the bad-feed removal proceed — the opposite of recovering."
+      },
+      "source": "lessons/L3.4.md - recovering after an orphan-mapping abort"
+    },
+    {
+      "id": "L3.4.q7",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "After the feed is fixed you re-run, and the earlier orphan-mapping abort had left the mappings intact. What outcome do the previously-missing records get?",
+      "options": [
+        { "id": "a", "text": "NoChangesDetected — they match their existing mappings (or ChangesDetectedAndMerged if a value actually changed while the feed was down)" },
+        { "id": "b", "text": "NewEntityCreated — they are treated as brand-new inserts" },
+        { "id": "c", "text": "DuplicateDetectedNoChangesMerged — dedup re-matches them by [DuplicationKey]" },
+        { "id": "d", "text": "ExceptionThrown — the mappings are now invalid" }
+      ],
+      "correct": ["a"],
+      "explanation": "Because the mappings were never removed, the records match directly through the mapping lookup → NoChangesDetected. Dedup only runs for unmapped records, so duplicate detection isn't involved.",
+      "misconceptions": {
+        "b": "They're still mapped, so they aren't new inserts.",
+        "c": "That path only happens if the mappings had actually been removed; here they're intact, so the records never reach dedup."
+      },
+      "source": "lessons/L3.4.md - recovering after an orphan-mapping abort"
+    },
+    {
+      "id": "L3.4.q8",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Production abort thresholds are 5%. A small JSON feed of 10 records legitimately drops 1 (10%), so its runs keep aborting. What's the right response?",
+      "options": [
+        { "id": "a", "text": "Raise the threshold for that specific migrator/segment — on a tiny dataset one record is already a large percentage, while large entities stay protected at 5%" },
+        { "id": "b", "text": "Lower the global threshold so small feeds stop aborting" },
+        { "id": "c", "text": "Remove the abort threshold entirely for all migrators" },
+        { "id": "d", "text": "Restore StarBridge from backup and re-run at 5%" }
+      ],
+      "correct": ["a"],
+      "explanation": "The threshold can be overridden per segment/migrator (a per-segment value takes precedence over the application default). Size it to what a legitimate run could plausibly remove: 5% suits a large entity (5% of 850,000 is a big loss), but false-trips a 10-record feed where one record is 10% — so raise it just for that migrator.",
+      "misconceptions": {
+        "b": "Lowering the threshold makes it more sensitive, not less — and changing the global value weakens protection for the large entities.",
+        "c": "Removing the guard everywhere exposes large entities to the mass-deletion it exists to prevent.",
+        "d": "Nothing needs restoring — this is a tuning question, not a recovery one."
+      },
+      "source": "lessons/L3.4.md - tune the percentage to the migrator"
     }
   ]
 }

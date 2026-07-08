@@ -1,0 +1,102 @@
+{
+  "poolId": "L3.7.items",
+  "conceptId": "L3.7",
+  "conceptName": "Splitting into multiple StarBridge databases",
+  "items": [
+    {
+      "id": "L3.7.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Why may only one process run at a time against a single StarBridge database?",
+      "options": [
+        { "id": "a", "text": "Two concurrent processes would corrupt the shared bookkeeping — mappings, the transaction log, and resumability state" },
+        { "id": "b", "text": "To save on SQL Server licensing costs" },
+        { "id": "c", "text": "Because the destination system accepts only one connection at a time" },
+        { "id": "d", "text": "It's a display limitation of the Synnduit Dashboard" }
+      ],
+      "correct": ["a"],
+      "explanation": "A StarBridge database is Synnduit's bookkeeping store; a second concurrent process would corrupt the mappings, transaction log, and progress/resumability state, so only one process may run against it at a time.",
+      "misconceptions": {
+        "b": "It's a data-integrity constraint on the bookkeeping, not a licensing choice.",
+        "c": "The limit is on the StarBridge database, not the destination's connections."
+      },
+      "source": "lessons/L1.5.md - one process per StarBridge DB"
+    },
+    {
+      "id": "L3.7.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Two groups of entities share one StarBridge database but must both sync during the same narrow window to meet an SLA. What is the constraint, and the fix?",
+      "options": [
+        { "id": "a", "text": "One process per StarBridge database means they can't run concurrently in one DB — split them into separate StarBridge databases (each with its own program/Run) so they can run in parallel" },
+        { "id": "b", "text": "Raise the RunAbortThreshold so both groups fit inside one run" },
+        { "id": "c", "text": "Increase the batch size so the single run finishes twice as fast" },
+        { "id": "d", "text": "Nothing is needed — Synnduit already runs entities in one database in parallel" }
+      ],
+      "correct": ["a"],
+      "explanation": "Everything in one StarBridge database runs serially under a single process. Concurrency comes from separate databases, each with its own process and bookkeeping, so splitting lets the two groups run at the same time.",
+      "misconceptions": {
+        "b": "Abort thresholds govern deletions/errors, not concurrency.",
+        "d": "A single database syncs its entities serially within one run, not concurrently."
+      },
+      "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L3.7.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Source A refreshes near-real-time; Source B refreshes nightly. Both feed entities tracked in one StarBridge database. Why might you split them into two databases?",
+      "options": [
+        { "id": "a", "text": "So each can run on its own independent schedule/cadence (freshness), instead of being coupled to a single run window" },
+        { "id": "b", "text": "Because two sources can never feed the same destination" },
+        { "id": "c", "text": "To reduce the number of POCO classes you have to write" },
+        { "id": "d", "text": "Because a split is required whenever there is more than one source" }
+      ],
+      "correct": ["a"],
+      "explanation": "In one database the two sources are tied to a single schedule. Splitting lets the fast-moving source run every few minutes on its own program while the slow one runs nightly — independent cadences.",
+      "misconceptions": {
+        "b": "Multiple sources feeding one destination is normal and fine in a single database.",
+        "d": "Many sources can share one database; splitting is a deliberate choice driven by concurrency/freshness/isolation, not a requirement."
+      },
+      "source": "lessons/L1.5.md - multiple StarBridge databases"
+    },
+    {
+      "id": "L3.7.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "In principle, what is the simplest / ideal Synnduit topology, before any driver forces you to deviate?",
+      "options": [
+        { "id": "a", "text": "One StarBridge database and one program managing all entities across every source and destination" },
+        { "id": "b", "text": "One StarBridge database per source system, always" },
+        { "id": "c", "text": "One StarBridge database per destination record" },
+        { "id": "d", "text": "A separate StarBridge database for every entity type" }
+      ],
+      "correct": ["a"],
+      "explanation": "The ideal is one database + one program for everything — the least to deploy, schedule, and monitor. You split only when concurrency, freshness, or isolation justifies the added operational surface.",
+      "misconceptions": {
+        "b": "Multiple sources can share one database; per-source splitting is not required.",
+        "d": "Per-entity databases would multiply operational overhead for no inherent benefit."
+      },
+      "source": "README.md#3-vocabulary-youll-hear-every-day"
+    },
+    {
+      "id": "L3.7.q5",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "One StarBridge database currently syncs HR (nightly) and a badge-access system (needs updates every few minutes) into the destination. The nightly run is getting long and the badge data is going stale. Should you split, and how would you decide?",
+      "rubric": [
+        "Freshness driver: the badge system needs a much faster cadence than HR, but sharing one database couples both to a single schedule/run",
+        "Concurrency constraint: only one process may run per StarBridge database, so the badge sync can't run while the long HR run is in progress",
+        "Recommendation: split into two StarBridge databases (each its own program/Run) so the badge sync runs frequently and concurrently, independent of the nightly HR run",
+        "Tradeoff: more databases/programs to deploy, schedule, and monitor - split because a driver justifies it, not by default"
+      ],
+      "sampleAnswer": "Yes, split. The badge system needs updates every few minutes, but in one database it's tied to the same schedule as HR and blocked by HR's long run (one process per StarBridge database). Move the badge entities into their own StarBridge database with its own program so it can run every few minutes, concurrently with and independent of the nightly HR run. The tradeoff is another database, program, and dashboard to maintain — worth it here because the freshness and concurrency drivers are real, but not something to do reflexively.",
+      "source": "lessons/L1.5.md - CSSD StarBridge one-process-per-DB rule"
+    }
+  ]
+}

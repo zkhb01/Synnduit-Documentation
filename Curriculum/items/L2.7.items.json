@@ -1,0 +1,102 @@
+{
+  "poolId": "L2.7.items",
+  "conceptId": "L2.7",
+  "conceptName": "Customizing the engine with pluggable operations",
+  "items": [
+    {
+      "id": "L2.7.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "How does the engine discover a custom operation class like a preprocessor or duplication rule?",
+      "options": [
+        { "id": "a", "text": "You implement the operation's interface, annotate the class with its attribute, and MEF discovers it — the same pattern as feeds and sinks" },
+        { "id": "b", "text": "You register it by hand in a central list in Program.cs" },
+        { "id": "c", "text": "You modify the Synnduit engine source to call it" },
+        { "id": "d", "text": "You add it to a Segment in appsettings.json" }
+      ],
+      "correct": ["a"],
+      "explanation": "Operation classes follow the same interface + attribute + MEF-discovery pattern as feeds and sinks; dependencies come in via [ImportingConstructor].",
+      "misconceptions": {
+        "b": "MEF discovers parts by their attributes — there's no central registration list.",
+        "c": "The whole point is extending the engine without modifying it (L1.3)."
+      },
+      "source": "Sync-DDH-SPO Deduplication/TeamSiteDuplicationRule.cs"
+    },
+    {
+      "id": "L2.7.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "You must decide whether a source record is 'already in the destination' by calling a SharePoint API (a stored key can't express it). Which extension point fits?",
+      "options": [
+        { "id": "a", "text": "A [DuplicationRule] / IDuplicationRule<T> — its GetDuplicates() runs your own match logic and returns Duplicates with a MatchWeight" },
+        { "id": "b", "text": "A [DuplicationKey] attribute on a POCO property" },
+        { "id": "c", "text": "A [PreprocessorOperation] that rejects the record" },
+        { "id": "d", "text": "A new sink method" }
+      ],
+      "correct": ["a"],
+      "explanation": "A custom duplication rule replaces the default key-based matching with your own logic — here, an API lookup — returning matches with a MatchWeight.",
+      "misconceptions": {
+        "b": "[DuplicationKey] matches on a stored property value; it can't perform an API lookup.",
+        "c": "A preprocessor transforms/rejects entities; it doesn't perform duplicate matching."
+      },
+      "source": "Sync-DDH-SPO Deduplication/TeamSiteDuplicationRule.cs"
+    },
+    {
+      "id": "L2.7.q3",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Inside a [PreprocessorOperation], you call preprocessorEntity.Reject() when a value can't be resolved. What outcome does that produce?",
+      "options": [
+        { "id": "a", "text": "Rejected — a clean deferral (the record isn't ready this run), not a failure" },
+        { "id": "b", "text": "ExceptionThrown — it's treated as an error" },
+        { "id": "c", "text": "NewEntityCreated — the record is inserted anyway" },
+        { "id": "d", "text": "The whole run aborts immediately" }
+      ],
+      "correct": ["a"],
+      "explanation": "Reject() defers the record, producing the Rejected outcome (L1.10) — explicitly not an error; it can be retried on a later run.",
+      "misconceptions": {
+        "b": "Reject() is a deliberate deferral, distinct from ExceptionThrown.",
+        "d": "Rejecting one record doesn't abort the run."
+      },
+      "source": "Sync-DDH-SPO Preprocessing/TeamSiteCalendarEventCategoryResolver.cs"
+    },
+    {
+      "id": "L2.7.q4",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "Which of these is NOT one of the engine's pluggable operation extension points?",
+      "options": [
+        { "id": "a", "text": "[EntityType] — it identifies a POCO's type, it isn't an operation class" },
+        { "id": "b", "text": "[PreprocessorOperation]" },
+        { "id": "c", "text": "[Homogenizer]" },
+        { "id": "d", "text": "[EventReceiver]" }
+      ],
+      "correct": ["a"],
+      "explanation": "[PreprocessorOperation], [Homogenizer], and [EventReceiver] mark discovered operation classes. [EntityType] is part of the POCO contract (L1.9), not an operation you implement.",
+      "misconceptions": {
+        "c": "[Homogenizer] is a real operation type — it normalizes a value before comparison.",
+        "d": "[EventReceiver] is a real operation type — it receives engine events."
+      },
+      "source": "Sync-DDH-SPO SharePointOnLine extension classes"
+    },
+    {
+      "id": "L2.7.q5",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "A source feed delivers calendar events whose category is a set of source-system GUIDs, but the destination needs the mapped destination category IDs — and an event whose category can't be resolved should not sync yet. Which extension point do you use, and sketch how it behaves?",
+      "rubric": [
+        "Use a [PreprocessorOperation] implementing IPreprocessorOperation<T> (transform-before-sync hook), discovered by MEF like a feed/sink",
+        "In Preprocess(), for source-origin entities, resolve each source category GUID to its destination category ID (e.g. via IMapper) and set the destination field",
+        "If a category can't be resolved, log and call Reject() — producing the Rejected outcome (L1.10), a deferral that retries on a later run rather than an error",
+        "Dependencies (context/mapper/logger) come in via [ImportingConstructor]"
+      ],
+      "sampleAnswer": "Write a [PreprocessorOperation] class implementing IPreprocessorOperation<TeamSiteCalendarEvent>; MEF discovers it like any feed/sink. In Preprocess(), for source-origin entities I map each source-system category GUID to its destination category ID (via the injected IMapper) and set the destination CategoryIds field. If any category can't be resolved, I log an error and call entity.Reject(), which produces the Rejected outcome (L1.10) — the event is deferred and retried on a later run once its category exists, rather than failing. The context, mapper, and logger are injected via [ImportingConstructor].",
+      "source": "Sync-DDH-SPO Preprocessing/TeamSiteCalendarEventCategoryResolver.cs"
+    }
+  ]
+}

@@ -67,9 +67,10 @@ L1.1 What Synnduit is
                         └─▶ L1.12 Thresholds & resumability
           L1.8 ─▶ L1.9 POCO & attributes
           L1.9 + L1.6 ─▶ L1.11 Dedup & merge
+          L1.2 + L1.6 + L1.11 ─▶ L1.13 Multi-source entities
 ```
 
-Entry: **L1.1**. Synthesis: **L1.10, L1.11, L1.12**.
+Entry: **L1.1**. Synthesis: **L1.10, L1.11, L1.12, L1.13**.
 
 ### Concepts
 
@@ -133,9 +134,14 @@ Objective: Safety features — abort thresholds (deletion/orphan/exception %) pr
 Sample items: (Scenario) "Source bug returns 0 rows — what stops the destination being wiped?" (GC/orphan threshold abort.)
 Remediation: the §5.4 threshold settings; "guardrails against a bad snapshot."
 
+**L1.13 — Multi-source entities (several systems of record)** · prereqs: L1.2, L1.6, L1.11 · source: README §4, `School.cs`
+Objective: One destination entity can be co-owned by several sources via `[SharedSourceSystemIdentifiers]`; each source gets its own mapping and they converge (mapping + dedup) rather than duplicate. Record-level ownership — a source owns a portion of the set; a supplementary source (JSON) can be SOR for a gap (Contract Staff) the primary (HR) lacks. Record-level counterpart to field-level `[ForceNullPropagation]` (L0.E2).
+Sample items: (MC) what `[SharedSourceSystemIdentifiers]` enables; (Scenario) HR has no Contract Staff — how does JSON become their SOR without duplicating HR's staff?
+Remediation: walk `School.cs`'s source list; each source's id → its own mapping → one destination record; contrast record-level vs field-level ownership.
+
 ### L1 completion gate
 
-12–15 item assessment sampling every concept, weighted toward synthesis concepts L1.6, L1.10, L1.11. Per-concept scoring feeds remediation; advancing requires all 12 mastered.
+13–16 item assessment sampling every concept, weighted toward synthesis concepts L1.6, L1.10, L1.11, L1.13. Per-concept scoring feeds remediation; advancing requires all 13 mastered.
 
 ---
 
@@ -235,11 +241,13 @@ Remediation: extract the nullable-requirement doc; show wrong (`int`) vs right (
 
 ```
 L1.9 + L0.E2 ─▶ L2.1 Write a POCO
-                   ├─▶ L2.2 Implement a Feed   (+ L0.G2, L0.E1)
+                   ├─▶ L2.2 Implement a Feed   (+ L0.G2; L0.E1 recommended for EF sources)
                    └─▶ L2.3 Implement a Sink   (+ L0.G2, L0.D1)
                           └─▶ L2.4 Sink + CacheFeed
 L2.2 + L2.3 + L0.D2 ─▶ L2.5 Wire it up with MEF
 L2.2 + L1.7 ─▶ L2.6 Add it to a Run
+L2.5 + L1.11 + L1.10 ─▶ L2.7 Customizing the engine with pluggable operations
+L1.7 + L1.12 + L2.1 ─▶ L2.8 Configuring garbage collection & orphan-mapping behavior
 ```
 
 ### Concepts
@@ -250,6 +258,8 @@ L2.2 + L1.7 ─▶ L2.6 Add it to a Run
 - **L2.4 — Sink + CacheFeed** · `ICacheFeed<X>` to re-read destination state; usually one class with the sink · src: `SinkAndCacheFeed.cs`
 - **L2.5 — Wire it up with MEF** · `[Export]` + `[PartCreationPolicy(Shared)]` + `[ImportingConstructor]`; `[Feed]`/`[Sink]` discovery · src: `TeamSiteWebPartService.cs`
 - **L2.6 — Add it to a Run** · Migration (parents first) + GarbageCollection (children first) segments in `appsettings.json` · src: README §5.4
+- **L2.7 — Customizing the engine with pluggable operations** · interface + attribute + MEF discovery for `[PreprocessorOperation]` (transform / `Reject()`) and `[DuplicationRule]` (custom `GetDuplicates`); names `[Homogenizer]`/`[EventReceiver]` · src: Sync-DDH-SPO preprocessing + deduplication classes
+- **L2.8 — Configuring garbage collection & orphan-mapping behavior** · `GarbageCollectionBehavior` (`DeleteCreated`/`DeleteMapped`/`DeleteAll`) on `[EntityType]`/`[ExternalSystem]`; `OrphanMappingBehavior` (`None`/`Deactivate`/`Remove`) on `[SourceSystemParameters]`; defaults + more-specific-level-wins · src: Sync-DDH-SPO `TeamSiteAssetPrincipalPermission.cs`, Sync-SRC-DDH `SchoolObjectModel.cs`
 
 ### Assessment (interim)
 
@@ -257,7 +267,7 @@ L2 items mix auto-scored concept checks (mc/order) with **model-scored code-writ
 
 ### L2 completion gate
 
-All 6 concepts mastered. Synthesis concepts: L2.5 (MEF wiring) and L2.6 (Run ordering).
+All 8 concepts mastered. Synthesis concepts: L2.5 (MEF wiring), L2.6 (Run ordering), L2.7 (engine extension points), and L2.8 (cleanup configuration).
 
 ---
 
@@ -274,6 +284,7 @@ L1.5 + L1.10 ─▶ L3.2 Read a run in StarBridge
                    └─▶ L3.6 Monitor with the Dashboard
 L1.12 ─▶ L3.4 When a threshold aborts a run
 L3.2 + L2.5 + L2.6 ─▶ L3.5 Resolve a sync exception
+L1.5 + L1.12 + L3.1 ─▶ L3.7 Splitting into multiple StarBridge databases
 ```
 
 ### Concepts
@@ -284,6 +295,7 @@ L3.2 + L2.5 + L2.6 ─▶ L3.5 Resolve a sync exception
 - **L3.4 — When a threshold aborts a run** · abort thresholds protect the destination from a bad feed; check the source before raising them · src: README §4 / §5.4, threshold docs
 - **L3.5 — Resolve a sync exception** · read text → root cause → fix, via the real cases (reference-id / UNIQUE-KEY / no-sink) · src: `ExceptionHistoryWithResolutions/`
 - **L3.6 — Monitor with the Synnduit Dashboard** · visual run history over any StarBridge DB (CSSD has 8); scripts for deep triage · src: Synnduit Dashboard.docx
+- **L3.7 — Splitting into multiple StarBridge databases** · ideal is one DB + one program; split for concurrency (one process per DB) or data freshness, weighed against operational cost · src: README §3/§4, L1.5, CSSD practice
 
 ### Assessment
 
@@ -291,7 +303,7 @@ Same model as L2: auto-scored concept checks (mc) plus model-scored **troublesho
 
 ### L3 completion gate
 
-All 6 concepts mastered. Synthesis concepts: L3.3 (diagnostic toolbox) and L3.5 (root-cause resolution).
+All 7 concepts mastered. Synthesis concepts: L3.3 (diagnostic toolbox), L3.5 (root-cause resolution), and L3.7 (the split-decision tradeoff).
 
 ---
 

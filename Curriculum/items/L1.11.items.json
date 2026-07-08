@@ -43,7 +43,7 @@
     },
     {
       "id": "L1.11.q3",
-      "type": "scenario",
+      "type": "mc",
       "difficulty": "apply",
       "scoring": "auto",
       "stem": "An unmapped source record is checked against the destination using its [DuplicationKey]. A match is found, and the source and destination field values are identical. What outcome results?",
