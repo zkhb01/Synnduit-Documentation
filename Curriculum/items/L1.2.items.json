@@ -6,37 +6,37 @@
     {
       "id": "L1.2.q1",
       "type": "mc",
-      "difficulty": "recall",
+      "difficulty": "apply",
       "scoring": "auto",
-      "stem": "At CSSD, which system is the destination for the Synnduit syncs?",
+      "stem": "At CSSD, DDH (District Data Hub) is the destination for inbound syncs like Sync-SRC-DDH — but many syncs export data out of DDH (e.g. Sync-DDH-AAD, which pushes to Azure AD / Entra). In those outbound syncs, what role does DDH play?",
       "options": [
-        { "id": "a", "text": "PowerSchool" },
-        { "id": "b", "text": "HRAD (PeopleSoft HR)" },
-        { "id": "c", "text": "DDH (District Data Hub)" },
-        { "id": "d", "text": "ServiceNow" }
+        { "id": "a", "text": "Source — data flows DDH → the other system" },
+        { "id": "b", "text": "Destination — DDH is always the destination" },
+        { "id": "c", "text": "Neither — DDH is only a hub, never a source or destination" },
+        { "id": "d", "text": "Both source and destination within that one sync" }
       ],
-      "correct": ["c"],
-      "explanation": "At CSSD the destination is always the DDH — the district's single source of truth that data is synced into.",
+      "correct": ["a"],
+      "explanation": "Source vs destination is set per sync by the direction of flow, not fixed to a system. DDH is the destination for inbound syncs (Sync-SRC-DDH) and the source for outbound syncs (Sync-DDH-AAD → Azure AD/Entra, Sync-DDH-SPO → SharePoint). The Sync-<source>-<destination> naming convention names each end.",
       "misconceptions": {
-        "a": "PowerSchool is a source system (School and Student APIs).",
-        "b": "HRAD is a source system (PeopleSoft HR).",
-        "d": "ServiceNow is a source system."
+        "b": "DDH is the destination only for inbound syncs. In Sync-DDH-AAD the data originates in DDH and lands in Azure AD, so DDH is the source there.",
+        "c": "Every sync has a concrete source and destination; calling DDH a 'hub' just means it plays both roles across different syncs.",
+        "d": "A single sync is one-directional — DDH is the source or the destination for a given sync, never both at once."
       },
-      "source": "README.md#1-what-is-synnduit"
+      "source": "README.md#5-a-real-ccsd-example-sync-src-ddh"
     },
     {
       "id": "L1.2.q2",
       "type": "classify",
       "difficulty": "apply",
       "scoring": "model",
-      "stem": "Classify each system as Source or Destination in the CSSD integration: (1) PowerSchool, (2) DDH, (3) HRAD, (4) ServiceNow.",
+      "stem": "In the inbound Sync-SRC-DDH integration (data flowing into the DDH), classify each system as Source or Destination: (1) PowerSchool, (2) DDH, (3) HRAD, (4) ServiceNow.",
       "rubric": [
         "PowerSchool = Source",
-        "DDH = Destination",
+        "DDH = Destination (for this inbound sync)",
         "HRAD = Source",
         "ServiceNow = Source"
       ],
-      "sampleAnswer": "PowerSchool — Source; DDH — Destination; HRAD — Source; ServiceNow — Source. Only the DDH is the destination; the rest are sources where data originates.",
+      "sampleAnswer": "In Sync-SRC-DDH the DDH is the destination and PowerSchool, HRAD, and ServiceNow are the sources feeding it. (The roles are per-sync: in an outbound sync like Sync-DDH-AAD the DDH is instead the source.)",
       "source": "README.md#5-a-real-ccsd-example-sync-src-ddh"
     },
     {
@@ -97,6 +97,27 @@
         "c": "A single sync is one-directional; bidirectional behavior would be two separate syncs."
       },
       "source": "README.md#2-the-mental-model"
+    },
+    {
+      "id": "L1.2.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "The Sync-DDH-AD integration runs two syncs back to back: first DDH → Active Directory, then Active Directory → HRAD. What role does on-prem Active Directory play across these two syncs?",
+      "options": [
+        { "id": "a", "text": "Destination in the first (DDH → AD), then source in the second (AD → HRAD)" },
+        { "id": "b", "text": "Source in both syncs" },
+        { "id": "c", "text": "Destination in both syncs" },
+        { "id": "d", "text": "No role — DDH syncs directly to HRAD in one step" }
+      ],
+      "correct": ["a"],
+      "explanation": "Roles are per-sync. In DDH → AD, Active Directory is the destination; in AD → HRAD, that same Active Directory is the source. Sync-DDH-AD bundles both, run separately back to back, so data hops DDH → AD → HRAD — the same per-sync role rule that makes DDH itself a hub.",
+      "misconceptions": {
+        "b": "AD only receives data in the first sync (DDH → AD); it isn't the source there.",
+        "c": "In the second sync (AD → HRAD) AD is the source, not the destination.",
+        "d": "There is no direct DDH → HRAD sync here; the data passes through AD in two separate one-directional syncs."
+      },
+      "source": "lessons/L1.2.md — CSSD Sync-DDH-AD integration"
     }
   ]
 }

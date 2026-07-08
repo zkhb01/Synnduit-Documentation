@@ -1,0 +1,102 @@
+{
+  "poolId": "L1.13.items",
+  "conceptId": "L1.13",
+  "conceptName": "Multi-source entities (several systems of record)",
+  "items": [
+    {
+      "id": "L1.13.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does [SharedSourceSystemIdentifiers(...)] on a POCO declare?",
+      "options": [
+        { "id": "a", "text": "That more than one source system can own records of this destination entity type" },
+        { "id": "b", "text": "That the entity has more than one destination" },
+        { "id": "c", "text": "That every property must be nullable" },
+        { "id": "d", "text": "That the entity should be garbage-collected aggressively" }
+      ],
+      "correct": ["a"],
+      "explanation": "It registers the several source systems that may each own records of this entity type, so each source's IDs can be mapped to the shared destination records.",
+      "misconceptions": {
+        "b": "It's about multiple sources, not multiple destinations.",
+        "c": "That's the nullable requirement (L0.E2), a separate rule."
+      },
+      "source": "Sync-SRC-DDH SchoolObjectModel/School.cs"
+    },
+    {
+      "id": "L1.13.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A School record is fed by both PowerSchool and HR. Why doesn't the destination end up with two School records?",
+      "options": [
+        { "id": "a", "text": "Each source gets its own mapping to the same destination record, and dedup converges a second source's record onto the existing one instead of duplicating it" },
+        { "id": "b", "text": "The second source is ignored entirely" },
+        { "id": "c", "text": "Synnduit merges the two source databases before syncing" },
+        { "id": "d", "text": "PowerSchool and HR must never feed the same entity" }
+      ],
+      "correct": ["a"],
+      "explanation": "With shared source identifiers, each source has its own mapping (L1.6) to the one destination record; when a second source brings a record the destination already has, dedup (L1.11) matches by [DuplicationKey] and maps to it rather than creating a twin.",
+      "misconceptions": {
+        "b": "Both sources contribute; neither is ignored.",
+        "d": "Co-feeding one entity is exactly what [SharedSourceSystemIdentifiers] enables."
+      },
+      "source": "README.md#4-key-features-worth-knowing"
+    },
+    {
+      "id": "L1.13.q3",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "HR is the system of record for staff, but it has no record of Contract Staff. Those are maintained in a JSON file instead. How does Synnduit let JSON be the system of record for just the Contract Staff while HR stays authoritative for everyone else — without duplicating anyone?",
+      "rubric": [
+        "Add JSON (and HR) to the entity's [SharedSourceSystemIdentifiers] so both sources can own records of the type",
+        "Each source gets its own mapping to the destination; ownership is record-level — HR owns its staff, JSON owns the Contract Staff HR lacks",
+        "Because the two sources own different (non-overlapping) records, they don't collide; where they could overlap, dedup ([DuplicationKey]) converges rather than duplicates",
+        "Result: one destination Staff set, fed by two systems of record, each authoritative for its portion"
+      ],
+      "sampleAnswer": "List both HR and JSON in the Staff entity's [SharedSourceSystemIdentifiers]. That lets each be a system of record for records of the type, each with its own mapping to the shared destination record. Ownership is at the record level: HR remains authoritative for the staff it holds, and JSON becomes the SOR for the Contract Staff HR doesn't have. The two own different records so they don't collide; if they ever did, dedup matches on the [DuplicationKey] and maps to the existing record instead of creating a duplicate. The destination ends up with one staff set fed by two systems of record.",
+      "source": "Sync-SRC-DDH SchoolObjectModel/School.cs"
+    },
+    {
+      "id": "L1.13.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "The DDH `School` is enriched by several sources — PowerSchool sets the government school code, JSON sets `SiteUrlSuffix`. How do both sources' columns land on the one record without each feed wiping the other's fields?",
+      "options": [
+        { "id": "a", "text": "[SharedSourceSystemIdentifiers] converges the sources onto one record; each source sets only its own columns, and by the nullable rule (L0.E2) a source's null on a column it doesn't provide is ignored — so it doesn't overwrite the other source's value" },
+        { "id": "b", "text": "The last source to run wins and overwrites every column" },
+        { "id": "c", "text": "Synnduit keeps a separate copy of the record per source" },
+        { "id": "d", "text": "You must merge the sources into a single feed first" }
+      ],
+      "correct": ["a"],
+      "explanation": "[SharedSourceSystemIdentifiers] lets multiple sources map to the same destination record; column co-ownership works because unprovided fields arrive null and are ignored by default (L0.E2). Use [ForceNullPropagation] when a source's null on a column it owns should actually take effect. So co-ownership is both by row and by column — this attribute isn't records-only.",
+      "misconceptions": {
+        "b": "Unprovided nulls are ignored, not written — each source only affects the columns it owns.",
+        "c": "There's one converged destination record, not one per source.",
+        "d": "Each source keeps its own feed; the engine converges them via mappings + dedup."
+      },
+      "source": "Sync-SRC-DDH SchoolObjectModel/School.cs"
+    },
+    {
+      "id": "L1.13.q5",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A child record references a Staff by a PowerSchool id, and the run throws 'unable to resolve reference identifier.' The Staff entity's [SharedSourceSystemIdentifiers] lists HR and JSON but not PowerSchool. What's the fix?",
+      "options": [
+        { "id": "a", "text": "Add PowerSchool to Staff's [SharedSourceSystemIdentifiers] so that source's ids can be mapped" },
+        { "id": "b", "text": "Delete the child record" },
+        { "id": "c", "text": "Lower the orphan-mapping threshold" },
+        { "id": "d", "text": "Switch the destination system" }
+      ],
+      "correct": ["a"],
+      "explanation": "If a source isn't in [SharedSourceSystemIdentifiers], the engine can't map that source's ids for the entity, so a reference by that id can't resolve. Adding the source to the list fixes it (this is the L3.5 exception).",
+      "misconceptions": {
+        "c": "Thresholds are unrelated; the issue is an unregistered source system."
+      },
+      "source": "README.md#4-key-features-worth-knowing"
+    }
+  ]
+}

@@ -24,7 +24,7 @@
     },
     {
       "id": "L1.10.q2",
-      "type": "scenario",
+      "type": "mc",
       "difficulty": "apply",
       "scoring": "auto",
       "stem": "Run 1 creates a Staff record. On run 2 the source data for that staff is byte-for-byte identical. What outcome does run 2 produce for that record?",

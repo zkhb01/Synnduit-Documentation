@@ -1,0 +1,101 @@
+{
+  "poolId": "L2.8.items",
+  "conceptId": "L2.8",
+  "conceptName": "Configuring garbage collection and orphan-mapping behavior",
+  "items": [
+    {
+      "id": "L2.8.q1",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "What does GarbageCollectionBehavior control, and what is its default?",
+      "options": [
+        { "id": "a", "text": "Which unreferenced destination entities garbage collection deletes; it defaults to DeleteCreated (only ones this system instance created)" },
+        { "id": "b", "text": "How many exceptions abort a segment; it defaults to 30" },
+        { "id": "c", "text": "Whether orphan mappings are removed; it defaults to Remove" },
+        { "id": "d", "text": "The order of Migration and GarbageCollection segments in a Run" }
+      ],
+      "correct": ["a"],
+      "explanation": "GarbageCollectionBehavior bounds which unreferenced destination entities GC removes; the conservative default is DeleteCreated (only entities this system created).",
+      "misconceptions": {
+        "c": "That's OrphanMappingBehavior (default None) — a separate knob about mappings, not destination-entity deletion scope."
+      },
+      "source": "Sync-DDH-SPO TeamSiteAssetPrincipalPermission.cs"
+    },
+    {
+      "id": "L2.8.q2",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "Which GarbageCollectionBehavior is the most aggressive — deleting even unreferenced destination records this sync never created?",
+      "options": [
+        { "id": "a", "text": "DeleteAll" },
+        { "id": "b", "text": "DeleteCreated" },
+        { "id": "c", "text": "DeleteMapped" },
+        { "id": "d", "text": "None" }
+      ],
+      "correct": ["a"],
+      "explanation": "DeleteCreated (default) removes only what this system created; DeleteMapped adds anything with a mapping; DeleteAll removes every unreferenced entity, even pre-existing ones. Use DeleteAll only when the sync owns the whole set.",
+      "misconceptions": {
+        "b": "DeleteCreated is the safest/most conservative — only entities this system created.",
+        "d": "None isn't a GarbageCollectionBehavior value; it's an OrphanMappingBehavior value."
+      },
+      "source": "Sync-DDH-SPO TeamSiteAssetPrincipalPermission.cs"
+    },
+    {
+      "id": "L2.8.q3",
+      "type": "mc",
+      "difficulty": "recall",
+      "scoring": "auto",
+      "stem": "OrphanMappingBehavior governs what happens to a mapping whose source entity has disappeared. What are its options and default?",
+      "options": [
+        { "id": "a", "text": "None (default; leave the mapping active), Deactivate, or Remove" },
+        { "id": "b", "text": "DeleteCreated, DeleteMapped, or DeleteAll" },
+        { "id": "c", "text": "Just true or false" },
+        { "id": "d", "text": "It always removes the mapping; there is no choice" }
+      ],
+      "correct": ["a"],
+      "explanation": "OrphanMappingBehavior is None (default — mapping stays active), Deactivate (deactivated but kept), or Remove (removed entirely).",
+      "misconceptions": {
+        "b": "Those are GarbageCollectionBehavior values (destination deletion scope), not orphan-mapping disposition.",
+        "d": "The default is actually None — nothing is removed unless you opt in."
+      },
+      "source": "Sync-SRC-DDH SchoolObjectModel/SchoolObjectModel.cs"
+    },
+    {
+      "id": "L2.8.q4",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "An entity's OrphanMappingBehavior is left at None. What does that mean for the orphan-mapping abort threshold (L1.12)?",
+      "options": [
+        { "id": "a", "text": "There's nothing for it to act on — with None, orphan mappings stay active and are never identified for removal, so that threshold doesn't apply; GarbageCollectionBehavior is the cleanup lever instead" },
+        { "id": "b", "text": "The threshold fires immediately on every run" },
+        { "id": "c", "text": "None forces all mappings to be removed" },
+        { "id": "d", "text": "None disables garbage collection entirely" }
+      ],
+      "correct": ["a"],
+      "explanation": "None means no orphan processing, so no mappings are identified for deactivation/removal and the orphan threshold has nothing to evaluate. Deactivate/Remove are what create orphan candidates (and, with Remove, the L3.4 dedup-recovery path on re-run).",
+      "misconceptions": {
+        "c": "None is the opposite — it leaves mappings active.",
+        "d": "Orphan behavior governs mappings, not whether garbage collection runs."
+      },
+      "source": "lessons/L2.8.md - orphan behavior None and the L1.12 threshold"
+    },
+    {
+      "id": "L2.8.q5",
+      "type": "scenario",
+      "difficulty": "synthesis",
+      "scoring": "model",
+      "stem": "You sync SharePoint asset permissions and the sync is the authoritative owner of that permission set: any permission in the destination the source no longer lists should be removed — even ones some earlier process created. The external system's default is DeleteMapped. What GarbageCollectionBehavior do you set, where, and why?",
+      "rubric": [
+        "Set GarbageCollectionBehavior = DeleteAll — delete every unreferenced destination entity, not just those this system created or mapped",
+        "Set it on the [EntityType] for that permission entity (a per-entity override), so it applies to just that entity",
+        "The more specific [EntityType] setting overrides the broader [ExternalSystem] default (DeleteMapped)",
+        "Rationale: the sync is authoritative for the full set, so aggressive cleanup is correct here despite being riskier than the default DeleteCreated"
+      ],
+      "sampleAnswer": "Set GarbageCollectionBehavior = DeleteAll on the [EntityType] for the permission entity. DeleteAll removes every unreferenced destination record, including ones this sync didn't create — appropriate because the sync owns the entire permission set, so anything the source no longer lists shouldn't remain. Because a per-entity-type setting overrides the system-wide default, this entity uses DeleteAll while the rest of the SchoolObjectModel/SharePoint system stays on its DeleteMapped default. It's the aggressive end of the scale, justified only by the sync being authoritative here.",
+      "source": "Sync-DDH-SPO TeamSiteAssetPrincipalPermission.cs"
+    }
+  ]
+}

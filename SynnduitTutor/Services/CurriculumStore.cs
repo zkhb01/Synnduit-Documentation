@@ -109,6 +109,20 @@ public sealed class CurriculumStore
                 }
             }
 
+            // Fail loudly on items that can't be scored or can't give feedback: auto-scored items with
+            // no options/correct (or an unrecognized type inference can't resolve), and model-scored
+            // items with neither a rubric nor a sample answer (an empty self-check panel). A silently
+            // mis-scored or feedback-less item shortchanges the learner, so reject it at load.
+            var invalid = _banks.Values
+                .SelectMany(b => b.Items.Select(it => (b.PoolId, it.Id, Error: it.AutoScoringError ?? it.ModelScoringError)))
+                .Where(x => x.Error is not null)
+                .Select(x => $"  [{x.PoolId}] {x.Id}: {x.Error}")
+                .ToList();
+            if (invalid.Count > 0)
+                throw new InvalidDataException(
+                    $"Curriculum has {invalid.Count} ill-formed item(s):\n" +
+                    string.Join("\n", invalid));
+
             var lessonsDir = Path.Combine(_root, "lessons");
             if (Directory.Exists(lessonsDir))
             {

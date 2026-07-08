@@ -24,18 +24,22 @@
     },
     {
       "id": "L1.9.q2",
-      "type": "match",
+      "type": "mc",
       "difficulty": "apply",
-      "scoring": "model",
-      "stem": "Match each attribute (left) to its job (right): (a) [EntityProperty] (b) [SourceSystemIdentifier] (c) [DuplicationKey] (d) [EntityType]. Jobs: (1) marks the source-side ID for the mapping, (2) globally identifies the entity type via a GUID, (3) marks a field to be tracked for change detection, (4) used to match a new record to an existing one during dedup.",
+      "scoring": "auto",
+      "stem": "Match each POCO attribute to its job. Which set of pairings is entirely correct?",
       "options": [
-        { "id": "a", "text": "[EntityProperty]" },
-        { "id": "b", "text": "[SourceSystemIdentifier]" },
-        { "id": "c", "text": "[DuplicationKey]" },
-        { "id": "d", "text": "[EntityType]" }
+        { "id": "a", "text": "[EntityType] → GUID identity of the entity type · [SourceSystemIdentifier] → source-side ID for the mapping · [EntityProperty] → field tracked for change detection · [DuplicationKey] → matches a new record to an existing one during dedup" },
+        { "id": "b", "text": "[EntityType] → GUID identity · [SourceSystemIdentifier] → matches a new record during dedup · [EntityProperty] → tracked for change detection · [DuplicationKey] → source-side ID for the mapping" },
+        { "id": "c", "text": "[EntityType] → field tracked for change detection · [SourceSystemIdentifier] → source-side ID · [EntityProperty] → GUID identity · [DuplicationKey] → dedup matching" },
+        { "id": "d", "text": "[EntityType] → GUID identity · [SourceSystemIdentifier] → tracked for change detection · [EntityProperty] → source-side ID for the mapping · [DuplicationKey] → dedup matching" }
       ],
-      "correct": ["a:3", "b:1", "c:4", "d:2"],
-      "explanation": "[EntityProperty]=change tracking, [SourceSystemIdentifier]=source-side ID, [DuplicationKey]=dedup matching, [EntityType]=GUID identity.",
+      "correct": ["a"],
+      "explanation": "[EntityType] = GUID identity, [SourceSystemIdentifier] = source-side ID for the mapping, [EntityProperty] = tracked for change detection, [DuplicationKey] = dedup matching.",
+      "misconceptions": {
+        "b": "This swaps the two most-confused attributes: [SourceSystemIdentifier] marks the source-side ID for the mapping, while [DuplicationKey] is the dedup key.",
+        "d": "[SourceSystemIdentifier] is the source-side ID; [EntityProperty] is the change-tracking marker — they're swapped here."
+      },
       "source": "README.md#55-anatomy-of-an-entity-poco"
     },
     {

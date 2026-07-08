@@ -139,6 +139,16 @@
           "itemPoolId": "L1.12.items",
           "masteryThreshold": 0.8,
           "remediationAngle": "The appsettings threshold settings; frame as 'guardrails against a bad snapshot'."
+        },
+        {
+          "id": "L1.13",
+          "name": "Multi-source entities (several systems of record)",
+          "objective": "One destination entity type can have multiple source systems of record, declared with [SharedSourceSystemIdentifiers(...)]. Each source gets its own mapping to the shared destination record, so sources converge (via mapping + dedup) instead of duplicating. Co-ownership spans rows and columns: a source can be authoritative for a portion of the records (e.g. JSON provides Contract Staff HR lacks) and/or contribute a subset of the columns (e.g. PowerSchool the government school code, JSON the SiteUrlSuffix). SharedSourceSystemIdentifiers lets the sources converge on one record; how their columns merge is governed by the nullable-ignore default and ForceNullPropagation (L0.E2).",
+          "prereqs": ["L1.2", "L1.6", "L1.11"],
+          "sources": ["README.md#4-key-features-worth-knowing", "Sync-SRC-DDH SchoolObjectModel/School.cs"],
+          "itemPoolId": "L1.13.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Anchor on School.cs: [SharedSourceSystemIdentifiers] lists HR, JSON, and PowerSchool. Each source's ID gets its own mapping to the one School record; dedup converges them. Co-ownership is by row (a source owns a portion of the set, e.g. JSON owns Contract Staff HR lacks) AND by column (each source augments the record with the attributes it owns — PowerSchool the government school code, JSON the SiteUrlSuffix); the column merge relies on the nullable-ignore default + ForceNullPropagation (L0.E2)."
         }
       ]
     },
@@ -151,6 +161,34 @@
       "gatesLevel": "L2",
       "sourcingRule": "link external for the generic skill; author only the Synnduit-application slice",
       "concepts": [
+        {
+          "id": "L0.O1",
+          "name": "Interfaces & implementation",
+          "genericObjective": "An interface is a contract; implementing it means supplying every member.",
+          "synnduitObjective": "ISink<T> / IFeed<T> are the contracts your connectors fulfill.",
+          "prereqs": [],
+          "externalSource": "Microsoft Learn - interfaces",
+          "authoredSource": "ISink<T> member list mapped to a real sink",
+          "itemPoolId": "L0.O1.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": false,
+          "remediationAngle": "MS Learn interfaces -> show ISink<T>'s members mapped to a real sink's methods."
+        },
+        {
+          "id": "L0.O2",
+          "name": "Attributes (declarative metadata)",
+          "genericObjective": "[Attribute] annotations attach metadata read by tooling/frameworks at runtime.",
+          "synnduitObjective": "The POCO contract is attributes: [EntityType], [EntityProperty], [SourceSystemIdentifier], [DuplicationKey].",
+          "prereqs": [],
+          "externalSource": "Microsoft Learn - attributes",
+          "authoredSource": "Staff.cs; TeamSiteWebPart.cs",
+          "itemPoolId": "L0.O2.items",
+          "skipOnPass": true,
+          "masteryThreshold": 0.8,
+          "synnduitCritical": false,
+          "remediationAngle": "MS Learn attributes -> annotate a real POCO attribute-by-attribute (ties into L1.9)."
+        },
         {
           "id": "L0.G1",
           "name": "Using generic types",
@@ -209,34 +247,6 @@
           "remediationAngle": "Flag even for strong DI devs (they know Microsoft.Extensions.DI, not MEF). Author 'the DI you know vs the MEF Synnduit uses', then annotate a real [Export]/[ImportingConstructor] pair."
         },
         {
-          "id": "L0.O1",
-          "name": "Interfaces & implementation",
-          "genericObjective": "An interface is a contract; implementing it means supplying every member.",
-          "synnduitObjective": "ISink<T> / IFeed<T> are the contracts your connectors fulfill.",
-          "prereqs": [],
-          "externalSource": "Microsoft Learn - interfaces",
-          "authoredSource": "ISink<T> member list mapped to a real sink",
-          "itemPoolId": "L0.O1.items",
-          "skipOnPass": true,
-          "masteryThreshold": 0.8,
-          "synnduitCritical": false,
-          "remediationAngle": "MS Learn interfaces -> show ISink<T>'s members mapped to a real sink's methods."
-        },
-        {
-          "id": "L0.O2",
-          "name": "Attributes (declarative metadata)",
-          "genericObjective": "[Attribute] annotations attach metadata read by tooling/frameworks at runtime.",
-          "synnduitObjective": "The POCO contract is attributes: [EntityType], [EntityProperty], [SourceSystemIdentifier], [DuplicationKey].",
-          "prereqs": [],
-          "externalSource": "Microsoft Learn - attributes",
-          "authoredSource": "Staff.cs; TeamSiteWebPart.cs",
-          "itemPoolId": "L0.O2.items",
-          "skipOnPass": true,
-          "masteryThreshold": 0.8,
-          "synnduitCritical": false,
-          "remediationAngle": "MS Learn attributes -> annotate a real POCO attribute-by-attribute (ties into L1.9)."
-        },
-        {
           "id": "L0.E1",
           "name": "Querying a source with EF",
           "genericObjective": "DbContext, LINQ-to-Entities (.Where().Select()), and deferred execution (runs on enumeration, not when written).",
@@ -288,12 +298,12 @@
         {
           "id": "L2.2",
           "name": "Implement a Feed",
-          "objective": "Write a source connector: [Feed(SourceSystem = typeof(...))] class XFeed : IFeed<X> whose LoadEntities() opens a DbContext, queries with LINQ, projects rows into POCOs, and returns a materialized snapshot (.ToList()).",
-          "prereqs": ["L2.1", "L0.G2", "L0.E1"],
-          "sources": ["README.md#5.6", "Sync-SRC-DDH StaffFeed.cs"],
+          "objective": "Write a source connector: [Feed(SourceSystem = typeof(...))] class XFeed : IFeed<X> whose LoadEntities() reads the source (a SQL DB via EF, an API/provider, or a file) and returns a materialized snapshot of POCOs. The DbContext/.ToList() handling is specific to EF sources, not universal.",
+          "prereqs": ["L2.1", "L0.G2"],
+          "sources": ["README.md#5.6", "Sync-SRC-DDH StaffFeed.cs", "Sync-SRC-DDH PowerSchool/Feeds/CalendarCategoryFeed.cs", "Sync-SRC-DDH Json/Feeds/JsonFeed.cs"],
           "itemPoolId": "L2.2.items",
           "masteryThreshold": 0.8,
-          "remediationAngle": "Walk StaffFeed.cs: the [Feed] attribute, IFeed<Staff>, and LoadEntities() returning .ToList() of projected Staff POCOs."
+          "remediationAngle": "Walk StaffFeed.cs (an EF source): the [Feed] attribute, IFeed<Staff>, and LoadEntities() returning a materialized snapshot; note that API/file feeds (CalendarCategoryFeed, JsonFeed) use the same contract without the DbContext/.ToList() step. L0.E1 (EF querying) is recommended only when the source is EF-backed."
         },
         {
           "id": "L2.3",
@@ -334,6 +344,26 @@
           "itemPoolId": "L2.6.items",
           "masteryThreshold": 0.8,
           "remediationAngle": "The appsettings.json Segment list: place the new Migration after its parents and the GarbageCollection before them (reverse order)."
+        },
+        {
+          "id": "L2.7",
+          "name": "Customizing the engine with pluggable operations",
+          "objective": "Beyond feeds and sinks, engine behavior is extensible through discovered operation classes: implement an interface + annotate the class + MEF discovers it (services injected via [ImportingConstructor]). Implement a [PreprocessorOperation] (IPreprocessorOperation<T> - transform an entity before sync, or Reject() it) and a [DuplicationRule] (IDuplicationRule<T> - custom duplicate matching returning Duplicates with a MatchWeight), and recognize the rest of the family: [Homogenizer] (value normalization) and [EventReceiver] (engine event hooks).",
+          "prereqs": ["L2.5", "L1.11", "L1.10"],
+          "sources": ["Sync-DDH-SPO Preprocessing/TeamSiteCalendarEventCategoryResolver.cs", "Sync-DDH-SPO Deduplication/TeamSiteDuplicationRule.cs"],
+          "itemPoolId": "L2.7.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Same MEF pattern as feeds/sinks: implement the operation interface, annotate the class, let MEF discover it. Anchor on the two real Sync-DDH-SPO parts - a preprocessor that resolves values and Reject()s (ties to L1.10's Rejected outcome), and a duplication rule that matches by an API lookup instead of a [DuplicationKey] (ties to L1.11)."
+        },
+        {
+          "id": "L2.8",
+          "name": "Configuring garbage collection and orphan-mapping behavior",
+          "objective": "Cleanup is configurable via annotation parameters. GarbageCollectionBehavior (set on [EntityType] or [ExternalSystem]) controls which unreferenced destination entities GC deletes: DeleteCreated (only ones this system instance created; the default), DeleteMapped (any with a mapping), DeleteAll (every unreferenced entity). OrphanMappingBehavior (set on [SourceSystemParameters]/[Feed]/[EntityType]/[ExternalSystem]) controls the disposition of a mapping whose source entity is gone: None (default; leave active), Deactivate, Remove. A more specific level overrides the broader default.",
+          "prereqs": ["L1.7", "L1.12", "L2.1"],
+          "sources": ["Sync-DDH-SPO TeamSiteAssetPrincipalPermission.cs", "Sync-SRC-DDH SchoolObjectModel/SchoolObjectModel.cs"],
+          "itemPoolId": "L2.8.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Two independent cleanup knobs: GarbageCollectionBehavior = which unreferenced destination records GC deletes (DeleteCreated/DeleteMapped/DeleteAll, default DeleteCreated); OrphanMappingBehavior = what happens to a mapping whose source is gone (None/Deactivate/Remove, default None). Map each value to how safe/aggressive it is, and to the real examples (TeamSiteAssetPrincipalPermission = DeleteAll on the entity type; SchoolObjectModel = DeleteMapped + orphan Remove on the external/source system)."
         }
       ]
     },
@@ -404,6 +434,16 @@
           "itemPoolId": "L3.6.items",
           "masteryThreshold": 0.8,
           "remediationAngle": "The dashboard sits on top of StarBridge's Console views; if an older DB lacks them, the dashboard's setup scripts create them first."
+        },
+        {
+          "id": "L3.7",
+          "name": "Splitting into multiple StarBridge databases",
+          "objective": "The ideal is one StarBridge database and one program managing every entity, but one database often spans multiple sources and destinations. Split into multiple StarBridge databases when a concrete driver justifies it: concurrency (only one process may run per database, to prevent corruption, so parallel runs need separate databases) or data freshness (sources on different cadences run on independent schedules), plus isolation and independent evolution - weighed against the added operational cost.",
+          "prereqs": ["L1.5", "L1.12", "L3.1"],
+          "sources": ["README.md#3-vocabulary-youll-hear-every-day", "README.md#4-key-features-worth-knowing", "CSSD operational practice - StarBridge one-process-per-DB rule (see L1.5)"],
+          "itemPoolId": "L3.7.items",
+          "masteryThreshold": 0.8,
+          "remediationAngle": "Start from L1.5's one-process-per-StarBridge-DB rule: concurrency comes from separate databases, never parallel processes on one. Frame splitting as a deliberate tradeoff - concurrency/freshness/isolation vs more databases and schedules to run and monitor."
         }
       ]
     }

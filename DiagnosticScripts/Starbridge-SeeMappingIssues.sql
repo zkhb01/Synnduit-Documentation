@@ -1,4 +1,9 @@
  
+-- If a synnduit run has this exception:
+--  Synnduit.SynnduitException - An item with the same key has already been added
+--  can stem from having more than on process running against the same Synnduit database at the same time.
+--  See Starbridge-CorruptionCheck.sql as well
+--
 SELECT [EntityTypeId], [SourceSystemId], [SourceSystemEntityId], COUNT(*)
   FROM [dbo].[EntityMapping]
   WHERE [State] <> 3

@@ -1,7 +1,8 @@
 -- use this query to this exception:
 --   Synnduit.SynnduitException - An item with the same key has already been added
---   If rows show you have 2 options.
---   1.	Restore the most recent backup. As you restore, Check backup but restoring locally and running the same query to confirm 0 rows returned. 
+--     can stem from having more than on process running against the same Synnduit database at the same time.
+--   If rows show, you have 2 options.
+--   1.	Restore the most recent Starbridge DB backup. As you restore, Check backup by restoring locally and running this same query to confirm 0 rows returned. 
 --   2.	Try using the Clean script to deactivate the duplicate rows (less desirable, potential loss of history)
  
 

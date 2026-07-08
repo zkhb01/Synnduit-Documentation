@@ -27,7 +27,7 @@
       "type": "mc",
       "difficulty": "apply",
       "scoring": "auto",
-      "stem": "Why does `LoadEntities()` end its query with `.ToList()`?",
+      "stem": "In an EF-backed feed, why does `LoadEntities()` end its query with `.ToList()`?",
       "options": [
         { "id": "a", "text": "To sort the rows" },
         { "id": "b", "text": "To materialize the query (run the SQL) while the DbContext is still open and return a concrete snapshot" },
@@ -35,7 +35,7 @@
         { "id": "d", "text": "It has no effect and is optional" }
       ],
       "correct": ["b"],
-      "explanation": "EF defers execution; .ToList() forces it now, so the SQL runs before the using block disposes the context.",
+      "explanation": "EF defers execution; .ToList() forces it now, so the SQL runs before the using block disposes the context. (This applies to EF/DbContext sources; an API or file feed already holds concrete data.)",
       "misconceptions": {
         "d": "Without materializing, enumeration could happen after the context is disposed — a runtime error."
       },
@@ -46,16 +46,16 @@
       "type": "scenario",
       "difficulty": "synthesis",
       "scoring": "model",
-      "stem": "Sketch a `CourseFeed` that feeds `Course` from a source you query with EF. Include the [Feed] attribute, the interface, and a LoadEntities() that opens a context, projects rows into Course, and materializes.",
+      "stem": "Sketch a `CourseFeed` that feeds `Course` from a SQL database queried with EF. Include the [Feed] attribute, the interface, and a LoadEntities() that opens a context, projects rows into Course, and materializes.",
       "rubric": [
         "[Feed(SourceSystem = typeof(<SomeSource>))] on the class",
         "class CourseFeed : IFeed<Course>",
         "LoadEntities() returns IEntityCollection<Course>",
         "Opens/uses a DbContext and queries it (e.g. .Where/.Select)",
         "Projects rows into new Course { ... } POCOs",
-        "Materializes the query with .ToList()"
+        "Materializes the query with .ToList() (because the source is EF-backed)"
       ],
-      "sampleAnswer": "[Feed(SourceSystem = typeof(PowerSchool.PowerSchool))]\npublic class CourseFeed : IFeed<Course>\n{\n    private readonly PsFactory factory;\n    public CourseFeed(PsFactory factory) => this.factory = factory;\n\n    public IEntityCollection<Course> LoadEntities()\n    {\n        using var ctx = this.factory.CreatePs();\n        return ctx.Courses\n            .Select(c => new Course { Code = c.Id, CourseNumber = c.Number, Title = c.Name })\n            .ToList();\n    }\n}",
+      "sampleAnswer": "[Feed(SourceSystem = typeof(StudentInformationSystem))]\npublic class CourseFeed : IFeed<Course>\n{\n    private readonly SisFactory factory;\n    public CourseFeed(SisFactory factory) => this.factory = factory;\n\n    public IEntityCollection<Course> LoadEntities()\n    {\n        using var ctx = this.factory.CreateContext();\n        return ctx.Courses\n            .Select(c => new Course { Code = c.Id, CourseNumber = c.Number, Title = c.Name })\n            .ToList();\n    }\n}",
       "source": "Sync-SRC-DDH StaffFeed.cs"
     },
     {
@@ -89,6 +89,27 @@
       ],
       "sampleAnswer": "Because LINQ-to-Entities defers execution, the query tries to run when the caller enumerates it — but by then the using block has disposed the context, so it throws. Materializing with .ToList() before returning fixes it.",
       "source": "Sync-SRC-DDH StaffFeed.cs"
+    },
+    {
+      "id": "L2.2.q6",
+      "type": "mc",
+      "difficulty": "apply",
+      "scoring": "auto",
+      "stem": "A feed reads its data from the PowerSchool API through an injected provider (not a database). Does its LoadEntities() need the `.ToList()` / open-DbContext handling from the EF example?",
+      "options": [
+        { "id": "a", "text": "No — that concern is specific to EF/DbContext sources; an API/provider (or file) feed already has concrete data, so you just project and return (e.g. .ToEntityCollection())" },
+        { "id": "b", "text": "Yes — every feed must call .ToList() or it will crash" },
+        { "id": "c", "text": "Yes — feeds only work against SQL databases" },
+        { "id": "d", "text": "No — API feeds can't return a snapshot, so they skip LoadEntities()" }
+      ],
+      "correct": ["a"],
+      "explanation": "The feed contract is the same for any source — return a full materialized snapshot of POCOs — but the EF deferred-execution/.ToList() gotcha only applies when the source is a DbContext. An API/provider feed (like the PowerSchool CalendarCategoryFeed) or a JSON file feed already holds concrete data; it just projects and returns.",
+      "misconceptions": {
+        "b": "The .ToList() step is EF-specific, not a universal feed rule.",
+        "c": "Feeds back onto any source — SQL, an API, or a file — via the same IFeed<X> contract.",
+        "d": "Every feed implements LoadEntities(); an API feed returns its snapshot from the provider's results."
+      },
+      "source": "Sync-SRC-DDH PowerSchool/Feeds/CalendarCategoryFeed.cs"
     }
   ]
 }
