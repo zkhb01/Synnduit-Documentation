@@ -16,4 +16,9 @@ SynnduitTutor/App_Data/
 *.db-wal
 **/run.
 .idea/*
-/SynnduitTutor/SynnduitTutor.csproj.user
+
+# User-specific IDE + publish state (VS default) — never commit
+*.user
+
+# Local folder-publish profiles (machine-specific convenience; deploy is a copy step)
+**/PublishProfiles/

@@ -13,4 +13,21 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
   </ItemGroup>
 
+  <!--
+    Curriculum content lives outside the project (sibling folders) and is loaded at runtime by
+    CurriculumStore. Link both courses' content in as publish-only items so a file publish carries
+    Curriculum/ and Curriculum-SDM/ into the output root; the app then resolves the "Curriculum" and
+    "Curriculum-SDM" folder names against the content root with no config change. CopyToPublishDirectory
+    (not CopyToOutputDirectory) keeps these out of the dev bin/ — local runs still walk up to the source
+    folders. Only concept-graph.json / items/*.json / lessons/*.md ship (the .py extractor stays out).
+  -->
+  <ItemGroup>
+    <Content Include="..\Curriculum\**\*.json;..\Curriculum\**\*.md"
+             Link="Curriculum\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="Never" />
+    <Content Include="..\Curriculum-SDM\**\*.json;..\Curriculum-SDM\**\*.md"
+             Link="Curriculum-SDM\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToPublishDirectory="PreserveNewest" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
 </Project>

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using SynnduitTutor.Components;
 using SynnduitTutor.Data;
@@ -73,6 +74,20 @@ using (var scope = app.Services.CreateScope())
         _ = catalog.GetStore(course.Id)!.Graph;
 }
 
+// Behind the F5 BIG-IP that terminates TLS and forwards to IIS over plain HTTP (pool …_8081),
+// so the app sees Request.Scheme == "http" for requests that were HTTPS at the browser. Honor the
+// proxy's X-Forwarded-Proto/-For so the app knows the original scheme; otherwise UseHttpsRedirection
+// below would 302 every forwarded request back to HTTPS and loop forever. Must run first.
+// KnownNetworks/Proxies are cleared because IIS is only reachable via the trusted F5 on the internal
+// network (the F5 is the single ingress), so we accept its forwarded headers unconditionally.
+var forwardedHeaderOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
+};
+forwardedHeaderOptions.KnownNetworks.Clear();
+forwardedHeaderOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeaderOptions);
+
 // Hosting under a sub-path (e.g. behind SDM's IIS site at "/Tutor"). Set Hosting:PathBase to "/Tutor"
 // in production; leave empty to serve at the site root (local dev). The <base href> in App.razor reads
 // the same value so in-app (base-relative) links resolve correctly under the prefix.
@@ -86,7 +101,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// No app-level HTTPS redirect: the F5 BIG-IP terminates TLS and is the single HTTPS-enforcing ingress,
+// then forwards to IIS over HTTP (:8081). Redirecting here re-sends every forwarded request to HTTPS,
+// which the F5 forwards back as HTTP — an infinite loop. TLS is enforced at the proxy; scheme-awareness
+// for link generation comes from UseForwardedHeaders above. (UseHsts still advertises HTTPS to browsers.)
 app.UseEntraAuth();   // no-op unless AzureAd is configured
 app.UseAntiforgery();
 
