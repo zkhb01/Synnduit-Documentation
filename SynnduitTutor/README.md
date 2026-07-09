@@ -31,6 +31,58 @@ dotnet test SynnduitTutor.Tests
 Covers scoring (mc/multi/order/model), gating (prereq locking, placement-skip, level gates),
 and mastery (mastery on pass, L0 first-attempt skip-on-pass, escalation after repeated fails).
 
+## Deploy (on-prem IIS)
+
+One app serves **both** courses — `synnduit` (`Curriculum/`) and `sdm` (`Curriculum-SDM/`), configured in
+the `Courses` array. The intended topology is co-hosting under the existing SDM site at **`/Tutor`**: SDM's
+`Training:TutorBaseUrl` is `/Tutor` in prod and its Training menu links each course as `/Tutor/<courseId>`.
+
+The `.csproj` links both curriculum folders in as **publish content** (`CopyToPublishDirectory`), so a file
+publish carries `Curriculum/` and `Curriculum-SDM/` into the output root; the app resolves those folder names
+against the content root with no path config. (Local `dotnet run` is unaffected — the content only copies on
+publish, and dev still walks up to the source folders.)
+
+**Server prerequisites (one-time):**
+
+1. Install the **.NET 9 Hosting Bundle** (ASP.NET Core Module v2 + runtime), then `iisreset`.
+2. Enable the **WebSocket Protocol** IIS feature — Blazor Server's circuit needs it (else it degrades to long-polling).
+
+**Each deploy:**
+
+1. Publish `SynnduitTutor` in **Release** (your usual VS file-publish profile). Both `Curriculum/` and
+   `Curriculum-SDM/` appear in the publish folder automatically.
+2. In the published `appsettings.json`, set the sub-path so in-app links resolve under the prefix:
+   ```jsonc
+   "Hosting": { "PathBase": "/Tutor" }
+   ```
+   Leave the `Courses` paths as the folder names (`Curriculum` / `Curriculum-SDM`) — they resolve at the
+   publish root. Keep `Anthropic:ApiKey` and `AzureAd` empty here; supply them via env vars / user-secrets
+   to enable live remediation / Entra SSO (the app falls back to stubs without them).
+3. Copy the publish folder to the server and register it as an **IIS Application** named `Tutor` **under the
+   SDM site**, with an app pool set to **No Managed Code**. `PathBase`, the IIS alias, and SDM's
+   `TutorBaseUrl` must all agree on `/Tutor`.
+
+   **IIS launches the app for you** via the `web.config` (ASP.NET Core Module) that publish drops in the
+   folder — you do **not** run it yourself. `dotnet run` is for source only and won't work against publish
+   output; the published entry point is the assembly `SynnduitTutor.dll` (the folder is named `Tutor`, the
+   assembly isn't). To boot-check a copied publish folder from the console before wiring up IIS:
+   ```powershell
+   cd <publish-folder>
+   dotnet .\SynnduitTutor.dll   # look for "Loaded 2 training course(s): synnduit, sdm"; Ctrl+C to stop
+   ```
+   A `307` redirect to https on that console run is expected (`UseHttpsRedirection`) — it means the app booted.
+4. Grant the app pool identity (e.g. `IIS AppPool\Tutor`) **Modify** on `App_Data/` — the SQLite mastery
+   store (`tutor.db`) is created and written there at runtime.
+
+**Redeploys:** overwrite the app folder, but do **not** enable "remove additional files at destination" in the
+publish profile — that would wipe `App_Data/tutor.db`. Content re-ships on every publish; the DB persists.
+
+Verify by browsing `https://<sdm-host>/Tutor/synnduit` and `/Tutor/sdm` directly (both should load their concept
+maps), then via the SDM **Training** menu — each course opens with the signed-in user preloaded (`?name=&id=`).
+
+To host it as its **own** IIS site instead (own hostname), set `PathBase` to `""` and point SDM's
+`Training:TutorBaseUrl` at the absolute origin.
+
 ## Architecture
 
 | Piece | Responsibility |
