@@ -16,3 +16,4 @@ SynnduitTutor/App_Data/
 *.db-wal
 **/run.
 .idea/*
+/SynnduitTutor/SynnduitTutor.csproj.user
