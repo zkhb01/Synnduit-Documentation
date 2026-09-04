@@ -37,7 +37,7 @@
         { "id": "d", "text": "Read, Write, and Delete" }
       ],
       "correct": ["a"],
-      "explanation": "SDM has Department, School, and Functional-Site Data Owners — AAD-backed groups granting editing rights over their area.",
+      "explanation": "SDM has Department, School, and Functional-Site Data Owners — AAD-backed groups granting editing rights over their area. Each identifies the delegate that the area's owner (manager / principal / owner) delegates their data-owner privileges to, to maintain that area's data on their behalf.",
       "misconceptions": {
         "b": "Those are generic role names, not SDM's data-owner families.",
         "c": "Those are other entities, not the data-owner families.",
@@ -92,13 +92,14 @@
       "type": "scenario",
       "difficulty": "synthesis",
       "scoring": "model",
-      "stem": "A colleague reports: \"The School Data Owner for School 001 is wrong, and a standalone group's membership is also off.\" Using SDM's entity map, where do these two issues live, and what do they have in common?",
+      "stem": "A colleague reports: \"The School Data Owner for School 001 is wrong, and a standalone group's membership is also off.\" Using SDM's entity map, where do these two issues live, who is actually responsible for the School Data Owner assignment, and what do the two issues have in common?",
       "rubric": [
         "Places both under the Access bucket: School Data Owner is one of the three Data-Owner families; the standalone group is a Standalone Group membership list",
-        "Notes they are different mechanisms (group-backed role vs. hand-maintained list)",
-        "Notes the edits are made in SDM and written to DDH with audit"
+        "Explains that a Data Owner is a delegate: the person who owns the area — the principal (School), manager (Department), or owner (Functional Site) — delegates their data-owner privileges to someone under them to maintain that area's data on their behalf, so 'the School Data Owner is wrong' means the wrong delegate is assigned, and the owner (the principal) corrects it by reassigning",
+        "Notes they are different mechanisms (a delegated Data-Owner role vs. a hand-maintained standalone list)",
+        "Notes the edits are made in SDM and written to DDH with CreatedBy/UpdatedBy audit"
       ],
-      "sampleAnswer": "Both are access concerns. The School Data Owner is one of SDM's three Data-Owner families (an AAD-backed role), while the standalone group's membership is a hand-maintained Standalone Group list — different mechanisms, but both about who can do what. You'd correct each in its SDM area, and the edits write to DDH with CreatedBy/UpdatedBy audit.",
+      "sampleAnswer": "Both are access concerns. A School Data Owner is a delegate: the principal who owns School 001 delegates their data-owner privileges to someone under them to keep that school's supplemental data current on their behalf (Department = manager, Functional Site = owner work the same way). So \"the School Data Owner for School 001 is wrong\" means the wrong person is assigned as that delegate — the owner (the principal) fixes it by reassigning on the School Data Owners page. The standalone group's membership is a separate, hand-maintained Standalone Group list. Different mechanisms — a delegated Data-Owner role vs. a static membership list — but both are about who can maintain what, and both edits write to DDH with CreatedBy/UpdatedBy audit.",
       "source": "SupplementalDataManagerClient/README.md#routes"
     },
     {

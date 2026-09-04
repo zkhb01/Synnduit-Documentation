@@ -9,7 +9,7 @@
 > Source material: this repo's `README.md`, `Documentation/`, `DiagnosticScripts/`,
 > `ExceptionHistoryWithResolutions/`, plus `Synnduit-Database` (StarBridge schema),
 > `SynnduitDashboard`, the Synnduit engine source, and the CSSD example repos.
-
+ TODO - Add the task for supporters to save synnduit exceptions. ExceptionHistoryWithResolutions should be evergreend by adding new exception and their eventual resolution into this folder
 ---
 
 ## 1. How to use this doc

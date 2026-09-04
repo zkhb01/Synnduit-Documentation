@@ -43,12 +43,12 @@
         {
           "id": "S1.3",
           "name": "Authorization via AAD groups",
-          "objective": "Explain that SDM authorizes by reading Entra (AAD) DA-* group claims on the OIDC token (a 403 = a missing group), and that those group memberships can be managed in SDM via the Standalone Group menu (e.g. Help-Desk temporary access), taking effect at the user's next sign-in.",
+          "objective": "Explain that SDM authorizes in two layers: the menu options are made available from the user's Entra (AAD) DA-* group claims on the OIDC token (a 403 = a missing group), and the data on the screens is then filtered by the Permission tables in DDH's 'Security' schema (the full RACI-applied access). DA-* group memberships can be managed in SDM via the Standalone Group menu (e.g. Help-Desk temporary access), taking effect at the user's next sign-in.",
           "prereqs": ["S1.2"],
           "sources": ["README.md#authentication", "README.md#configuration", "README.md#purpose--business-context"],
           "itemPoolId": "S1.3.items",
           "masteryThreshold": 0.8,
-          "remediationAngle": "Trace one sign-in (Entra OIDC -> DA-* claims -> menu + API check -> 200/403); then the other direction: those DA-* memberships are managed in SDM via Standalone Groups (Help-Desk temp access), reaching the user at next sign-in."
+          "remediationAngle": "Two layers: (1) menu from DA-* claims — trace one sign-in (Entra OIDC -> DA-* claims -> menu + API check -> 200/403), and note those memberships are managed in SDM via Standalone Groups (Help-Desk temp access), reaching the user at next sign-in; (2) screen data filtered by the Permission tables in DDH's 'Security' schema (RACI) — so an accessible screen with thin/absent data is this layer, not a missing group."
         },
         {
           "id": "S1.4",
